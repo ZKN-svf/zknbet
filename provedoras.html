@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Provedoras</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">🏆 Provedoras parceiras</h2>
+      <span id="count" style="color:var(--text-muted);font-size:14px;font-weight:600;"></span>
+    </div>
+
+    <div class="providers-strip" id="grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));">
+      <div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Carregando...</div>
+    </div>
+  </section>
+
+  <footer class="zkn-footer">
+    <div class="zkn-footer-inner">
+      <p><strong>ZKNbet</strong> © 2026 · Todos os direitos reservados</p>
+      <p class="disclaimer">Proibido para menores de 18 anos. Jogue com responsabilidade.</p>
+    </div>
+  </footer>
+
+  <script src="assets/app.js"></script>
+  <script src="assets/nitrogames.js"></script>
+  <script>
+    async function iniciar() {
+      const provs = await NitroGames.listarProvedores();
+      if (!provs.sucesso) {
+        document.getElementById('grid').innerHTML =
+          `<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">${provs.mensagem || 'Erro.'}</div>`;
+        return;
+      }
+      document.getElementById('count').textContent = `${provs.provedores.length} provedoras`;
+      document.getElementById('grid').innerHTML = provs.provedores.map(p => `
+        <div class="provider-chip" onclick="location.href='jogos.html'" style="padding:28px 20px;">
+          <div style="font-size:32px;margin-bottom:8px;">🎰</div>
+          <div style="font-size:15px;margin-bottom:4px;">${p.name}</div>
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;">${p.games_count} jogos</div>
+        </div>
+      `).join('');
+    }
+    iniciar();
+  </script>
+</body>
+</html>

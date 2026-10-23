@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Minha Conta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+
+  <div class="auth-wrap" style="max-width:600px;">
+    <div class="card auth-card">
+      <h1>👤 Minha Conta</h1>
+      <p class="subtitle">Gerencie seus dados e segurança.</p>
+
+      <div id="userInfo" style="margin:24px 0;"></div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button class="btn-secondary btn-block" onclick="location.href='alterar-dados.html'">✏️ Alterar dados</button>
+        <button class="btn-secondary btn-block" onclick="location.href='alterar-senha.html'">🔒 Alterar senha</button>
+        <button class="btn-secondary btn-block" onclick="location.href='historico.html'">📜 Histórico de transações</button>
+        <button class="btn-secondary btn-block" onclick="location.href='saque-primeiro-acesso.html'">🔑 Configurar dados de saque</button>
+        <button class="btn-secondary btn-block" onclick="location.href='indicacao.html'">🤝 Programa de indicação</button>
+      </div>
+
+      <button class="btn-primary btn-block" style="background:var(--red);color:#fff;margin-top:24px;" onclick="sair()">Sair da conta</button>
+    </div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    if (!ZKNAuth.requireLogin('minha-conta.html')) throw new Error('redirecionado');
+
+    async function carregar() {
+      const saldo = await ZKNAuth.getSaldo();
+      const user = ZKNAuth.getUser();
+      document.getElementById('userInfo').innerHTML = `
+        <div style="display:flex;align-items:center;gap:16px;padding:20px;background:var(--bg-3);border-radius:var(--radius);border:1px solid var(--border);">
+          <div class="drawer-avatar" style="width:56px;height:56px;font-size:20px;">${ZKN.gerarIniciais(user.name)}</div>
+          <div style="min-width:0;">
+            <div style="font-weight:800;font-size:18px;margin-bottom:2px;">${user.name}</div>
+            <div style="color:var(--text-muted);font-size:14px;">${user.phone}</div>
+            <div style="color:var(--text-muted);font-size:12px;">${user.email || ""}</div>
+            <div style="color:var(--gold);font-size:12px;font-weight:700;margin-top:4px;">Código: ${user.refCode}</div>
+          </div>
+        </div>
+        <div class="saldo-info" style="margin-top:16px;">
+          <span class="label">Saldo atual</span>
+          <span class="val">${ZKN.formatBRL(saldo)}</span>
+        </div>
+      `;
+    }
+    function sair() {
+      if (confirm('Deseja sair da conta?')) ZKNAuth.logout();
+    }
+    carregar();
+  </script>
+</body>
+</html>

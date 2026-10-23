@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Saque PIX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+
+  <div class="saque-wrap">
+    <div class="saldo-info">
+      <span class="label">Saldo disponível para saque</span>
+      <span class="val" data-balance>R$ 0,00</span>
+    </div>
+
+    <div class="card" style="max-width:none;width:100%;">
+      <h1>💸 Saque via PIX</h1>
+      <p class="subtitle">Digite o valor e sua senha de 6 dígitos para confirmar.</p>
+
+      <label for="valorSaque">Valor do saque (R$)</label>
+      <input type="number" id="valorSaque" placeholder="0,00" step="0.01" min="1" style="font-size:18px;font-weight:700;">
+
+      <label for="pin">Senha de saque (6 dígitos)</label>
+      <input type="password" id="pin" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off">
+
+      <button id="btnSaque" class="btn-primary btn-block">Solicitar Saque</button>
+
+      <div class="status-box" id="statusBox"></div>
+    </div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/sigilopay.js"></script>
+  <script>
+    if (!ZKNAuth.requireLogin('saque.html')) throw new Error('redirecionado');
+
+    // Se ainda não tem PIN de saque, redireciona para configurar
+    if (!ZKNAuth.temPinSaque()) {
+      location.href = 'saque-primeiro-acesso.html';
+      throw new Error('sem pin');
+    }
+
+    // ---------- Saldo real ----------
+    ZKNAuth.getSaldo();
+
+    // ---------- Helpers ----------
+    function setStatus(tipo, msg) {
+      const box = document.getElementById('statusBox');
+      box.className = 'status-box active ' + tipo;
+      box.innerHTML = msg;
+    }
+
+    const pinEl = document.getElementById('pin');
+    pinEl.addEventListener('input', () => {
+      pinEl.value = pinEl.value.replace(/\D/g, '').slice(0, 6);
+    });
+
+    const valorEl = document.getElementById('valorSaque');
+    valorEl.addEventListener('input', () => {
+      // só limpa status anterior ao digitar de novo
+      document.getElementById('statusBox').className = 'status-box';
+    });
+
+    // ---------- Solicitar saque ----------
+    document.getElementById('btnSaque').onclick = async () => {
+      const valor = parseFloat(valorEl.value);
+      const pin = pinEl.value;
+      const saldo = ZKN.ZKN_USER.balance;
+
+      if (!valor || valor < 1) return setStatus('error', 'Valor inválido. Mínimo R$ 1,00.');
+      if (valor > saldo) {
+        return setStatus('error', `Saldo insuficiente. Você tem ${ZKN.formatBRL(saldo)}.`);
+      }
+      if (!/^\d{6}$/.test(pin)) return setStatus('error', 'Informe o PIN de 6 dígitos.');
+
+      const btn = document.getElementById('btnSaque');
+      btn.disabled = true;
+      btn.textContent = 'Verificando...';
+
+      // 1) Verifica PIN no servidor
+      const pinOk = await ZKNAuth.verificarPinSaque(pin);
+      if (!pinOk.sucesso) {
+        btn.disabled = false;
+        btn.textContent = 'Solicitar Saque';
+        return setStatus('error', pinOk.mensagem || 'PIN incorreto.');
+      }
+
+      // 2) Pede os dados de saque no servidor
+      const dados = await ZKNAuth.getDadosSaque();
+      if (!dados) {
+        btn.disabled = false;
+        btn.textContent = 'Solicitar Saque';
+        return setStatus('error', 'Chave PIX não encontrada. Refaça o cadastro de saque.');
+      }
+
+      // 3) Envia a transferência
+      btn.textContent = 'Enviando...';
+      setStatus('pending', 'Processando saque...');
+
+      const res = await SigiloPay.criarTransferencia(valor, dados.pixKey, {
+        nome: dados.holderName,
+        cpf: dados.holderCpf,
+      });
+
+      btn.disabled = false;
+      btn.textContent = 'Solicitar Saque';
+
+      if (!res.sucesso) {
+        setStatus('error', res.mensagem || 'Erro ao processar saque.');
+        ZKN.toast('Erro no saque', res.mensagem || 'Tente novamente.', 'error');
+        return;
+      }
+
+      // 4) Sucesso — atualiza saldo direto do servidor
+      setStatus(
+        'success',
+        `✅ Saque de ${ZKN.formatBRL(valor)} solicitado!<br>Status: ${res.status || 'PENDENTE'}.`
+      );
+      await ZKNAuth.getSaldo();
+      ZKN.toast('Saque solicitado!', `${ZKN.formatBRL(valor)} em processamento.`);
+
+      valorEl.value = '';
+      pinEl.value = '';
+    };
+  </script>
+</body>
+</html>
