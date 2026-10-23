@@ -49,7 +49,7 @@
       const email = emailEl ? emailEl.value.trim() : '';
       const password = passEl ? passEl.value : '';
 
-      // Validacao: precisa de phone OU email valido
+      // Validacao
       const phoneOk = phone && window.ZKNVal.validarCelular(phone);
       const emailOk = email && window.ZKNVal.validarEmail(email);
 
@@ -64,10 +64,20 @@
       btn.disabled = true;
       btn.textContent = 'Entrando...';
 
-      // Payload: prioriza email se preenchido, senao phone
-      const payload = emailOk ? { email, password } : { phone, password };
+      // PRIORIZA PHONE (se preenchido), senao usa email
+      let payload;
+      if (phoneOk) {
+        payload = { phone, password };
+        console.log('[LOGIN] Usando PHONE:', JSON.stringify(payload));
+      } else {
+        payload = { email, password };
+        console.log('[LOGIN] Usando EMAIL:', JSON.stringify(payload));
+      }
 
-      console.log('[LOGIN] payload enviado:', JSON.stringify(payload));
+      // Debug: mostra o body que sera enviado
+      const bodyStr = JSON.stringify(payload);
+      console.log('[LOGIN] Body enviado:', bodyStr);
+      console.log('[LOGIN] Body hex:', Array.from(bodyStr).map(c => c.charCodeAt(0).toString(16)).join(' '));
 
       const r = await ZKNAuth.login(payload);
 
@@ -75,11 +85,11 @@
       btn.textContent = 'Entrar';
 
       if (!r.sucesso) {
-        console.error('[LOGIN] falha:', r.mensagem);
+        console.error('[LOGIN] Falha:', r.mensagem);
         return ZKN.toast('Nao foi possivel entrar', r.mensagem || 'Verifique os dados.', 'error');
       }
 
-      console.log('[LOGIN] sucesso, user:', r.user);
+      console.log('[LOGIN] Sucesso:', r.user);
       ZKN.toast('Bem-vindo!', 'Login realizado com sucesso.');
       const back = new URLSearchParams(location.search).get('back') || 'index.html';
       setTimeout(() => location.href = back, 600);
