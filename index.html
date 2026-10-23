@@ -68,6 +68,7 @@
   <script src="assets/validators.js"></script>
   <script src="assets/auth.js"></script>
   <script src="assets/app.js"></script>
+  <script src="assets/providers-map.js"></script>
   <script src="assets/nitrogames.js"></script>
   <script src="assets/games-lib.js"></script>
   <script>
@@ -264,7 +265,7 @@
       // Carrega todos os jogos
       const res = await NitroGames.listarJogos();
       if (res.sucesso) {
-        ALL_GAMES = res.jogos || [];
+        ALL_GAMES = window.ZKNProviders ? window.ZKNProviders.aplicarProvidersReais(res.jogos || []) : (res.jogos || []);
         renderFeatured();
         renderFavoritosHome();
         renderRecentesHome();
@@ -282,7 +283,7 @@
         `).join('');
       } else {
         // Fallback: mostra o que veio dos jogos
-        const nomes = [...new Set(ALL_GAMES.map(j => j.provider_name).filter(Boolean))];
+        const nomes = window.ZKNProviders ? window.ZKNProviders.providersUnicos(ALL_GAMES) : [...new Set(ALL_GAMES.map(j => j.provider_name).filter(Boolean))];
         document.getElementById('providersStrip').innerHTML = nomes.map(n => `
           <div class="provider-chip" onclick="location.href='jogos.html'">${n}</div>
         `).join('');
