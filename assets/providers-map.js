@@ -1,8 +1,8 @@
 ﻿// ============================================================
-// ZKNbet — Mapa de providers reais
-// A NitroGames retorna provider_name="PGSOFT" para todos os jogos.
-// Este mapa corrige a exibicao sem depender do backend.
-// Para adicionar/remover: edite PROVIDER_OVERRIDES abaixo.
+// ZKNbet - Mapa de provedoras reais
+// A NitroGames retorna provider_name="PGSOFT" para todos.
+// Este mapa corrige a exibicao no frontend.
+// Para adicionar: edite PROVIDER_OVERRIDES abaixo.
 // ============================================================
 
 const PROVIDER_OVERRIDES = {
@@ -72,7 +72,7 @@ const PROVIDER_OVERRIDES = {
   "dreams of macau": "PG Soft",
   "wild bandito": "PG Soft",
 
-  // ===== REEL KINGDOM (subsidiaria da Pragmatic) =====
+  // ===== REEL KINGDOM =====
   "big bass bonanza": "Reel Kingdom",
   "big bass splash": "Reel Kingdom",
   "big bass bonanza - keeping it reel": "Reel Kingdom",
@@ -82,18 +82,17 @@ const PROVIDER_OVERRIDES = {
   "big bass secrets of the golden lake": "Reel Kingdom",
 };
 
-// Retorna o provider real do jogo (ou o que veio da API se nao estiver no mapa)
 function providerReal(jogo) {
   const nome = String(jogo.name || '').toLowerCase().trim();
-  return PROVIDER_OVERRIDES[nome] || jogo.provider_name || '';
+  const override = PROVIDER_OVERRIDES[nome];
+  if (override) return override;
+  return jogo.provider_name || '';
 }
 
-// Aplica o override em um array de jogos
 function aplicarProvidersReais(jogos) {
   return jogos.map(j => ({ ...j, provider_name: providerReal(j) }));
 }
 
-// Retorna lista unica de providers (para a secao "Provedoras parceiras")
 function providersUnicos(jogos) {
   const set = new Set();
   jogos.forEach(j => {
