@@ -41,26 +41,45 @@
     phoneEl.addEventListener('input', () => window.ZKNVal.mascaraCelular(phoneEl));
 
     document.getElementById('btnEntrar').onclick = async () => {
-      const email = document.getElementById('email').value.trim();
-      const phone = window.ZKNVal.normalizarCelular(phoneEl.value);
-      const password = document.getElementById('password').value;
+      const phoneEl = document.getElementById('phone');
+      const emailEl = document.getElementById('email');
+      const passEl = document.getElementById('password');
 
-      if (!email && !window.ZKNVal.validarCelular(phone)) return ZKN.toast('Informe celular ou e-mail', 'Preencha um dos dois.', 'error');
-      if (!window.ZKNVal.validarCelular(phone)) return ZKN.toast('Celular inválido', 'Digite DDD + 9 + 8 dígitos.', 'error');
-      if (!password || password.length < 6) return ZKN.toast('Senha muito curta', 'Mínimo de 6 caracteres.', 'error');
+      const phone = phoneEl ? window.ZKNVal.normalizarCelular(phoneEl.value) : '';
+      const email = emailEl ? emailEl.value.trim() : '';
+      const password = passEl ? passEl.value : '';
+
+      // Validacao: precisa de phone OU email valido
+      const phoneOk = phone && window.ZKNVal.validarCelular(phone);
+      const emailOk = email && window.ZKNVal.validarEmail(email);
+
+      if (!phoneOk && !emailOk) {
+        return ZKN.toast('Informe celular ou e-mail', 'Preencha um dos dois corretamente.', 'error');
+      }
+      if (!password || password.length < 6) {
+        return ZKN.toast('Senha muito curta', 'Minimo de 6 caracteres.', 'error');
+      }
 
       const btn = document.getElementById('btnEntrar');
       btn.disabled = true;
       btn.textContent = 'Entrando...';
 
-      const payload = email ? { email, password } : { phone, password };
+      // Payload: prioriza email se preenchido, senao phone
+      const payload = emailOk ? { email, password } : { phone, password };
+
+      console.log('[LOGIN] payload enviado:', JSON.stringify(payload));
+
       const r = await ZKNAuth.login(payload);
 
       btn.disabled = false;
       btn.textContent = 'Entrar';
 
-      if (!r.sucesso) return ZKN.toast('Não foi possível entrar', r.mensagem, 'error');
+      if (!r.sucesso) {
+        console.error('[LOGIN] falha:', r.mensagem);
+        return ZKN.toast('Nao foi possivel entrar', r.mensagem || 'Verifique os dados.', 'error');
+      }
 
+      console.log('[LOGIN] sucesso, user:', r.user);
       ZKN.toast('Bem-vindo!', 'Login realizado com sucesso.');
       const back = new URLSearchParams(location.search).get('back') || 'index.html';
       setTimeout(() => location.href = back, 600);
