@@ -152,15 +152,67 @@
           </div>
         `;
       }).join('');
+    }    // ==========================================================
+    // ORDEM DOS JOGOS FAMOSOS (aparecem primeiro)
+    // ==========================================================
+    const ORDEM_FAMOSOS = [
+      'Fortune Tiger',
+      'Fortune Ox',
+      'Fortune Rabbit',
+      'Fortune Mouse',
+      'Fortune Dragon',
+      'Gates of Olympus',
+      'Sweet Bonanza',
+      'Sweet Bonanza Xmas',
+      'Sugar Rush',
+      'Sugar Rush 1000',
+      'Big Bass Bonanza',
+      'Big Bass Splash',
+      'Big Bass Bonanza - Keeping it Reel',
+      'Starlight Princess',
+      'The Dog House',
+      'Wolf Gold',
+      'Wild West Gold',
+      'Ganesha Gold',
+      'Bikini Paradise',
+      'Dragon Tiger Luck',
+      'Double Fortune',
+      'Jungle Delight',
+    ];
+
+    function ordenarFamosos(lista) {
+      // Cria um map de prioridade: nome -> índice (menor = mais importante)
+      const prioridade = {};
+      ORDEM_FAMOSOS.forEach((nome, i) => { prioridade[nome.toLowerCase()] = i; });
+
+      return [...lista].sort((a, b) => {
+        const aIdx = prioridade[a.name.toLowerCase()];
+        const bIdx = prioridade[b.name.toLowerCase()];
+        // Se ambos estão na lista de famosos, ordena por prioridade
+        if (aIdx !== undefined && bIdx !== undefined) return aIdx - bIdx;
+        // Se só um está, ele vem antes
+        if (aIdx !== undefined) return -1;
+        if (bIdx !== undefined) return 1;
+        // Nenhum é famoso: ordem alfabética
+        return a.name.localeCompare(b.name);
+      });
     }
+
 
     function renderFeatured() {
       const busca = filtro.toLowerCase().trim();
-      const lista = ALL_GAMES.filter(g => {
+      let lista = ALL_GAMES.filter(g => {
         if (!busca) return true;
         const hay = (g.name + ' ' + (g.provider_name || '')).toLowerCase();
         return hay.includes(busca);
       });
+
+      // Se NAO tem busca: aplica ordem dos famosos
+      // Se TEM busca: mantem a ordem original (mais intuitivo pra busca)
+      if (!busca) {
+        lista = ordenarFamosos(lista);
+      }
+
       document.getElementById('gamesCount').textContent = lista.length + ' jogos';
       renderCards('featuredGrid', lista);
     }
