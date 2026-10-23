@@ -1,0 +1,524 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet - Painel Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    body { padding-top: 0; }
+    .admin-header {
+      background: var(--bg-1);
+      border-bottom: 1px solid var(--border-gold);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .admin-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .admin-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .admin-tab {
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .admin-tab:hover { color: var(--text); }
+    .admin-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--grad-gold);
+    }
+    .stat-card.green::before { background: var(--grad-green); }
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+    .stat-value.gold { color: var(--gold); }
+    .stat-value.green { color: var(--green); }
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-2);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .admin-table th {
+      background: var(--bg-3);
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+    .admin-table td {
+      padding: 12px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr:hover td { background: rgba(245, 190, 60, 0.03); }
+
+    .admin-input {
+      padding: 10px 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 14px;
+      width: 100%;
+      outline: none;
+      font-family: inherit;
+    }
+    .admin-input:focus { border-color: var(--gold); }
+
+    .admin-btn {
+      padding: 10px 20px;
+      background: var(--grad-gold);
+      color: #0a0f1a;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    .admin-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-gold); }
+    .admin-btn.danger { background: var(--red); color: #fff; }
+    .admin-btn.secondary { background: var(--bg-3); color: var(--text); border: 1px solid var(--border-strong); }
+
+    .login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .login-box {
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg-2);
+      border: 1px solid var(--border-gold);
+      border-radius: var(--radius-lg);
+      padding: 40px 32px;
+      box-shadow: var(--shadow-lg);
+    }
+    .login-box h1 {
+      font-family: var(--font-display);
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    .login-box p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+    .login-box label { margin-top: 14px; }
+    .login-box .admin-btn { width: 100%; margin-top: 20px; padding: 14px; font-size: 15px; }
+
+    .hidden { display: none !important; }
+    .toast-container { position: fixed; top: 84px; right: 24px; z-index: 9999; }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge.deposit { background: rgba(0, 214, 127, 0.15); color: var(--green); }
+    .badge.withdraw { background: rgba(255, 71, 87, 0.15); color: var(--red); }
+    .badge.pending { background: rgba(245, 190, 60, 0.15); color: var(--gold); }
+    .badge.completed { background: rgba(0, 214, 127, 0.15); color: var(--green); }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .stat-value { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TELA DE LOGIN -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-box">
+      <h1>ZKNbet <span style="color:var(--gold);">Admin</span></h1>
+      <p>Painel administrativo</p>
+
+      <label for="adminEmail">Email</label>
+      <input type="email" id="adminEmail" class="admin-input" placeholder="seu@email.com" autocomplete="username">
+
+      <label for="adminPassword">Senha</label>
+      <input type="password" id="adminPassword" class="admin-input" placeholder="Sua senha" autocomplete="current-password">
+
+      <button id="btnLogin" class="admin-btn">Entrar</button>
+    </div>
+  </div>
+
+  <!-- PAINEL -->
+  <div id="adminPanel" class="hidden">
+    <div class="admin-header">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-family:var(--font-display);font-weight:900;font-size:20px;">
+          <span style="color:var(--gold);">Z</span>KNbet <span style="font-size:14px;color:var(--text-muted);font-weight:600;">Admin</span>
+        </span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="adminName" style="font-size:14px;font-weight:600;"></span>
+        <button onclick="sairAdmin()" class="admin-btn secondary" style="padding:8px 14px;font-size:12px;">Sair</button>
+      </div>
+    </div>
+
+    <div class="admin-container">
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-tab="dashboard">Dashboard</button>
+        <button class="admin-tab" data-tab="users">Usuários</button>
+        <button class="admin-tab" data-tab="transactions">Transações</button>
+        <button class="admin-tab" data-tab="nitrogames">NitroGames</button>
+        <button class="admin-tab" data-tab="withdraw">Saque</button>
+        <button class="admin-tab" data-tab="audit">Auditoria</button>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div id="tab-dashboard" class="tab-content">
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card"><div class="stat-label">Usuários</div><div class="stat-value" id="statUsers">-</div><div class="stat-sub" id="statUsersHoje">-</div></div>
+          <div class="stat-card green"><div class="stat-label">Saldo total (usuários)</div><div class="stat-value green" id="statBalance">-</div></div>
+          <div class="stat-card"><div class="stat-label">Depósitos</div><div class="stat-value gold" id="statDeposits">-</div><div class="stat-sub" id="statDepositsHoje">-</div></div>
+          <div class="stat-card"><div class="stat-label">Saques</div><div class="stat-value" id="statWithdraws">-</div></div>
+          <div class="stat-card"><div class="stat-label">GGR (lucro bruto)</div><div class="stat-value gold" id="statGGR">-</div><div class="stat-sub" id="statGGRHoje">-</div></div>
+          <div class="stat-card green"><div class="stat-label">Owner Wallet (lucro)</div><div class="stat-value green" id="statOwner">-</div></div>
+        </div>
+      </div>
+
+      <!-- USUÁRIOS -->
+      <div id="tab-users" class="tab-content hidden">
+        <div style="margin-bottom:16px;display:flex;gap:8px;">
+          <input type="text" id="userSearch" class="admin-input" placeholder="Buscar por nome, email ou celular..." style="max-width:400px;">
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Nome</th><th>Email</th><th>Celular</th><th>Saldo</th><th>Ações</th></tr></thead>
+            <tbody id="usersTable"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TRANSAÇÕES -->
+      <div id="tab-transactions" class="tab-content hidden">
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Data</th><th>Usuário</th><th>Tipo</th><th>Valor</th><th>Status</th></tr></thead>
+            <tbody id="transactionsTable"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- NITROGAMES -->
+      <div id="tab-nitrogames" class="tab-content hidden">
+        <div class="stat-card" style="margin-bottom:16px;">
+          <div class="stat-label">Saldo de agente (NitroGames)</div>
+          <div class="stat-value gold" id="statNitroBalance">-</div>
+          <div class="stat-sub" style="margin-top:8px;">Este é o saldo da sua conta de agente na NitroGames. Se estiver zerado, os jogos não abrem (AGENT_WALLET_EMPTY).</div>
+        </div>
+        <button class="admin-btn secondary" onclick="carregarNitroBalance()">🔄 Atualizar saldo</button>
+      </div>
+
+      <!-- SAQUE -->
+      <div id="tab-withdraw" class="tab-content hidden">
+        <div class="stat-card" style="margin-bottom:16px;">
+          <div class="stat-label">Saldo disponível para saque (Owner Wallet)</div>
+          <div class="stat-value green" id="statOwnerBalance">-</div>
+        </div>
+        <div style="max-width:500px;">
+          <div class="form-group"><label>Valor (R$)</label><input type="number" id="wdAmount" class="admin-input" placeholder="0,00" step="0.01" min="1"></div>
+          <div class="form-group"><label>Chave PIX</label><input type="text" id="wdPixKey" class="admin-input" placeholder="CPF, celular, email..."></div>
+          <div class="form-group"><label>Tipo da chave</label>
+            <select id="wdPixType" class="admin-input">
+              <option value="cpf">CPF</option><option value="cnpj">CNPJ</option><option value="email">Email</option><option value="phone">Celular</option><option value="random">Aleatória</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Nome do titular</label><input type="text" id="wdHolderName" class="admin-input" placeholder="Nome completo"></div>
+          <div class="form-group"><label>CPF/CNPJ do titular</label><input type="text" id="wdHolderDoc" class="admin-input" placeholder="000.000.000-00"></div>
+          <button class="admin-btn" onclick="solicitarSaque()">💸 Solicitar saque</button>
+        </div>
+      </div>
+
+      <!-- AUDITORIA -->
+      <div id="tab-audit" class="tab-content hidden">
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Data</th><th>Ação</th><th>Detalhes</th><th>IP</th></tr></thead>
+            <tbody id="auditTable"><tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script>
+    const API = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+    let adminToken = localStorage.getItem('zkn_admin_token');
+    let adminUser = JSON.parse(localStorage.getItem('zkn_admin_user') || 'null');
+
+    function api(path, opts = {}) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (adminToken) headers['Authorization'] = 'Bearer ' + adminToken;
+      return fetch(API + path, { ...opts, headers: { ...headers, ...(opts.headers || {}) } })
+        .then(async r => {
+          const data = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error(data.message || 'Erro ' + r.status);
+          return data;
+        });
+    }
+
+    function fmtBRL(v) { return 'R$ ' + Number(v || 0).toFixed(2).replace('.', ','); }
+    function fmtDate(ts) { return new Date(ts).toLocaleString('pt-BR'); }
+
+    function toast(title, msg, type = 'success') {
+      let c = document.querySelector('.toast-container');
+      if (!c) { c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); }
+      const el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.innerHTML = `<div class="toast-title">${title}</div>${msg ? `<div class="toast-body">${msg}</div>` : ''}`;
+      c.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    // ---------- LOGIN ----------
+    document.getElementById('btnLogin').onclick = async () => {
+      const email = document.getElementById('adminEmail').value.trim();
+      const password = document.getElementById('adminPassword').value;
+      if (!email || !password) return toast('Preencha tudo', '', 'error');
+      try {
+        const data = await api('/admin/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+        adminToken = data.token;
+        adminUser = data.admin;
+        localStorage.setItem('zkn_admin_token', adminToken);
+        localStorage.setItem('zkn_admin_user', JSON.stringify(adminUser));
+        entrarNoPainel();
+      } catch (e) {
+        toast('Erro no login', e.message, 'error');
+      }
+    };
+
+    function entrarNoPainel() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('adminPanel').classList.remove('hidden');
+      document.getElementById('adminName').textContent = adminUser ? adminUser.name : 'Admin';
+      carregarDashboard();
+    }
+
+    function sairAdmin() {
+      localStorage.removeItem('zkn_admin_token');
+      localStorage.removeItem('zkn_admin_user');
+      location.reload();
+    }
+
+    // ---------- TABS ----------
+    document.querySelectorAll('.admin-tab').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        const tab = btn.dataset.tab;
+        document.getElementById('tab-' + tab).classList.remove('hidden');
+        if (tab === 'dashboard') carregarDashboard();
+        if (tab === 'users') carregarUsers();
+        if (tab === 'transactions') carregarTransactions();
+        if (tab === 'nitrogames') carregarNitroBalance();
+        if (tab === 'withdraw') carregarOwnerBalance();
+        if (tab === 'audit') carregarAudit();
+      };
+    });
+
+    // ---------- DASHBOARD ----------
+    async function carregarDashboard() {
+      try {
+        const d = await api('/admin/dashboard');
+        document.getElementById('statUsers').textContent = d.users.total;
+        document.getElementById('statUsersHoje').textContent = '+' + d.users.hoje + ' hoje';
+        document.getElementById('statBalance').textContent = fmtBRL(d.balance.total);
+        document.getElementById('statDeposits').textContent = fmtBRL(d.depositos.total);
+        document.getElementById('statDepositsHoje').textContent = '+' + fmtBRL(d.depositos.hoje) + ' hoje';
+        document.getElementById('statWithdraws').textContent = fmtBRL(d.saques.total);
+        document.getElementById('statGGR').textContent = fmtBRL(d.ggr.global.ggr);
+        document.getElementById('statGGRHoje').textContent = '+' + fmtBRL(d.ggr.hoje.ggr) + ' hoje';
+        document.getElementById('statOwner').textContent = fmtBRL(d.owner_wallet);
+      } catch (e) { toast('Erro', e.message, 'error'); }
+    }
+
+    // ---------- USERS ----------
+    let allUsers = [];
+    async function carregarUsers() {
+      try {
+        const d = await api('/admin/users');
+        allUsers = d.users || [];
+        renderUsers();
+      } catch (e) { toast('Erro', e.message, 'error'); }
+    }
+    function renderUsers() {
+      const q = (document.getElementById('userSearch')?.value || '').toLowerCase();
+      const list = allUsers.filter(u => !q || (u.name + ' ' + u.email + ' ' + u.phone).toLowerCase().includes(q));
+      const tb = document.getElementById('usersTable');
+      if (!list.length) { tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Nenhum usuário</td></tr>'; return; }
+      tb.innerHTML = list.map(u => `
+        <tr>
+          <td><strong>${u.name}</strong></td>
+          <td>${u.email || '-'}</td>
+          <td>${u.phone}</td>
+          <td style="font-weight:700;color:var(--gold);">${fmtBRL(u.balance)}</td>
+          <td><button class="admin-btn secondary" style="padding:6px 10px;font-size:11px;" onclick="ajustarSaldo('${u.uid}', '${u.name}')">Ajustar saldo</button></td>
+        </tr>
+      `).join('');
+    }
+    async function ajustarSaldo(uid, nome) {
+      const v = prompt(`Ajustar saldo de ${nome}\n\nDigite o valor (+ para adicionar, - para remover):`);
+      if (!v) return;
+      const amount = parseFloat(v.replace(',', '.'));
+      if (isNaN(amount)) return toast('Valor inválido', '', 'error');
+      const reason = prompt('Motivo do ajuste:') || '';
+      try {
+        await api('/admin/users/' + uid + '/balance', { method: 'PUT', body: JSON.stringify({ amount, reason }) });
+        toast('Saldo ajustado', '', 'success');
+        carregarUsers();
+      } catch (e) { toast('Erro', e.message, 'error'); }
+    }
+
+    // ---------- TRANSACTIONS ----------
+    async function carregarTransactions() {
+      try {
+        const d = await api('/admin/transactions');
+        const tb = document.getElementById('transactionsTable');
+        const list = d.transactions || [];
+        if (!list.length) { tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Nenhuma transação</td></tr>'; return; }
+        tb.innerHTML = list.map(t => `
+          <tr>
+            <td>${fmtDate(t.created_at)}</td>
+            <td>${t.user_name || t.uid}</td>
+            <td><span class="badge ${t.type}">${t.type}</span></td>
+            <td style="font-weight:700;">${fmtBRL(t.amount)}</td>
+            <td><span class="badge ${t.status}">${t.status}</span></td>
+          </tr>
+        `).join('');
+      } catch (e) { toast('Erro', e.message, 'error'); }
+    }
+
+    // ---------- NITROGAMES ----------
+    async function carregarNitroBalance() {
+      try {
+        const d = await api('/admin/nitrogames/balance');
+        document.getElementById('statNitroBalance').textContent = JSON.stringify(d.balance || {});
+      } catch (e) { toast('Erro', e.message, 'error'); }
+    }
+
+    // ---------- WITHDRAW ----------
+    async function carregarOwnerBalance() {
+      try {
+        const d = await api('/admin/dashboard');
+        document.getElementById('statOwnerBalance').textContent = fmtBRL(d.owner_wallet);
+      } catch (e) { toast('Erro', e.message, 'error'); }
+    }
+    async function solicitarSaque() {
+      const amount = parseFloat(document.getElementById('wdAmount').value);
+      const pixKey = document.getElementById('wdPixKey').value.trim();
+      const pixType = document.getElementById('wdPixType').value;
+      const holderName = document.getElementById('wdHolderName').value.trim();
+      const holderDocument = document.getElementById('wdHolderDoc').value.trim();
+      if (!amount || amount < 1) return toast('Valor inválido', '', 'error');
+      if (!pixKey || !holderName || !holderDocument) return toast('Preencha todos os campos', '', 'error');
+      try {
+        await api('/admin/withdraw', { method: 'POST', body: JSON.stringify({ amount, pixKey, pixType, holderName, holderDocument }) });
+        toast('Saque solicitado!', 'Processando via SigiloPay...', 'success');
+        carregarOwnerBalance();
+      } catch (e) { toast('Erro no saque', e.message, 'error'); }
+    }
+
+    // ---------- AUDIT ----------
+    async function carregarAudit() {
+      try {
+        const d = await api('/admin/audit');
+        const tb = document.getElementById('auditTable');
+        const list = d.audit || [];
+        if (!list.length) { tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Nenhuma ação registrada</td></tr>'; return; }
+        tb.innerHTML = list.map(a => `
+          <tr>
+            <td>${fmtDate(a.created_at)}</td>
+            <td><strong>${a.action}</strong></td>
+            <td style="font-size:11px;color:var(--text-muted);">${a.details || '-'}</td>
+            <td style="font-size:11px;">${a.ip || '-'}</td>
+          </tr>
+        `).join('');
+      } catch (e) { toast('Erro', e.message, 'error'); }
+    }
+
+    // ---------- INIT ----------
+    if (adminToken && adminUser) {
+      entrarNoPainel();
+    }
+
+    // Enter no login
+    document.getElementById('adminPassword').addEventListener('keypress', e => {
+      if (e.key === 'Enter') document.getElementById('btnLogin').click();
+    });
+  </script>
+</body>
+</html>
