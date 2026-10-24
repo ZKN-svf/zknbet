@@ -66,13 +66,16 @@
   <script>
     if (!ZKNAuth.requireLogin('deposito.html')) throw new Error('redirecionado');
 
+    const MINUTOS_EXPIRACAO = 3;
     let identifierAtual = null;
-    let pollInterval = null;
     let timerInterval = null;
+    let saldoPollInterval = null;
     let expiresAt = null;
+    let saldoInicial = 0;
+    let pixPago = false;
 
-    // ---------- Saldo inicial ----------
-    ZKNAuth.getSaldo();
+    // Carrega saldo inicial
+    ZKNAuth.getSaldo().then(s => { saldoInicial = s; });
 
     // ---------- Quick valores ----------
     document.querySelectorAll('#quickValores button').forEach(b => {
@@ -83,7 +86,6 @@
       };
     });
 
-    // Limpa seleção dos quick values se digitar manualmente
     document.getElementById('valor').addEventListener('input', () => {
       document.querySelectorAll('#quickValores button').forEach(x => x.classList.remove('active'));
     });
@@ -110,14 +112,15 @@
       expiresAt = new Date(expiraEm).getTime();
       const total = expiresAt - Date.now();
 
-      // Atualiza já no primeiro tick
       const tick = () => {
         const restante = expiresAt - Date.now();
         if (restante <= 0) {
           clearInterval(timerInterval);
           document.getElementById('timerText').textContent = '00:00';
-          setStatus('error', 'QR Code expirado. Gere um novo.');
-          if (pollInterval) clearInterval(pollInterval);
+          if (!pixPago) {
+            // Expirou sem pagamento: cancela
+            cancelarPix();
+          }
           return;
         }
         const min = Math.floor(restante / 60000);
@@ -134,8 +137,47 @@
     }
 
     function pararTudo() {
-      if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+      if (saldoPollInterval) { clearInterval(saldoPollInterval); saldoPollInterval = null; }
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    }
+
+    async function cancelarPix() {
+      if (!identifierAtual || pixPago) return;
+
+      pararTudo();
+      setStatus('error', '⏱️ PIX expirado após 3 minutos. Gere um novo QR Code.');
+      document.getElementById('progressFill').style.width = '100%';
+
+      // Esconde o QR Code (mas mantem o copia e cola visivel caso o usuario queira tentar)
+      const qrBlock = document.getElementById('qrBlock');
+      const qrFrame = document.getElementById('qrcode');
+      if (qrFrame) {
+        qrFrame.innerHTML = '<div style="color:#94a3b8;padding:40px;text-align:center;font-family:Inter,sans-serif;">⏱️<br><br>PIX expirado<br><small>Gere um novo QR Code</small></div>';
+      }
+
+      // Avisa o backend para marcar como expirado
+      try {
+        await fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? ZKN_CONFIG.api : 'https://zknbet-api.gabrielrobin63.workers.dev/api') + '/pix/cancel/' + encodeURIComponent(identifierAtual), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (ZKNAuth.getToken() || '')
+          }
+        });
+      } catch (e) {
+        console.warn('[cancelarPix] erro ao cancelar no backend:', e.message);
+      }
+
+      // Habilita o botao pra gerar novo
+      const btn = document.getElementById('btnGerar');
+      btn.disabled = false;
+      btn.textContent = 'Gerar novo QR Code PIX';
+
+      // Remove destaque do campo valor pra usuario editar
+      document.getElementById('valor').focus();
+
+      ZKN.toast('PIX expirado', 'O QR Code expirou. Gere um novo.', 'warning');
+
       identifierAtual = null;
     }
 
@@ -143,20 +185,21 @@
     document.getElementById('btnGerar').onclick = async () => {
       const valor = parseFloat(document.getElementById('valor').value);
       if (!valor || valor < 10) {
-        return ZKN.toast('Valor inválido', 'Informe um valor de no mínimo R$ 10,00.', 'error');
+        return ZKN.toast('Valor inválido', 'Depósito mínimo de R$ 10,00.', 'error');
       }
 
       pararTudo();
+      pixPago = false;
 
       const btn = document.getElementById('btnGerar');
       btn.disabled = true;
       btn.textContent = 'Gerando...';
       document.getElementById('qrBlock').classList.remove('active');
 
-      const user = ZKNAuth.getUser();
-      const email = user?.email || (user?.phone ? `${user.phone}@zknbet.com` : '');
+      // Guarda saldo atual para comparar
+      saldoInicial = await ZKNAuth.getSaldo();
 
-      const res = await SigiloPay.criarCobrancaPIX(valor, 'Depósito ZKNbet', email);
+      const res = await SigiloPay.criarCobrancaPIX(valor);
 
       btn.disabled = false;
       btn.textContent = 'Gerar QR Code PIX';
@@ -169,22 +212,25 @@
       SigiloPay.gerarQRCode(document.getElementById('qrcode'), res.qr_code_copia_cola);
       document.getElementById('copiaCola').value = res.qr_code_copia_cola;
       document.getElementById('qrBlock').classList.add('active');
-      setStatus('pending', 'Aguardando pagamento...');
+      setStatus('pending', 'Aguardando pagamento... O PIX expira em 3 minutos.');
       document.getElementById('progressFill').style.width = '0%';
-      iniciarTimer(res.expires_at);
 
-      // Polling de status
-      pollInterval = setInterval(async () => {
-        if (!identifierAtual) return;
-        const check = await SigiloPay.consultarPagamento(identifierAtual);
-        if (check.sucesso && check.pago) {
+      // Timer de 3 MINUTOS (ignora o expires_at da SigiloPay)
+      const expiraEm = new Date(Date.now() + MINUTOS_EXPIRACAO * 60 * 1000).toISOString();
+      iniciarTimer(expiraEm);
+
+      // ---------- Polling de SALDO (a cada 5s) ----------
+      saldoPollInterval = setInterval(async () => {
+        if (pixPago) return;
+        const saldoAgora = await ZKNAuth.getSaldo();
+        if (saldoAgora > saldoInicial) {
+          pixPago = true;
           pararTudo();
           setStatus('success', '✅ Pagamento confirmado! Saldo atualizado.');
           document.getElementById('progressFill').style.width = '100%';
-          await ZKNAuth.getSaldo();
-          ZKN.toast('Depósito confirmado!', `${ZKN.formatBRL(valor)} adicionados ao seu saldo.`);
+          ZKN.toast('Depósito confirmado!', `${ZKN.formatBRL(saldoAgora - saldoInicial)} adicionados ao seu saldo.`);
         }
-      }, 3000);
+      }, 5000);
     };
   </script>
 </body>

@@ -23,7 +23,7 @@
       <p class="subtitle">Digite o valor e sua senha de 6 dígitos para confirmar.</p>
 
       <label for="valorSaque">Valor do saque (R$)</label>
-      <input type="number" id="valorSaque" placeholder="0,00" step="0.01" min="1" style="font-size:18px;font-weight:700;">
+      <input type="number" id="valorSaque" placeholder="20,00" step="0.01" min="20" style="font-size:18px;font-weight:700;">
 
       <label for="pin">Senha de saque (6 dígitos)</label>
       <input type="password" id="pin" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off">
@@ -72,65 +72,73 @@
 
     // ---------- Solicitar saque ----------
     document.getElementById('btnSaque').onclick = async () => {
-      const valor = parseFloat(valorEl.value);
-      const pin = pinEl.value;
-      const saldo = ZKN.ZKN_USER.balance;
-
-      if (!valor || valor < 1) return setStatus('error', 'Valor inválido. Mínimo R$ 1,00.');
-      if (valor > saldo) {
-        return setStatus('error', `Saldo insuficiente. Você tem ${ZKN.formatBRL(saldo)}.`);
-      }
-      if (!/^\d{6}$/.test(pin)) return setStatus('error', 'Informe o PIN de 6 dígitos.');
-
       const btn = document.getElementById('btnSaque');
+      const valor = parseFloat(document.getElementById('valorSaque').value);
+      const pin = pinEl.value;
+
+      // Validacoes ANTES de tocar no botao
+      if (!valor || valor < 20) {
+        return setStatus('error', 'Valor minimo de saque: R$ 20,00 (exigencia da SigiloPay).');
+      }
+      if (valor > ZKN.ZKN_USER.balance) {
+        return setStatus('error', `Saldo insuficiente. Você tem ${ZKN.formatBRL(ZKN.ZKN_USER.balance)}.`);
+      }
+      if (!/^\d{6}$/.test(pin)) {
+        return setStatus('error', 'Informe o PIN de 6 dígitos.');
+      }
+
       btn.disabled = true;
-      btn.textContent = 'Verificando...';
+      btn.textContent = 'Verificando PIN...';
+      setStatus('pending', 'Verificando PIN...');
 
-      // 1) Verifica PIN no servidor
-      const pinOk = await ZKNAuth.verificarPinSaque(pin);
-      if (!pinOk.sucesso) {
+      try {
+        // 1) Verifica PIN (com timeout de 15s)
+        const pinOk = await Promise.race([
+          ZKNAuth.verificarPinSaque(pin),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout ao verificar PIN. Tente novamente.')), 15000))
+        ]);
+
+        if (!pinOk || !pinOk.sucesso) {
+          return setStatus('error', (pinOk && pinOk.mensagem) || 'PIN incorreto.');
+        }
+
+        // 2) Pega os dados de saque
+        const dados = ZKNAuth.getDadosSaque();
+        if (!dados || !dados.pixKey) {
+          return setStatus('error', 'Chave PIX não encontrada. Refaça o cadastro de saque.');
+        }
+
+        btn.textContent = 'Enviando para SigiloPay...';
+        setStatus('pending', 'Processando saque...');
+
+        // 3) Cria a transferencia (com timeout de 30s)
+        const res = await Promise.race([
+          SigiloPay.criarTransferencia(valor, dados.pixKey, {
+            nome: dados.holderName,
+            cpf: dados.holderCpf,
+          }),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout ao processar saque. Tente novamente em instantes.')), 30000))
+        ]);
+
+        if (res && res.sucesso) {
+          setStatus('success', `✅ Saque de ${ZKN.formatBRL(valor)} solicitado!<br>Status: ${res.status || 'PENDENTE'}.`);
+          ZKN.ZKN_USER.balance = ZKN.ZKN_USER.balance - valor;
+          ZKN.toast('Saque solicitado!', `${ZKN.formatBRL(valor)} em processamento.`);
+          document.getElementById('valorSaque').value = '';
+          pinEl.value = '';
+        } else {
+          setStatus('error', (res && res.mensagem) || 'Erro ao processar saque.');
+          ZKN.toast('Erro no saque', (res && res.mensagem) || 'Tente novamente.', 'error');
+        }
+      } catch (e) {
+        // QUALQUER erro cai aqui e destrava o botao
+        setStatus('error', 'Erro: ' + (e.message || 'Falha na conexao'));
+        ZKN.toast('Erro no saque', e.message || 'Verifique a conexao.', 'error');
+      } finally {
+        // SEMPRE destrava o botao, aconteca o que acontecer
         btn.disabled = false;
         btn.textContent = 'Solicitar Saque';
-        return setStatus('error', pinOk.mensagem || 'PIN incorreto.');
       }
-
-      // 2) Pede os dados de saque no servidor
-      const dados = await ZKNAuth.getDadosSaque();
-      if (!dados) {
-        btn.disabled = false;
-        btn.textContent = 'Solicitar Saque';
-        return setStatus('error', 'Chave PIX não encontrada. Refaça o cadastro de saque.');
-      }
-
-      // 3) Envia a transferência
-      btn.textContent = 'Enviando...';
-      setStatus('pending', 'Processando saque...');
-
-      const res = await SigiloPay.criarTransferencia(valor, dados.pixKey, {
-        nome: dados.holderName,
-        cpf: dados.holderCpf,
-      });
-
-      btn.disabled = false;
-      btn.textContent = 'Solicitar Saque';
-
-      if (!res.sucesso) {
-        setStatus('error', res.mensagem || 'Erro ao processar saque.');
-        ZKN.toast('Erro no saque', res.mensagem || 'Tente novamente.', 'error');
-        return;
-      }
-
-      // 4) Sucesso — atualiza saldo direto do servidor
-      setStatus(
-        'success',
-        `✅ Saque de ${ZKN.formatBRL(valor)} solicitado!<br>Status: ${res.status || 'PENDENTE'}.`
-      );
-      await ZKNAuth.getSaldo();
-      ZKN.toast('Saque solicitado!', `${ZKN.formatBRL(valor)} em processamento.`);
-
-      valorEl.value = '';
-      pinEl.value = '';
-    };
-  </script>
+    };</script>
 </body>
 </html>
