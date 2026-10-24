@@ -232,7 +232,8 @@
         <button class="admin-tab" data-tab="users">Usuários</button>
         <button class="admin-tab" data-tab="transactions">Transações</button>
         <button class="admin-tab" data-tab="nitrogames">NitroGames</button>
-        <button class="admin-tab" data-tab="withdraw">Saque</button>
+        <button class="admin-tab" data-tab="withdraws">Saques pendentes</button>
+        <button class="admin-tab" data-tab="withdraw">Saque (lucro)</button>
         <button class="admin-tab" data-tab="audit">Auditoria</button>
       </div>
 
@@ -282,6 +283,31 @@
       </div>
 
       <!-- SAQUE -->
+      
+      <!-- SAQUES PENDENTES -->
+      <div id="tab-withdraws" class="tab-content hidden">
+        <div style="margin-bottom:16px;display:flex;gap:8px;align-items:center;">
+          <h3 style="font-family:var(--font-display);font-size:18px;font-weight:800;">Saques pendentes</h3>
+          <button class="admin-btn secondary" onclick="carregarWithdraws()" style="padding:6px 12px;font-size:12px;">Atualizar</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Jogador</th>
+                <th>Valor</th>
+                <th>PIX</th>
+                <th>Titular</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="withdrawsTable"><tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
       <div id="tab-withdraw" class="tab-content hidden">
         <div class="stat-card" style="margin-bottom:16px;">
           <div class="stat-label">Saldo disponível para saque (Owner Wallet)</div>
@@ -385,6 +411,7 @@
         if (tab === 'users') carregarUsers();
         if (tab === 'transactions') carregarTransactions();
         if (tab === 'nitrogames') carregarNitroBalance();
+        if (tab === 'withdraws') carregarWithdraws();
         if (tab === 'withdraw') carregarOwnerBalance();
         if (tab === 'audit') carregarAudit();
       };
@@ -508,6 +535,73 @@
           </tr>
         `).join('');
       } catch (e) { toast('Erro', e.message, 'error'); }
+    }
+
+    
+    // ---------- SAQUES PENDENTES ----------
+    async function carregarWithdraws() {
+      try {
+        const d = await api('/admin/withdraws');
+        const tb = document.getElementById('withdrawsTable');
+        const list = d.withdraws || [];
+        if (!list.length) {
+          tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Nenhum saque</td></tr>';
+          return;
+        }
+        tb.innerHTML = list.map(w => {
+          const statusClass = w.status === 'completed' ? 'completed'
+                            : w.status === 'pending' ? 'pending'
+                            : 'withdraw';
+          const pixDisplay = w.pix_key ? `${w.pix_key_type}: ${w.pix_key}` : '-';
+          const titular = w.holder_name ? `${w.holder_name} (${w.holder_cpf || '?'})` : '-';
+
+          let acoes = '-';
+          if (w.status === 'pending') {
+            acoes = `<button class="admin-btn" style="padding:6px 10px;font-size:11px;background:var(--grad-green);color:#fff;" onclick="aprovarSaque('${w.id}', ${w.amount})">✓ Aprovar</button>
+                     <button class="admin-btn danger" style="padding:6px 10px;font-size:11px;margin-left:4px;" onclick="rejeitarSaque('${w.id}', ${w.amount})">✗ Rejeitar</button>`;
+          }
+
+          return `
+            <tr>
+              <td>${fmtDate(w.created_at)}</td>
+              <td><strong>${w.user_name || '-'}</strong><br><small style="color:var(--text-muted);">${w.user_email || w.user_phone || ''}</small></td>
+              <td style="font-weight:700;color:var(--gold);">${fmtBRL(w.amount)}</td>
+              <td style="font-size:11px;">${pixDisplay}</td>
+              <td style="font-size:11px;">${titular}</td>
+              <td><span class="badge ${statusClass}">${w.status}</span></td>
+              <td>${acoes}</td>
+            </tr>
+          `;
+        }).join('');
+      } catch (e) {
+        toast('Erro', e.message, 'error');
+      }
+    }
+
+    async function aprovarSaque(txId, amount) {
+      if (!confirm(`Aprovar saque de ${fmtBRL(amount)}? Isso vai chamar a SigiloPay e debitar da sua conta.`)) return;
+      try {
+        toast('Processando...', 'Chamando SigiloPay', 'pending');
+        const d = await api(`/admin/withdraws/${txId}/approve`, { method: 'POST' });
+        toast('Saque aprovado!', `Withdraw ID: ${d.withdraw?.id || '-'}`, 'success');
+        carregarWithdraws();
+        carregarDashboard();
+      } catch (e) {
+        toast('Erro ao aprovar', e.message, 'error');
+      }
+    }
+
+    async function rejeitarSaque(txId, amount) {
+      const reason = prompt(`Motivo da rejeição (saldo ${fmtBRL(amount)} será devolvido ao jogador):`);
+      if (reason === null) return;
+      try {
+        await api(`/admin/withdraws/${txId}/reject`, { method: 'POST', body: JSON.stringify({ reason: reason || 'Rejeitado pelo admin' }) });
+        toast('Saque rejeitado', `Saldo de ${fmtBRL(amount)} devolvido ao jogador`, 'warning');
+        carregarWithdraws();
+        carregarDashboard();
+      } catch (e) {
+        toast('Erro ao rejeitar', e.message, 'error');
+      }
     }
 
     // ---------- INIT ----------
