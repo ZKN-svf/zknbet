@@ -56,17 +56,21 @@ async function consultarPagamento(identifier) {
 
 async function criarTransferencia(valor, chavePix, dadosProprietario) {
   try {
+    const bodyEnviado = {
+      amount: parseFloat(Number(valor).toFixed(2)),
+      pix: { key: chavePix, type: detectarTipoPix(chavePix) },
+      owner: {
+        name: dadosProprietario.nome,
+        document: String(dadosProprietario.cpf).replace(/\D/g, ''),
+      },
+    };
+
+    console.log('[SIGILO FRONTEND] Body enviado:', JSON.stringify(bodyEnviado, null, 2));
+
     const res = await fetch(_apiBase() + '/pix/transfer', {
       method: 'POST',
       headers: _authHeaders(),
-      body: JSON.stringify({
-        amount: parseFloat(Number(valor).toFixed(2)),
-        pix: { key: chavePix, type: detectarTipoPix(chavePix) },
-        owner: {
-          name: dadosProprietario.nome,
-          document: String(dadosProprietario.cpf).replace(/\D/g, ''),
-        },
-      }),
+      body: JSON.stringify(bodyEnviado),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) return { sucesso: false, mensagem: data.message || 'Erro no saque' };

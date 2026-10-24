@@ -92,6 +92,9 @@
       const id = window.ZKNVal.identificarTipo(pixKeyRaw);
       if (id.tipo === 'unknown') return ZKN.toast('Chave PIX inválida', 'Informe CPF, celular ou e-mail válido.', 'error');
       if (!holderName || holderName.length < 5) return ZKN.toast('Nome inválido', 'Nome completo do titular.', 'error');
+      if (!/^[A-Za-z\s]+$/.test(holderName)) {
+        return ZKN.toast('Nome com acento ou caractere inválido', 'Use apenas letras sem acento (ex: Anderson Guimaraes).', 'error');
+      }
       if (!window.ZKNVal.validarCPF(holderCpf)) return ZKN.toast('CPF inválido', 'CPF do titular inválido.', 'error');
 
       const btn = document.getElementById('btnSalvar');
