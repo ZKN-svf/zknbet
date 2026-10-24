@@ -103,7 +103,7 @@
         }
 
         // 2) Pega os dados de saque
-        const dados = ZKNAuth.getDadosSaque();
+        const dados = await ZKNAuth.getDadosSaque();
         if (!dados || !dados.pixKey) {
           return setStatus('error', 'Chave PIX não encontrada. Refaça o cadastro de saque.');
         }

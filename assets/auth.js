@@ -145,6 +145,21 @@ async function getIndicacoes() {
   return ok ? { referrals: data.referrals || [], stats: data.stats || {} } : { referrals: [], stats: {} };
 }
 
+
+// ---------- Dados de saque (PIX) - busca do backend ----------
+async function getDadosSaque() {
+  try {
+    const res = await fetch((window.ZKN_CONFIG?.api || AUTH_CONFIG.apiBase) + '/me/pix', {
+      headers: { 'Authorization': 'Bearer ' + (getToken() || '') },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.pix || null;
+  } catch (e) {
+    console.warn('[getDadosSaque]', e.message);
+    return null;
+  }
+}
 window.ZKNAuth = {
   CONFIG: AUTH_CONFIG,
   api,
@@ -153,6 +168,6 @@ window.ZKNAuth = {
   atualizarDados, alterarSenha, getSaldo,
   getFavoritos, addFavorito, removerFavorito,
   getRecentes, addRecente,
-  salvarPinSaque, verificarPinSaque, temPinSaque,
+  salvarPinSaque, verificarPinSaque, temPinSaque, getDadosSaque,
   getTransacoes, getIndicacoes,
 };
