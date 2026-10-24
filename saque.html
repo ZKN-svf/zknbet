@@ -18,7 +18,32 @@
       <span class="val" data-balance>R$ 0,00</span>
     </div>
 
-    <div class="card" style="max-width:none;width:100%;">
+    
+    <!-- ROLLOVER (progresso de apostas obrigatorias) -->
+    <div id="rolloverBox" style="display:none; background:var(--bg-2); border:1px solid var(--border-gold); border-radius:var(--radius); padding:16px 20px; margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; font-weight:700;">Rollover exigido</div>
+          <div style="font-size:13px; color:var(--text); margin-top:2px;">
+            Você precisa apostar <strong style="color:var(--gold);">60%</strong> dos seus depósitos para liberar o saque
+          </div>
+        </div>
+        <div style="font-size:24px; font-weight:900; color:var(--gold);" id="rolloverPct">0%</div>
+      </div>
+
+      <div class="progress-bar" style="height:8px; margin-bottom:8px;">
+        <div class="progress-bar-fill" id="rolloverFill" style="width:0%; background:var(--grad-gold);"></div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted);">
+        <span>Apostado: <strong id="rolloverBet" style="color:var(--text);">R$ 0</strong></span>
+        <span>Falta: <strong id="rolloverRemaining" style="color:var(--gold);">R$ 0</strong></span>
+      </div>
+
+      <div id="rolloverStatus" style="margin-top:12px; padding:10px; border-radius:8px; font-size:12px; text-align:center; display:none;">
+      </div>
+    </div>
+<div class="card" style="max-width:none;width:100%;">
       <h1>💸 Saque via PIX</h1>
       <p class="subtitle">Digite o valor e sua senha de 6 dígitos para confirmar.</p>
 
@@ -71,7 +96,43 @@
     });
 
     // ---------- Solicitar saque ----------
-    document.getElementById('btnSaque').onclick = async () => {
+    
+    // ---------- ROLLOVER ----------
+    async function carregarRollover() {
+      const r = await ZKNAuth.getRollover();
+      const box = document.getElementById('rolloverBox');
+      if (!r || !box) return;
+
+      // Se o usuario nunca depositou, esconde a caixa
+      if (!r.total_deposited || r.total_deposited === 0) {
+        box.style.display = 'none';
+        return;
+      }
+
+      box.style.display = 'block';
+      document.getElementById('rolloverPct').textContent = r.percent + '%';
+      document.getElementById('rolloverFill').style.width = r.percent + '%';
+      document.getElementById('rolloverBet').textContent = ZKN.formatBRL(r.total_bet);
+      document.getElementById('rolloverRemaining').textContent = ZKN.formatBRL(r.remaining);
+
+      const status = document.getElementById('rolloverStatus');
+      if (r.liberado) {
+        status.style.display = 'block';
+        status.style.background = 'rgba(0, 214, 127, 0.1)';
+        status.style.color = 'var(--green)';
+        status.innerHTML = '✅ Rollover cumprido! Você pode sacar.';
+        document.getElementById('rolloverFill').style.background = 'var(--grad-green)';
+      } else {
+        status.style.display = 'block';
+        status.style.background = 'rgba(245, 190, 60, 0.1)';
+        status.style.color = 'var(--gold)';
+        status.innerHTML = '⏳ Falta apostar <strong>' + ZKN.formatBRL(r.remaining) + '</strong> para liberar o saque.';
+      }
+    }
+
+    // Chama ao carregar
+    carregarRollover();
+document.getElementById('btnSaque').onclick = async () => {
       const btn = document.getElementById('btnSaque');
       const valor = parseFloat(document.getElementById('valorSaque').value);
       const pin = pinEl.value;

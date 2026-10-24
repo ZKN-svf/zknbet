@@ -160,13 +160,27 @@ async function getDadosSaque() {
     return null;
   }
 }
+
+// ---------- Progresso do rollover (apostas obrigatorias) ----------
+async function getRollover() {
+  try {
+    const res = await fetch((window.ZKN_CONFIG?.api || AUTH_CONFIG.apiBase) + '/me/rollover', {
+      headers: { 'Authorization': 'Bearer ' + (getToken() || '') },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    console.warn('[getRollover]', e.message);
+    return null;
+  }
+}
 window.ZKNAuth = {
   CONFIG: AUTH_CONFIG,
   api,
   register, login, logout,
   getUser, isLoggedIn, requireLogin, getToken, setUser,
   atualizarDados, alterarSenha, getSaldo,
-  getFavoritos, addFavorito, removerFavorito,
+  getFavoritos, addFavorito, removerFavorito, getRollover,
   getRecentes, addRecente,
   salvarPinSaque, verificarPinSaque, temPinSaque, getDadosSaque,
   getTransacoes, getIndicacoes,
