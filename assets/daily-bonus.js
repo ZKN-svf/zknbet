@@ -6,7 +6,7 @@
 
 (function() {
   // Configuracoes
-  const CHANCE = 0.20;           // 20% de chance de aparecer
+  const CHANCE = 1.0;  // TESTE: 100%           // 20% de chance de aparecer
   const STORAGE_KEY = 'zkn_daily_bonus_last_shown';  // quando apareceu por ultimo
   const STORAGE_CLAIMED = 'zkn_daily_bonus_claimed'; // quando resgatou por ultimo
   const PAGES_ATIVAS = ['index.html', 'jogos.html'];
