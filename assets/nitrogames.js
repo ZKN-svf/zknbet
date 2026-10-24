@@ -15,12 +15,28 @@ function _authHeaders() {
 }
 
 async function listarJogos() {
+  const CACHE_KEY = 'zkn_games_cache_v1';
+  const TTL = 5 * 60 * 1000; // 5 min
+
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < TTL) {
+        return { sucesso: true, jogos: data };
+      }
+    }
+  } catch {}
+
   try {
     const res = await fetch(_apiBase() + '/nitrogames/games');
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.sucesso) {
       return { sucesso: false, mensagem: data.mensagem || 'Erro ao listar jogos', jogos: [] };
     }
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ data: data.jogos || [], timestamp: Date.now() }));
+    } catch {}
     return { sucesso: true, jogos: data.jogos || [] };
   } catch (e) {
     return { sucesso: false, mensagem: 'Erro de conexao: ' + e.message, jogos: [] };
@@ -28,12 +44,28 @@ async function listarJogos() {
 }
 
 async function listarProvedores() {
+  const CACHE_KEY = 'zkn_providers_cache_v1';
+  const TTL = 5 * 60 * 1000;
+
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < TTL) {
+        return { sucesso: true, provedores: data };
+      }
+    }
+  } catch {}
+
   try {
     const res = await fetch(_apiBase() + '/nitrogames/providers');
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.sucesso) {
       return { sucesso: false, mensagem: data.mensagem || 'Erro', provedores: [] };
     }
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ data: data.provedores || [], timestamp: Date.now() }));
+    } catch {}
     return { sucesso: true, provedores: data.provedores || [] };
   } catch (e) {
     return { sucesso: false, mensagem: 'Erro de conexao', provedores: [] };

@@ -6,7 +6,10 @@
   <title>ZKNbet - Cassino Online</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
+  <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
+  <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -265,37 +268,40 @@
     async function carregarHome() {
       iniciarTicker();
 
-      // Carrega todos os jogos
-      const res = await NitroGames.listarJogos();
-      if (res.sucesso) {
-        ALL_GAMES = window.ZKNProviders ? window.ZKNProviders.aplicarProvidersReais(res.jogos || []) : (res.jogos || []);
+      // OTIMIZADO: paraleliza jogos + provedoras
+      const [jogos, provs] = await Promise.all([
+        NitroGames.listarJogos(),
+        NitroGames.listarProvedores(),
+      ]);
+
+      if (jogos.sucesso) {
+        ALL_GAMES = window.ZKNProviders ? window.ZKNProviders.aplicarProvidersReais(jogos.jogos || []) : (jogos.jogos || []);
         renderFeatured();
         renderFavoritosHome();
         renderRecentesHome();
       } else {
         document.getElementById('featuredGrid').innerHTML =
           '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">' +
-          (res.mensagem || 'Erro ao carregar jogos.') + '</div>';
+          (jogos.mensagem || 'Erro ao carregar jogos.') + '</div>';
       }
 
-      // Provedoras
-      const provs = await NitroGames.listarProvedores();
       if (provs.sucesso && provs.provedores.length) {
         document.getElementById('providersStrip').innerHTML = provs.provedores.map(p => `
           <div class="provider-chip" onclick="location.href='jogos.html'">${p.name}</div>
         `).join('');
       } else {
-        // Fallback: mostra o que veio dos jogos
         const nomes = window.ZKNProviders ? window.ZKNProviders.providersUnicos(ALL_GAMES) : [...new Set(ALL_GAMES.map(j => j.provider_name).filter(Boolean))];
         document.getElementById('providersStrip').innerHTML = nomes.map(n => `
           <div class="provider-chip" onclick="location.href='jogos.html'">${n}</div>
         `).join('');
       }
 
-      // Carrega favoritos/recentes do backend se logado
+      // OTIMIZADO: favoritos + recentes em paralelo
       if (ZKNAuth.isLoggedIn() && window.ZKNGamesLib) {
-        await ZKNGamesLib.carregarFavoritos();
-        await ZKNGamesLib.carregarRecentes();
+        await Promise.all([
+          ZKNGamesLib.carregarFavoritos(),
+          ZKNGamesLib.carregarRecentes(),
+        ]);
         renderFavoritosHome();
         renderRecentesHome();
       }

@@ -92,13 +92,15 @@
     }, 500);
   }
 
-  if (document.readyState === 'complete') {
-    setTimeout(esconder, 300);
+  // OTIMIZADO: esconde assim que o HTML estiver pronto (nao espera imagens)
+  if (document.readyState !== 'loading') {
+    setTimeout(esconder, 100);
   } else {
-    window.addEventListener('load', () => setTimeout(esconder, 400));
+    document.addEventListener('DOMContentLoaded', () => setTimeout(esconder, 150));
   }
 
-  setTimeout(esconder, 5000);
+  // Fallback de seguranca (2s em vez de 5s)
+  setTimeout(esconder, 2000);
 
   window.ZKNLoading = { hide: esconder };
 })();
