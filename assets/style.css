@@ -1287,33 +1287,3 @@ body.drawer-open { overflow: hidden; }
     box-shadow: 0 0 10px rgba(245, 190, 60, 0.4) !important;
   }
 }
-
-/* ============================================================ */
-/* SPA — transicao suave entre paginas                          */
-/* ============================================================ */
-body.spa-loading .spa-main,
-body.spa-loading > *:not(.zkn-header):not(.drawer):not(.drawer-backdrop):not(.toast-container) {
-  opacity: 0.6;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
-}
-
-body.spa-loading::before {
-  content: '';
-  position: fixed;
-  top: 0; left: 0;
-  height: 3px;
-  width: 30%;
-  background: linear-gradient(90deg, transparent, #f5be3c, transparent);
-  z-index: 9999;
-  animation: spa-progress 1s linear infinite;
-}
-
-@keyframes spa-progress {
-  0% { left: -30%; }
-  100% { left: 100%; }
-}
-
-.spa-main {
-  transition: opacity 0.2s ease;
-}

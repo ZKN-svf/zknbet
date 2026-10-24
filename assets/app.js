@@ -299,12 +299,3 @@ window.ZKN = {
   ZKN_USER, formatBRL, toast, gerarIniciais,
   renderHeader, abrirDrawer, fecharDrawer, abrirIndicacaoDrawer, atualizarSaldoBtn,
 };
-// ============================================================
-// SPA Router — carrega dinamicamente (navegacao instantanea)
-// ============================================================
-if (typeof window !== 'undefined' && !window.ZKNSpa) {
-  var spaScript = document.createElement('script');
-  spaScript.src = 'assets/spa-router.js';
-  spaScript.async = false;
-  document.head.appendChild(spaScript);
-}
