@@ -1142,3 +1142,53 @@ body.drawer-open { overflow: hidden; }
     font-size: 7px !important;
   }
 }
+
+/* ============================================================
+   BOTAO DE ATUALIZAR SALDO (ao lado do balance-chip)
+   ============================================================ */
+.balance-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.balance-refresh:hover {
+  background: var(--bg-3);
+  border-color: var(--border-gold);
+  color: var(--gold);
+}
+.balance-refresh:active {
+  transform: scale(0.92);
+}
+.balance-refresh svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.4s ease;
+}
+.balance-refresh.loading svg {
+  animation: spinRefresh 0.8s linear infinite;
+}
+@keyframes spinRefresh {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .balance-refresh {
+    width: 28px;
+    height: 28px;
+  }
+  .balance-refresh svg {
+    width: 14px;
+    height: 14px;
+  }
+}

@@ -65,8 +65,17 @@ function renderHeader() {
 
   const rightSide = logged
     ? `
-      <div class="balance-chip" onclick="location.href='deposito.html'">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="balance-chip" onclick="location.href='deposito.html'">
         <span class="value" data-balance>${formatBRL(ZKN_USER.balance)}</span>
+      </div>
+        <button class="balance-refresh" onclick="ZKN.atualizarSaldoBtn(this)" aria-label="Atualizar saldo" title="Atualizar saldo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </button>
       </div>
       <button class="btn-header" onclick="location.href='deposito.html'">Depositar</button>
       <button class="btn-header ghost" onclick="window.ZKNAuth.logout()">Sair</button>
@@ -259,7 +268,34 @@ window.ZKNSaldo = {
   iniciar: iniciarPollingSaldo,
   parar: pararPollingSaldo,
 };
+
+// ---------- Botao de atualizar saldo ----------
+async function atualizarSaldoBtn(btn) {
+  if (!btn || btn.classList.contains('loading')) return;
+  btn.classList.add('loading');
+  try {
+    if (window.ZKNSaldo && window.ZKNSaldo.atualizar) {
+      await window.ZKNSaldo.atualizar();
+    } else if (window.ZKNAuth && window.ZKNAuth.getSaldo) {
+      const saldo = await window.ZKNAuth.getSaldo();
+      document.querySelectorAll('[data-balance]').forEach(el => {
+        el.textContent = formatBRL(saldo);
+      });
+    }
+    // Feedback visual
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'var(--green)';
+    setTimeout(() => {
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 800);
+  } catch (e) {
+    console.warn('[atualizarSaldoBtn]', e.message);
+  } finally {
+    setTimeout(() => btn.classList.remove('loading'), 400);
+  }
+}
 window.ZKN = {
   ZKN_USER, formatBRL, toast, gerarIniciais,
-  renderHeader, abrirDrawer, fecharDrawer, abrirIndicacaoDrawer,
+  renderHeader, abrirDrawer, fecharDrawer, abrirIndicacaoDrawer, atualizarSaldoBtn,
 };

@@ -1,14 +1,37 @@
 ﻿// ============================================================
-// ZKNbet - Mapa de provedoras reais
-// A NitroGames retorna provider_name="PGSOFT" para todos.
-// Este mapa corrige a exibicao no frontend.
-// Para adicionar: edite PROVIDER_OVERRIDES abaixo.
+// ZKNbet - Mapa de provedoras reais (CORRIGIDO)
+// Fonte: pesquisa em Gaming Intelligence, Pragmatic Play, etc.
 // ============================================================
 
 const PROVIDER_OVERRIDES = {
+  // ===== PG SOFT =====
+  "fortune tiger": "PG Soft",
+  "fortune rabbit": "PG Soft",
+  "fortune dragon": "PG Soft",
+  "fortune ox": "PG Soft",
+  "fortune mouse": "PG Soft",
+  "double fortune": "PG Soft",
+  "bikini paradise": "PG Soft",
+  "ganesha gold": "PG Soft",
+  "jungle delight": "PG Soft",
+  "dragon tiger luck": "PG Soft",
+  "hood vs woolf": "PG Soft",
+  "jack frost": "PG Soft",
+  "phoenix rises": "PG Soft",
+  "queen of bounty": "PG Soft",
+  "songkran party": "PG Soft",
+  "treasures of aztec": "PG Soft",
+  "medusa": "PG Soft",
+  "fortune gods": "PG Soft",
+  "mahjong ways": "PG Soft",
+  "mahjong ways 2": "PG Soft",
+  "dreams of macau": "PG Soft",
+  "wild bandito": "PG Soft",
+
   // ===== PRAGMATIC PLAY =====
   "gates of olympus": "Pragmatic Play",
   "gates of olympus 1000": "Pragmatic Play",
+  "gates of olympus super scatter": "Pragmatic Play",
   "sweet bonanza": "Pragmatic Play",
   "sweet bonanza xmas": "Pragmatic Play",
   "sweet bonanza 1000": "Pragmatic Play",
@@ -20,10 +43,8 @@ const PROVIDER_OVERRIDES = {
   "starlight christmas": "Pragmatic Play",
   "the dog house": "Pragmatic Play",
   "the dog house megaways": "Pragmatic Play",
-  "the dog house multihold": "Pragmatic Play",
   "wolf gold": "Pragmatic Play",
   "wild west gold": "Pragmatic Play",
-  "wild beach party": "Pragmatic Play",
   "chilli heat": "Pragmatic Play",
   "chilli heat megaways": "Pragmatic Play",
   "pirate gold": "Pragmatic Play",
@@ -47,32 +68,8 @@ const PROVIDER_OVERRIDES = {
   "cowboys gold": "Pragmatic Play",
   "bonanza gold": "Pragmatic Play",
   "tales of egypt": "Pragmatic Play",
-  "jungle delight": "Pragmatic Play",
-  "dragon tiger luck": "Pragmatic Play",
-  "double fortune": "Pragmatic Play",
-  "fortune dragon": "Pragmatic Play",
-  "fortune mouse": "Pragmatic Play",
-  "fortune ox": "Pragmatic Play",
-  "fortune rabbit": "Pragmatic Play",
-  "fortune tiger": "Pragmatic Play",
-  "ganesha gold": "Pragmatic Play",
 
-  // ===== PG SOFT =====
-  "bikini paradise": "PG Soft",
-  "hood vs woolf": "PG Soft",
-  "jack frost": "PG Soft",
-  "phoenix rises": "PG Soft",
-  "queen of bounty": "PG Soft",
-  "songkran party": "PG Soft",
-  "treasures of aztec": "PG Soft",
-  "medusa": "PG Soft",
-  "fortune gods": "PG Soft",
-  "mahjong ways": "PG Soft",
-  "mahjong ways 2": "PG Soft",
-  "dreams of macau": "PG Soft",
-  "wild bandito": "PG Soft",
-
-  // ===== REEL KINGDOM =====
+  // ===== REEL KINGDOM (parceira da Pragmatic) =====
   "big bass bonanza": "Reel Kingdom",
   "big bass splash": "Reel Kingdom",
   "big bass bonanza - keeping it reel": "Reel Kingdom",
