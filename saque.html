@@ -78,7 +78,7 @@
 
       // Validacoes ANTES de tocar no botao
       if (!valor || valor < 20) {
-        return setStatus('error', 'Valor minimo de saque: R$ 20,00 (exigencia da SigiloPay).');
+        return setStatus('error', 'Valor minimo de saque: R$ 20,00.');
       }
       if (valor > ZKN.ZKN_USER.balance) {
         return setStatus('error', `Saldo insuficiente. Você tem ${ZKN.formatBRL(ZKN.ZKN_USER.balance)}.`);
@@ -92,17 +92,17 @@
       setStatus('pending', 'Verificando PIN...');
 
       try {
-        // 1) Verifica PIN (com timeout de 15s)
+        // 1) Verifica PIN (timeout 15s)
         const pinOk = await Promise.race([
           ZKNAuth.verificarPinSaque(pin),
-          new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout ao verificar PIN. Tente novamente.')), 15000))
+          new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout ao verificar PIN.')), 15000))
         ]);
 
         if (!pinOk || !pinOk.sucesso) {
           return setStatus('error', (pinOk && pinOk.mensagem) || 'PIN incorreto.');
         }
 
-        // 2) Pega os dados de saque
+        // 2) Pega dados de saque
         const dados = await ZKNAuth.getDadosSaque();
         if (!dados || !dados.pixKey) {
           return setStatus('error', 'Chave PIX não encontrada. Refaça o cadastro de saque.');
@@ -111,13 +111,13 @@
         btn.textContent = 'Enviando para SigiloPay...';
         setStatus('pending', 'Processando saque...');
 
-        // 3) Cria a transferencia (com timeout de 30s)
+        // 3) Cria transferencia (timeout 30s)
         const res = await Promise.race([
           SigiloPay.criarTransferencia(valor, dados.pixKey, {
             nome: dados.holderName,
             cpf: dados.holderCpf,
           }),
-          new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout ao processar saque. Tente novamente em instantes.')), 30000))
+          new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout ao processar saque.')), 30000))
         ]);
 
         if (res && res.sucesso) {
@@ -127,15 +127,16 @@
           document.getElementById('valorSaque').value = '';
           pinEl.value = '';
         } else {
-          setStatus('error', (res && res.mensagem) || 'Erro ao processar saque.');
-          ZKN.toast('Erro no saque', (res && res.mensagem) || 'Tente novamente.', 'error');
+          // MOSTRA A MENSAGEM REAL (nao mais "Invalid request data" hardcoded)
+          const msg = (res && res.mensagem) ? res.mensagem : 'Erro ao processar saque.';
+          setStatus('error', msg);
+          ZKN.toast('Erro no saque', msg, 'error');
+          console.log('[SAQUE] resposta completa:', JSON.stringify(res, null, 2));
         }
       } catch (e) {
-        // QUALQUER erro cai aqui e destrava o botao
         setStatus('error', 'Erro: ' + (e.message || 'Falha na conexao'));
         ZKN.toast('Erro no saque', e.message || 'Verifique a conexao.', 'error');
       } finally {
-        // SEMPRE destrava o botao, aconteca o que acontecer
         btn.disabled = false;
         btn.textContent = 'Solicitar Saque';
       }
