@@ -1,5 +1,5 @@
 ﻿// ============================================================
-// ZKNbet — Validators + Máscaras
+// ZKNbet — Validators + Máscaras (v2 — telefone robusto)
 // ============================================================
 
 // ---------- CPF ----------
@@ -19,20 +19,48 @@ function validarCPF(cpf) {
   return d2 === parseInt(cpf[10]);
 }
 
-// ---------- Celular BR ----------
-// Aceita (11) 91234-5678, 11912345678, +5511912345678
+// ---------- CELULAR (BR) ----------
+// Aceita:
+//   - 11999999999 (11 dígitos, DDD + 9 + 8)
+//   - 1199999999 (10 dígitos, DDD + 8 — fixo ou antigo)
+//   - 5511999999999 (13 dígitos, com +55)
+//   - +5511999999999
+//   - (11) 99999-9999
+//   - (11) 9999-9999
 function validarCelular(tel) {
-  tel = String(tel || '').replace(/\D/g, '');
-  if (tel.startsWith('55') && tel.length > 11) tel = tel.slice(2);
-  if (tel.length !== 11) return false;
-  if (!/^[1-9]{2}9\d{8}$/.test(tel)) return false;
+  let digits = String(tel || '').replace(/\D/g, '');
+
+  // Remove prefixo 55 (Brasil) se tiver
+  if (digits.length > 11 && digits.startsWith('55')) {
+    digits = digits.slice(2);
+  }
+
+  // Aceita 10 ou 11 dígitos
+  if (digits.length !== 10 && digits.length !== 11) return false;
+
+  // DDD válido (11 a 99)
+  const ddd = parseInt(digits.slice(0, 2));
+  if (ddd < 11 || ddd > 99) return false;
+
+  // Se 11 dígitos, o terceiro precisa ser 9 (celular novo)
+  if (digits.length === 11 && digits[2] !== '9') return false;
+
+  // Se 10 dígitos, o terceiro precisa ser 2-5 (fixo) ou 6-9 (celular antigo)
+  if (digits.length === 10) {
+    const primeiro = digits[2];
+    if (primeiro === '0' || primeiro === '1') return false;
+  }
+
   return true;
 }
 
+// Normaliza: retorna só os dígitos, sem +55 (formato do D1: 11 dígitos)
 function normalizarCelular(tel) {
-  tel = String(tel || '').replace(/\D/g, '');
-  if (tel.startsWith('55') && tel.length > 11) tel = tel.slice(2);
-  return tel;
+  let digits = String(tel || '').replace(/\D/g, '');
+  if (digits.length > 11 && digits.startsWith('55')) {
+    digits = digits.slice(2);
+  }
+  return digits;
 }
 
 // ---------- E-mail ----------
@@ -60,17 +88,30 @@ function mascaraCPF(input) {
   return v;
 }
 
+// Máscara de celular: aceita 10 ou 11 dígitos
+// 11 dígitos: (11) 99999-9999
+// 10 dígitos: (11) 9999-9999
 function mascaraCelular(input) {
   let v = input.value.replace(/\D/g, '').slice(0, 11);
-  if (v.length > 6) {
-    v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
-  } else if (v.length > 2) {
-    v = v.replace(/(\d{2})(\d{0,5})/, '($1) $2');
-  } else if (v.length > 0) {
-    v = v.replace(/(\d{0,2})/, '($1');
+
+  if (v.length <= 2) {
+    input.value = v.length > 0 ? '(' + v : '';
+    return input.value;
   }
-  input.value = v;
-  return v;
+
+  if (v.length <= 6) {
+    input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2);
+    return input.value;
+  }
+
+  if (v.length <= 10) {
+    // (11) 9999-9999
+    input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2, 6) + '-' + v.slice(6);
+  } else {
+    // (11) 99999-9999 (11 dígitos)
+    input.value = '(' + v.slice(0, 2) + ') ' + v.slice(2, 7) + '-' + v.slice(7);
+  }
+  return input.value;
 }
 
 // Máscara dinâmica (auto-detecta CPF ou celular)
@@ -82,7 +123,6 @@ function mascaraPixDinamica(input) {
   if (raw.length === 11) {
     return mascaraCelular(input);
   }
-  // Em digitação, aplica a de celular até saber
   return mascaraCelular(input);
 }
 

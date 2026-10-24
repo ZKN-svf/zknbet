@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // ZKNbet — App core (header, saldo, toasts, sessão, drawer)
 // ============================================================
 
@@ -209,8 +209,56 @@ document.addEventListener('DOMContentLoaded', () => {
   renderHeader();
   ZKN_USER.balance = ZKN_USER.balance;
   document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharDrawer(); });
+  window.addEventListener('pageshow', () => { if (window.ZKNAuth?.isLoggedIn?.()) iniciarPollingSaldo(); });
 });
 
+
+// ============================================================
+// ATUALIZACAO AUTOMATICA DE SALDO (polling)
+// Chama /api/balance a cada 15s e atualiza o header sem reload
+// ============================================================
+let _saldoPollInterval = null;
+
+async function atualizarSaldoHeader() {
+  if (!window.ZKNAuth?.isLoggedIn?.()) return;
+  try {
+    const saldo = await window.ZKNAuth.getSaldo();
+    // Atualiza todos os elementos [data-balance] (header, saldo-info, etc.)
+    document.querySelectorAll('[data-balance]').forEach(el => {
+      el.textContent = formatBRL(saldo);
+    });
+  } catch (e) {
+    // silencioso
+  }
+}
+
+function iniciarPollingSaldo() {
+  if (_saldoPollInterval) clearInterval(_saldoPollInterval);
+  if (!window.ZKNAuth?.isLoggedIn?.()) return;
+
+  // Atualiza imediatamente ao carregar
+  atualizarSaldoHeader();
+
+  // Depois a cada 15 segundos
+  _saldoPollInterval = setInterval(atualizarSaldoHeader, 15000);
+
+  console.log('[SALDO] polling iniciado (15s)');
+}
+
+function pararPollingSaldo() {
+  if (_saldoPollInterval) {
+    clearInterval(_saldoPollInterval);
+    _saldoPollInterval = null;
+    console.log('[SALDO] polling parado');
+  }
+}
+
+// Expoe no window pra usar em outras paginas se precisar
+window.ZKNSaldo = {
+  atualizar: atualizarSaldoHeader,
+  iniciar: iniciarPollingSaldo,
+  parar: pararPollingSaldo,
+};
 window.ZKN = {
   ZKN_USER, formatBRL, toast, gerarIniciais,
   renderHeader, abrirDrawer, fecharDrawer, abrirIndicacaoDrawer,
