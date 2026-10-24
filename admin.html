@@ -476,7 +476,29 @@
           </table>
         </div>
       </div>
-    </div>
+          <div style="display:flex;gap:8px;margin-top:16px;">
+            <button class="admin-btn" onclick="criarBonus()">Criar</button>
+            <button class="admin-btn secondary" onclick="fecharFormBonus()">Cancelar</button>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Valor sorteado</th>
+                <th>Usos</th>
+                <th>Expira</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="bonusesTable"><tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+</div>
   </div>
 
   <script src="assets/config.js"></script>
@@ -654,8 +676,6 @@
         `).join('');
       } catch (e) { toast('Erro', e.message, 'error'); }
     }
-
-    
     // ---------- SAQUES PENDENTES ----------
     async function carregarWithdraws() {
       try {
