@@ -762,20 +762,7 @@
 
     
     // ---------- Renderiza celula de rollover ----------
-    function renderRollover(u) {
-      const dep = Number(u.total_deposited || 0);
-      const bet = Number(u.total_bet || 0);
-      if (dep === 0) return '<span style="color:var(--text-muted);font-size:11px;">—</span>';
-
-      const req = dep * 0.60;
-      const falta = Math.max(0, req - bet);
-      const pct = Math.min(100, Math.round((bet / req) * 100));
-
-      if (falta === 0) {
-        return `<span class="badge completed">✓ ${pct}%</span>`;
-      }
-      return `<span class="badge pending">${pct}% · falta ${fmtBRL(falta)}</span>`;
-    }
+    function renderRollover(u) {const saldo=Number(u.balance||0);const dep=Number(u.deposited||0);const betSince=Number(u.bet_since_deposit||0);if(saldo<=0)return '<span style="color:var(--text-muted);font-size:11px;">sem saldo</span>';if(dep===0)return '<span style="color:var(--text-muted);font-size:11px;">sem deposito</span>';const req=dep*0.60;const falta=Math.max(0,req-betSince);const pct=Math.min(100,Math.round((betSince/req)*100));if(falta===0)return '<span class="badge completed">OK '+pct+'%</span>';return '<span class="badge pending">'+pct+'% falta '+fmtBRL(falta)+'</span>';}
 
     // ---------- INIT ----------
     if (adminToken && adminUser) {

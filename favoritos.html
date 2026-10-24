@@ -49,58 +49,80 @@
 
     let ALL_GAMES = [];
 
+    // ---------- RENDER: FAVORITOS ----------
     function renderFavoritos() {
-      const codes = ZKNGamesLib.getFavoritos();
+      const codes = (window.ZKNGamesLib && ZKNGamesLib.getFavoritos()) || [];
       const grid = document.getElementById('favGrid');
 
       if (!codes.length) {
-        grid.innerHTML = `
-          <div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;">
-            <div style="font-size:44px;margin-bottom:12px;">⭐</div>
-            <div style="font-weight:800;font-size:16px;margin-bottom:6px;">Nenhum favorito ainda</div>
-            <div style="color:var(--text-muted);font-size:14px;margin-bottom:20px;">
-              Toque na estrela ☆ em qualquer jogo para salvar aqui.
-            </div>
-            <a href="jogos.html" class="btn-primary" style="text-decoration:none;display:inline-flex;">Explorar jogos</a>
-          </div>
-        `;
+        grid.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;">' +
+          '<div style="font-size:44px;margin-bottom:12px;">⭐</div>' +
+          '<div style="font-weight:800;font-size:16px;margin-bottom:6px;">Nenhum favorito ainda</div>' +
+          '<div style="color:var(--text-muted);font-size:14px;margin-bottom:20px;">Toque na estrela ☆ em qualquer jogo para salvar aqui.</div>' +
+          '<a href="jogos.html" class="btn-primary" style="text-decoration:none;display:inline-flex;">Explorar jogos</a>' +
+          '</div>';
         return;
       }
+
       const jogos = codes.map(c => ALL_GAMES.find(j => j.game_code === c)).filter(Boolean);
+
+      if (!jogos.length) {
+        grid.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Carregando jogos...</div>';
+        return;
+      }
+
       ZKNGamesLib.renderGameSection(grid, jogos);
     }
 
+    // ---------- RENDER: RECENTES ----------
     function renderRecentes() {
-      const codes = ZKNGamesLib.getRecentes();
+      const codes = (window.ZKNGamesLib && ZKNGamesLib.getRecentes()) || [];
       const section = document.getElementById('recentesSection');
       const grid = document.getElementById('recentesGrid');
-      if (!codes.length) { section.style.display = 'none'; return; }
+
+      if (!codes.length) {
+        if (section) section.style.display = 'none';
+        return;
+      }
+
       const jogos = codes.map(c => ALL_GAMES.find(j => j.game_code === c)).filter(Boolean);
-      if (!jogos.length) { section.style.display = 'none'; return; }
-      section.style.display = 'block';
+
+      if (!jogos.length) {
+        if (section) section.style.display = 'none';
+        return;
+      }
+
+      if (section) section.style.display = 'block';
       ZKNGamesLib.renderGameSection(grid, jogos);
     }
 
-    async function iniciar() {
-      const [jogos] = await Promise.all([
-        NitroGames.listarJogos(),
-        ZKNGamesLib.carregarFavoritos(),
-        ZKNGamesLib.carregarRecentes(),
-      ]);
-      if (!jogos.sucesso) {
+    // ---------- CARREGAR ----------
+    async function carregar() {
+      // Carrega jogos da API
+      const res = await NitroGames.listarJogos();
+
+      if (res.sucesso) {
+        // Aplica providers reais
+        ALL_GAMES = window.ZKNProviders ? window.ZKNProviders.aplicarProvidersReais(res.jogos) : res.jogos;
+      } else {
         document.getElementById('favGrid').innerHTML =
-          `<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">${jogos.mensagem || 'Erro.'}</div>`;
+          '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">' +
+          (res.mensagem || 'Erro ao carregar jogos.') + '</div>';
         return;
       }
-      ALL_GAMES = jogos.jogos;
+
+      // Carrega favoritos e recentes do backend
+      await Promise.all([ZKNGamesLib.carregarFavoritos(), ZKNGamesLib.carregarRecentes()]);
+
       renderFavoritos();
       renderRecentes();
     }
 
-    window.__FAV_PAGE_RERENDER__ = () => renderFavoritos();
+    // ---------- HOOKS DE RE-RENDER ----------
+    window.__FAV_RERENDER__ = () => renderFavoritos();
     window.__RECENTES_UPDATED__ = () => renderRecentes();
 
-    iniciar();
+    carregar();
   </script>
 </body>
 </html>

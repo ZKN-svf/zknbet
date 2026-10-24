@@ -141,8 +141,10 @@
         const capa = j.image_url || '';
         const inicial = (j.name || '?').charAt(0).toUpperCase();
         const nomeEsc = (j.name || '').replace(/'/g, "\\'");
+        const favBtn = window.ZKNGamesLib && window.ZKNGamesLib.renderFavButton ? window.ZKNGamesLib.renderFavButton(j.game_code) : '';
         return `
           <div class="game-card" onclick="jogar('${j.game_code}', '${nomeEsc}')">
+            ${favBtn}
             <div class="game-card-cover">
               ${capa ? `<img src="${capa}" alt="${j.name}" loading="lazy" onerror="this.style.display='none';this.parentNode.insertBefore(document.createTextNode('${inicial}'),this.nextSibling)">` : inicial}
               <div class="game-card-play"><div class="play-btn">&#9654;</div></div>

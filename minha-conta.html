@@ -20,22 +20,47 @@
       <div id="userInfo" style="margin:24px 0;"></div>
 
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <button class="btn-secondary btn-block" onclick="location.href='alterar-dados.html'">✏️ Alterar dados</button>
+        <div id="stat-section" style="margin:16px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;"><div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Total depositado</div><div id="stat-total-deposited" style="font-size:18px;font-weight:800;color:var(--gold);">R$ 0,00</div></div><div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Total apostado</div><div id="stat-total-bet" style="font-size:18px;font-weight:800;color:var(--text);">R$ 0,00</div></div><div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Rollover</div><div id="stat-rollover" style="font-size:18px;font-weight:800;color:var(--green);">-</div></div></div>
+
+      <button class="btn-secondary btn-block" onclick="location.href='alterar-dados.html'">✏️ Alterar dados</button>
         <button class="btn-secondary btn-block" onclick="location.href='alterar-senha.html'">🔒 Alterar senha</button>
         <button class="btn-secondary btn-block" onclick="location.href='historico.html'">📜 Histórico de transações</button>
         <button class="btn-secondary btn-block" onclick="location.href='saque-primeiro-acesso.html'">🔑 Configurar dados de saque</button>
         <button class="btn-secondary btn-block" onclick="location.href='indicacao.html'">🤝 Programa de indicação</button>
       </div>
 
-      <button class="btn-primary btn-block" style="background:var(--red);color:#fff;margin-top:24px;" onclick="sair()">Sair da conta</button>
+      <!-- ESTATISTICAS -->
+      <div id="total-deposited-section" style="margin:16px 0;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
+          <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+            <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:4px;">Total depositado</div>
+            <div id="stat-total-deposited" style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--gold);">R$ 0,00</div>
+          </div>
+          <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+            <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:4px;">Total apostado</div>
+            <div id="stat-total-bet" style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--text);">R$ 0,00</div>
+          </div>
+          <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+            <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:4px;">Rollover pendente</div>
+            <div id="stat-rollover" style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--green);">LIBERADO</div>
+          </div>
+        </div>
+      </div>
+
+Sair da conta</button>
     </div>
   </div>
 
-  <script src="assets/loading.js"></script>
-  <script src="assets/config.js"></script>
-  <script src="assets/validators.js"></script>
-  <script src="assets/auth.js"></script>
-  <script src="assets/app.js"></script>
+  <script src="assets/loading.js">async function carregarEstatisticas(){try{const r=await ZKNAuth.getRollover();if(!r)return;const d=document.getElementById('stat-total-deposited');const b=document.getElementById('stat-total-bet');const ro=document.getElementById('stat-rollover');if(d)d.textContent=ZKN.formatBRL(r.total_deposited||0);if(b)b.textContent=ZKN.formatBRL(r.total_bet||0);if(ro){if(r.sem_rollover||r.liberado){ro.textContent='LIBERADO';ro.style.color='var(--green)';}else{ro.textContent=ZKN.formatBRL(r.remaining||0);ro.style.color='var(--gold)';}}}catch(e){}}carregarEstatisticas();
+</script>
+  <script src="assets/config.js">async function carregarEstatisticas(){try{const r=await ZKNAuth.getRollover();if(!r)return;const d=document.getElementById('stat-total-deposited');const b=document.getElementById('stat-total-bet');const ro=document.getElementById('stat-rollover');if(d)d.textContent=ZKN.formatBRL(r.total_deposited||0);if(b)b.textContent=ZKN.formatBRL(r.total_bet||0);if(ro){if(r.sem_rollover||r.liberado){ro.textContent='LIBERADO';ro.style.color='var(--green)';}else{ro.textContent=ZKN.formatBRL(r.remaining||0);ro.style.color='var(--gold)';}}}catch(e){}}carregarEstatisticas();
+</script>
+  <script src="assets/validators.js">async function carregarEstatisticas(){try{const r=await ZKNAuth.getRollover();if(!r)return;const d=document.getElementById('stat-total-deposited');const b=document.getElementById('stat-total-bet');const ro=document.getElementById('stat-rollover');if(d)d.textContent=ZKN.formatBRL(r.total_deposited||0);if(b)b.textContent=ZKN.formatBRL(r.total_bet||0);if(ro){if(r.sem_rollover||r.liberado){ro.textContent='LIBERADO';ro.style.color='var(--green)';}else{ro.textContent=ZKN.formatBRL(r.remaining||0);ro.style.color='var(--gold)';}}}catch(e){}}carregarEstatisticas();
+</script>
+  <script src="assets/auth.js">async function carregarEstatisticas(){try{const r=await ZKNAuth.getRollover();if(!r)return;const d=document.getElementById('stat-total-deposited');const b=document.getElementById('stat-total-bet');const ro=document.getElementById('stat-rollover');if(d)d.textContent=ZKN.formatBRL(r.total_deposited||0);if(b)b.textContent=ZKN.formatBRL(r.total_bet||0);if(ro){if(r.sem_rollover||r.liberado){ro.textContent='LIBERADO';ro.style.color='var(--green)';}else{ro.textContent=ZKN.formatBRL(r.remaining||0);ro.style.color='var(--gold)';}}}catch(e){}}carregarEstatisticas();
+</script>
+  <script src="assets/app.js">async function carregarEstatisticas(){try{const r=await ZKNAuth.getRollover();if(!r)return;const d=document.getElementById('stat-total-deposited');const b=document.getElementById('stat-total-bet');const ro=document.getElementById('stat-rollover');if(d)d.textContent=ZKN.formatBRL(r.total_deposited||0);if(b)b.textContent=ZKN.formatBRL(r.total_bet||0);if(ro){if(r.sem_rollover||r.liberado){ro.textContent='LIBERADO';ro.style.color='var(--green)';}else{ro.textContent=ZKN.formatBRL(r.remaining||0);ro.style.color='var(--gold)';}}}catch(e){}}carregarEstatisticas();
+</script>
   <script>
     if (!ZKNAuth.requireLogin('minha-conta.html')) throw new Error('redirecionado');
 
@@ -62,6 +87,35 @@
       if (confirm('Deseja sair da conta?')) ZKNAuth.logout();
     }
     carregar();
-  </script>
+    // ---------- ESTATISTICAS (total depositado, total apostado, rollover) ----------
+    async function carregarEstatisticas() {
+      try {
+        const rollover = await ZKNAuth.getRollover();
+        if (!rollover) return;
+
+        const statDep = document.getElementById('stat-total-deposited');
+        const statBet = document.getElementById('stat-total-bet');
+        const statRollover = document.getElementById('stat-rollover');
+
+        if (statDep) statDep.textContent = ZKN.formatBRL(rollover.total_deposited || 0);
+        if (statBet) statBet.textContent = ZKN.formatBRL(rollover.total_bet || 0);
+        if (statRollover) {
+          if (rollover.sem_rollover || rollover.liberado) {
+            statRollover.textContent = 'LIBERADO';
+            statRollover.style.color = 'var(--green)';
+          } else {
+            statRollover.textContent = ZKN.formatBRL(rollover.remaining || 0);
+            statRollover.style.color = 'var(--gold)';
+          }
+        }
+      } catch (e) {
+        console.warn('[carregarEstatisticas]', e.message);
+      }
+    }
+
+    carregarEstatisticas();
+
+  async function carregarEstatisticas(){try{const r=await ZKNAuth.getRollover();if(!r)return;const d=document.getElementById('stat-total-deposited');const b=document.getElementById('stat-total-bet');const ro=document.getElementById('stat-rollover');if(d)d.textContent=ZKN.formatBRL(r.total_deposited||0);if(b)b.textContent=ZKN.formatBRL(r.total_bet||0);if(ro){if(r.sem_rollover||r.liberado){ro.textContent='LIBERADO';ro.style.color='var(--green)';}else{ro.textContent=ZKN.formatBRL(r.remaining||0);ro.style.color='var(--gold)';}}}catch(e){}}carregarEstatisticas();
+</script>
 </body>
 </html>
