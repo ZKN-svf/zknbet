@@ -192,6 +192,161 @@
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .stat-value { font-size: 18px; }
     }
+  
+    /* ============================================================
+       MOBILE RESPONSIVO
+       ============================================================ */
+    @media (max-width: 768px) {
+      .admin-header {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .admin-header > div:first-child span {
+        font-size: 18px !important;
+      }
+      #adminName {
+        font-size: 12px !important;
+      }
+      .admin-btn.secondary {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+      }
+      .admin-container {
+        padding: 12px;
+      }
+      .admin-tabs {
+        gap: 4px;
+        margin-bottom: 16px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .admin-tabs::-webkit-scrollbar { display: none; }
+      .admin-tab {
+        padding: 10px 14px;
+        font-size: 12px;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .stat-card {
+        padding: 14px;
+      }
+      .stat-label {
+        font-size: 9px;
+      }
+      .stat-value {
+        font-size: 16px;
+      }
+      .stat-sub {
+        font-size: 10px;
+      }
+
+      /* Tabela vira cards empilhados no mobile */
+      .admin-table thead {
+        display: none;
+      }
+      .admin-table,
+      .admin-table tbody,
+      .admin-table tr,
+      .admin-table td {
+        display: block;
+        width: 100%;
+      }
+      .admin-table tr {
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 10px;
+        padding: 12px;
+        position: relative;
+      }
+      .admin-table tr:hover td {
+        background: transparent;
+      }
+      .admin-table td {
+        border: none;
+        padding: 6px 0;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+      .admin-table td:before {
+        content: attr(data-label);
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .admin-table td:last-child {
+        margin-top: 8px;
+        padding-top: 10px;
+        border-top: 1px solid var(--border);
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .admin-table td:last-child:before {
+        display: none;
+      }
+      .admin-table td[colspan] {
+        text-align: center !important;
+        display: block;
+        padding: 20px !important;
+      }
+      .admin-table td[colspan]:before {
+        display: none;
+      }
+
+      /* Formulario de saque */
+      .form-group input,
+      .form-group select {
+        font-size: 16px; /* evita zoom no iOS */
+      }
+      .admin-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 13px;
+      }
+      .admin-btn.danger,
+      .admin-btn.secondary {
+        width: auto;
+        padding: 8px 12px;
+        font-size: 11px;
+      }
+      #tab-withdraws > div:first-child {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 8px !important;
+      }
+
+      /* Login */
+      .login-box {
+        padding: 28px 20px;
+      }
+      .login-box h1 {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .stat-value {
+        font-size: 18px;
+      }
+      .admin-tab {
+        padding: 8px 10px;
+        font-size: 11px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -449,10 +604,10 @@
       if (!list.length) { tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Nenhum usuário</td></tr>'; return; }
       tb.innerHTML = list.map(u => `
         <tr>
-          <td><strong>${u.name}</strong></td>
-          <td>${u.email || '-'}</td>
-          <td>${u.phone}</td>
-          <td style="font-weight:700;color:var(--gold);">${fmtBRL(u.balance)}</td>
+          <td data-label="Nome"><strong>${u.name}</strong></td>
+          <td data-label="Email">${u.email || '-'}</td>
+          <td data-label="Celular">${u.phone}</td>
+          <td data-label="Saldo" style="font-weight:700;color:var(--gold);">${fmtBRL(u.balance)}</td>
           <td><button class="admin-btn secondary" style="padding:6px 10px;font-size:11px;" onclick="ajustarSaldo('${u.uid}', '${u.name}')">Ajustar saldo</button></td>
         </tr>
       `).join('');
@@ -479,11 +634,11 @@
         if (!list.length) { tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Nenhuma transação</td></tr>'; return; }
         tb.innerHTML = list.map(t => `
           <tr>
-            <td>${fmtDate(t.created_at)}</td>
-            <td>${t.user_name || t.uid}</td>
-            <td><span class="badge ${t.type}">${t.type}</span></td>
-            <td style="font-weight:700;">${fmtBRL(t.amount)}</td>
-            <td><span class="badge ${t.status}">${t.status}</span></td>
+            <td data-label="Data">${fmtDate(t.created_at)}</td>
+            <td data-label="Usuário">${t.user_name || t.uid}</td>
+            <td data-label="Tipo"><span class="badge ${t.type}">${t.type}</span></td>
+            <td data-label="Valor" style="font-weight:700;">${fmtBRL(t.amount)}</td>
+            <td data-label="Status"><span class="badge ${t.status}">${t.status}</span></td>
           </tr>
         `).join('');
       } catch (e) { toast('Erro', e.message, 'error'); }
@@ -563,12 +718,12 @@
 
           return `
             <tr>
-              <td>${fmtDate(w.created_at)}</td>
-              <td><strong>${w.user_name || '-'}</strong><br><small style="color:var(--text-muted);">${w.user_email || w.user_phone || ''}</small></td>
-              <td style="font-weight:700;color:var(--gold);">${fmtBRL(w.amount)}</td>
-              <td style="font-size:11px;">${pixDisplay}</td>
-              <td style="font-size:11px;">${titular}</td>
-              <td><span class="badge ${statusClass}">${w.status}</span></td>
+              <td data-label="Data">${fmtDate(w.created_at)}</td>
+              <td data-label="Jogador"><strong>${w.user_name || '-'}</strong><br><small style="color:var(--text-muted);">${w.user_email || w.user_phone || ''}</small></td>
+              <td data-label="Valor" style="font-weight:700;color:var(--gold);">${fmtBRL(w.amount)}</td>
+              <td data-label="PIX" style="font-size:11px;">${pixDisplay}</td>
+              <td data-label="Titular" style="font-size:11px;">${titular}</td>
+              <td data-label="Status"><span class="badge ${statusClass}">${w.status}</span></td>
               <td>${acoes}</td>
             </tr>
           `;
