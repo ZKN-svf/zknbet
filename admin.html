@@ -388,7 +388,6 @@
         <button class="admin-tab" data-tab="transactions">Transações</button>
         <button class="admin-tab" data-tab="nitrogames">NitroGames</button>
         <button class="admin-tab" data-tab="withdraws">Saques pendentes</button>
-        <button class="admin-tab" data-tab="withdraw">Saque (lucro)</button>
         <button class="admin-tab" data-tab="audit">Auditoria</button>
       </div>
 
@@ -463,24 +462,7 @@
         </div>
       </div>
 
-      <div id="tab-withdraw" class="tab-content hidden">
-        <div class="stat-card" style="margin-bottom:16px;">
-          <div class="stat-label">Saldo disponível para saque (Owner Wallet)</div>
-          <div class="stat-value green" id="statOwnerBalance">-</div>
-        </div>
-        <div style="max-width:500px;">
-          <div class="form-group"><label>Valor (R$)</label><input type="number" id="wdAmount" class="admin-input" placeholder="0,00" step="0.01" min="1"></div>
-          <div class="form-group"><label>Chave PIX</label><input type="text" id="wdPixKey" class="admin-input" placeholder="CPF, celular, email..."></div>
-          <div class="form-group"><label>Tipo da chave</label>
-            <select id="wdPixType" class="admin-input">
-              <option value="cpf">CPF</option><option value="cnpj">CNPJ</option><option value="email">Email</option><option value="phone">Celular</option><option value="random">Aleatória</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Nome do titular</label><input type="text" id="wdHolderName" class="admin-input" placeholder="Nome completo"></div>
-          <div class="form-group"><label>CPF/CNPJ do titular</label><input type="text" id="wdHolderDoc" class="admin-input" placeholder="000.000.000-00"></div>
-          <button class="admin-btn" onclick="solicitarSaque()">💸 Solicitar saque</button>
-        </div>
-      </div>
+      
 
       <!-- AUDITORIA -->
       <div id="tab-audit" class="tab-content hidden">
@@ -567,7 +549,6 @@
         if (tab === 'transactions') carregarTransactions();
         if (tab === 'nitrogames') carregarNitroBalance();
         if (tab === 'withdraws') carregarWithdraws();
-        if (tab === 'withdraw') carregarOwnerBalance();
         if (tab === 'audit') carregarAudit();
       };
     });
@@ -651,28 +632,6 @@
         const d = await api('/admin/nitrogames/balance');
         document.getElementById('statNitroBalance').textContent = JSON.stringify(d.balance || {});
       } catch (e) { toast('Erro', e.message, 'error'); }
-    }
-
-    // ---------- WITHDRAW ----------
-    async function carregarOwnerBalance() {
-      try {
-        const d = await api('/admin/dashboard');
-        document.getElementById('statOwnerBalance').textContent = fmtBRL(d.owner_wallet);
-      } catch (e) { toast('Erro', e.message, 'error'); }
-    }
-    async function solicitarSaque() {
-      const amount = parseFloat(document.getElementById('wdAmount').value);
-      const pixKey = document.getElementById('wdPixKey').value.trim();
-      const pixType = document.getElementById('wdPixType').value;
-      const holderName = document.getElementById('wdHolderName').value.trim();
-      const holderDocument = document.getElementById('wdHolderDoc').value.trim();
-      if (!amount || amount < 1) return toast('Valor inválido', '', 'error');
-      if (!pixKey || !holderName || !holderDocument) return toast('Preencha todos os campos', '', 'error');
-      try {
-        await api('/admin/withdraw', { method: 'POST', body: JSON.stringify({ amount, pixKey, pixType, holderName, holderDocument }) });
-        toast('Saque solicitado!', 'Processando via SigiloPay...', 'success');
-        carregarOwnerBalance();
-      } catch (e) { toast('Erro no saque', e.message, 'error'); }
     }
 
     // ---------- AUDIT ----------
