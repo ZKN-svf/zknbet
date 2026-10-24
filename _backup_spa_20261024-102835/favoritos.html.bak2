@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Favoritos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
+  <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
+  <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="spa-main">
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">⭐ Meus favoritos</h2>
+      <a href="jogos.html" class="section-link">Adicionar mais →</a>
+    </div>
+    <div class="games-carousel" id="favGrid">
+      <div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Carregando...</div>
+    </div>
+  </section>
+
+  <section class="section" id="recentesSection" style="display:none;padding-top:0;">
+    <div class="section-header">
+      <h2 class="section-title">🕘 Jogados recentemente</h2>
+    </div>
+    <div class="games-carousel" id="recentesGrid"></div>
+  </section>
+
+  <footer class="zkn-footer">
+    <div class="zkn-footer-inner">
+      <p><strong>ZKNbet</strong> © 2026 · Todos os direitos reservados</p>
+      <p class="disclaimer">Proibido para menores de 18 anos. Jogue com responsabilidade.</p>
+    </div>
+  </footer>
+
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/providers-map.js"></script>
+  <script src="assets/nitrogames.js"></script>
+  <script src="assets/games-lib.js"></script>
+  <script>
+    if (!ZKNAuth.requireLogin('favoritos.html')) throw new Error('redirecionado');
+
+    let ALL_GAMES = [];
+
+    // ---------- RENDER: FAVORITOS ----------
+    function renderFavoritos() {
+      const codes = (window.ZKNGamesLib && ZKNGamesLib.getFavoritos()) || [];
+      const grid = document.getElementById('favGrid');
+
+      if (!codes.length) {
+        grid.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;">' +
+          '<div style="font-size:44px;margin-bottom:12px;">⭐</div>' +
+          '<div style="font-weight:800;font-size:16px;margin-bottom:6px;">Nenhum favorito ainda</div>' +
+          '<div style="color:var(--text-muted);font-size:14px;margin-bottom:20px;">Toque na estrela ☆ em qualquer jogo para salvar aqui.</div>' +
+          '<a href="jogos.html" class="btn-primary" style="text-decoration:none;display:inline-flex;">Explorar jogos</a>' +
+          '</div>';
+        return;
+      }
+
+      const jogos = codes.map(c => ALL_GAMES.find(j => j.game_code === c)).filter(Boolean);
+
+      if (!jogos.length) {
+        grid.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Carregando jogos...</div>';
+        return;
+      }
+
+      ZKNGamesLib.renderGameSection(grid, jogos);
+    }
+
+    // ---------- RENDER: RECENTES ----------
+    function renderRecentes() {
+      const codes = (window.ZKNGamesLib && ZKNGamesLib.getRecentes()) || [];
+      const section = document.getElementById('recentesSection');
+      const grid = document.getElementById('recentesGrid');
+
+      if (!codes.length) {
+        if (section) section.style.display = 'none';
+        return;
+      }
+
+      const jogos = codes.map(c => ALL_GAMES.find(j => j.game_code === c)).filter(Boolean);
+
+      if (!jogos.length) {
+        if (section) section.style.display = 'none';
+        return;
+      }
+
+      if (section) section.style.display = 'block';
+      ZKNGamesLib.renderGameSection(grid, jogos);
+    }
+
+    // ---------- CARREGAR ----------
+    async function carregar() {
+      // Carrega jogos da API
+      const res = await NitroGames.listarJogos();
+
+      if (res.sucesso) {
+        // Aplica providers reais
+        ALL_GAMES = window.ZKNProviders ? window.ZKNProviders.aplicarProvidersReais(res.jogos) : res.jogos;
+      } else {
+        document.getElementById('favGrid').innerHTML =
+          '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">' +
+          (res.mensagem || 'Erro ao carregar jogos.') + '</div>';
+        return;
+      }
+
+      // Carrega favoritos e recentes do backend
+      await Promise.all([ZKNGamesLib.carregarFavoritos(), ZKNGamesLib.carregarRecentes()]);
+
+      renderFavoritos();
+      renderRecentes();
+    }
+
+    // ---------- HOOKS DE RE-RENDER ----------
+    window.__FAV_RERENDER__ = () => renderFavoritos();
+    window.__RECENTES_UPDATED__ = () => renderRecentes();
+
+    carregar();
+  </script>
+</body>
+</html>

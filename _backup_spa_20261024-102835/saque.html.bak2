@@ -1,0 +1,209 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Saque PIX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
+  <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
+  <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="spa-main">
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+
+  <div class="saque-wrap">
+    <div class="saldo-info">
+      <span class="label">Saldo disponível para saque</span>
+      <span class="val" data-balance>R$ 0,00</span>
+    </div>
+
+    
+    <!-- ROLLOVER (progresso de apostas obrigatorias) -->
+    <div id="rolloverBox" style="display:none; background:var(--bg-2); border:1px solid var(--border-gold); border-radius:var(--radius); padding:16px 20px; margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; font-weight:700;">Rollover exigido</div>
+          <div style="font-size:13px; color:var(--text); margin-top:2px;">
+            Você precisa apostar <strong style="color:var(--gold);">60%</strong> dos seus depósitos para liberar o saque
+          </div>
+        </div>
+        <div style="font-size:24px; font-weight:900; color:var(--gold);" id="rolloverPct">0%</div>
+      </div>
+
+      <div class="progress-bar" style="height:8px; margin-bottom:8px;">
+        <div class="progress-bar-fill" id="rolloverFill" style="width:0%; background:var(--grad-gold);"></div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted);">
+        <span>Apostado: <strong id="rolloverBet" style="color:var(--text);">R$ 0</strong></span>
+        <span>Falta: <strong id="rolloverRemaining" style="color:var(--gold);">R$ 0</strong></span>
+      </div>
+
+      <div id="rolloverStatus" style="margin-top:12px; padding:10px; border-radius:8px; font-size:12px; text-align:center; display:none;">
+      </div>
+    </div>
+<div class="card" style="max-width:none;width:100%;">
+      <h1>💸 Saque via PIX</h1>
+      <p class="subtitle">Digite o valor e sua senha de 6 dígitos para confirmar.</p>
+
+      <label for="valorSaque">Valor do saque (R$)</label>
+      <input type="number" id="valorSaque" placeholder="20,00" step="0.01" min="20" style="font-size:18px;font-weight:700;">
+
+      <label for="pin">Senha de saque (6 dígitos)</label>
+      <input type="password" id="pin" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off">
+
+      <button id="btnSaque" class="btn-primary btn-block">Solicitar Saque</button>
+
+      <div class="status-box" id="statusBox"></div>
+    </div>
+  </div>
+
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/sigilopay.js"></script>
+  <script>
+    if (!ZKNAuth.requireLogin('saque.html')) throw new Error('redirecionado');
+
+    // Se ainda não tem PIN de saque, redireciona para configurar
+    if (!ZKNAuth.temPinSaque()) {
+      location.href = 'saque-primeiro-acesso.html';
+      throw new Error('sem pin');
+    }
+
+    // ---------- Saldo real ----------
+    ZKNAuth.getSaldo();
+
+    // ---------- Helpers ----------
+    function setStatus(tipo, msg) {
+      const box = document.getElementById('statusBox');
+      box.className = 'status-box active ' + tipo;
+      box.innerHTML = msg;
+    }
+
+    const pinEl = document.getElementById('pin');
+    pinEl.addEventListener('input', () => {
+      pinEl.value = pinEl.value.replace(/\D/g, '').slice(0, 6);
+    });
+
+    const valorEl = document.getElementById('valorSaque');
+    valorEl.addEventListener('input', () => {
+      // só limpa status anterior ao digitar de novo
+      document.getElementById('statusBox').className = 'status-box';
+    });
+
+    // ---------- Solicitar saque ----------
+    
+    // ---------- ROLLOVER ----------
+    async function carregarRollover() {
+      const r = await ZKNAuth.getRollover();
+      const box = document.getElementById('rolloverBox');
+      if (!r || !box) return;
+
+      // Se o usuario nunca depositou, esconde a caixa
+      if (!r.total_deposited || r.total_deposited === 0) {
+        box.style.display = 'none';
+        return;
+      }
+
+      box.style.display = 'block';
+      document.getElementById('rolloverPct').textContent = r.percent + '%';
+      document.getElementById('rolloverFill').style.width = r.percent + '%';
+      document.getElementById('rolloverBet').textContent = ZKN.formatBRL(r.total_bet);
+      document.getElementById('rolloverRemaining').textContent = ZKN.formatBRL(r.remaining);
+
+      const status = document.getElementById('rolloverStatus');
+      if (r.liberado) {
+        status.style.display = 'block';
+        status.style.background = 'rgba(0, 214, 127, 0.1)';
+        status.style.color = 'var(--green)';
+        status.innerHTML = '✅ Rollover cumprido! Você pode sacar.';
+        document.getElementById('rolloverFill').style.background = 'var(--grad-green)';
+      } else {
+        status.style.display = 'block';
+        status.style.background = 'rgba(245, 190, 60, 0.1)';
+        status.style.color = 'var(--gold)';
+        status.innerHTML = '⏳ Falta apostar <strong>' + ZKN.formatBRL(r.remaining) + '</strong> para liberar o saque.';
+      }
+    }
+
+    // Chama ao carregar
+    carregarRollover();
+document.getElementById('btnSaque').onclick = async () => {
+      const btn = document.getElementById('btnSaque');
+      const valor = parseFloat(document.getElementById('valorSaque').value);
+      const pin = pinEl.value;
+
+      // Validacoes ANTES de tocar no botao
+      if (!valor || valor < 20) {
+        return setStatus('error', 'Valor minimo de saque: R$ 20,00.');
+      }
+      if (valor > ZKN.ZKN_USER.balance) {
+        return setStatus('error', `Saldo insuficiente. Você tem ${ZKN.formatBRL(ZKN.ZKN_USER.balance)}.`);
+      }
+      if (!/^\d{6}$/.test(pin)) {
+        return setStatus('error', 'Informe o PIN de 6 dígitos.');
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Verificando PIN...';
+      setStatus('pending', 'Verificando PIN...');
+
+      try {
+        // 1) Verifica PIN (timeout 15s)
+        const pinOk = await Promise.race([
+          ZKNAuth.verificarPinSaque(pin),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout ao verificar PIN.')), 15000))
+        ]);
+
+        if (!pinOk || !pinOk.sucesso) {
+          return setStatus('error', (pinOk && pinOk.mensagem) || 'PIN incorreto.');
+        }
+
+        // 2) Pega dados de saque
+        const dados = await ZKNAuth.getDadosSaque();
+        if (!dados || !dados.pixKey) {
+          return setStatus('error', 'Chave PIX não encontrada. Refaça o cadastro de saque.');
+        }
+
+        btn.textContent = 'Enviando para SigiloPay...';
+        setStatus('pending', 'Processando saque...');
+
+        // 3) Cria transferencia (timeout 30s)
+        const res = await Promise.race([
+          SigiloPay.criarTransferencia(valor, dados.pixKey, {
+            nome: dados.holderName,
+            cpf: dados.holderCpf,
+          }),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout ao processar saque.')), 30000))
+        ]);
+
+        if (res && res.sucesso) {
+          setStatus('success', `✅ Saque de ${ZKN.formatBRL(valor)} solicitado!<br>Status: ${res.status || 'PENDENTE'}.`);
+          ZKN.ZKN_USER.balance = ZKN.ZKN_USER.balance - valor;
+          ZKN.toast('Saque solicitado!', `${ZKN.formatBRL(valor)} em processamento.`);
+          document.getElementById('valorSaque').value = '';
+          pinEl.value = '';
+        } else {
+          // MOSTRA A MENSAGEM REAL (nao mais "Invalid request data" hardcoded)
+          const msg = (res && res.mensagem) ? res.mensagem : 'Erro ao processar saque.';
+          setStatus('error', msg);
+          ZKN.toast('Erro no saque', msg, 'error');
+          console.log('[SAQUE] resposta completa:', JSON.stringify(res, null, 2));
+        }
+      } catch (e) {
+        setStatus('error', 'Erro: ' + (e.message || 'Falha na conexao'));
+        ZKN.toast('Erro no saque', e.message || 'Verifique a conexao.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Solicitar Saque';
+      }
+    };</script>
+</body>
+</html>
