@@ -1326,9 +1326,32 @@ body.drawer-open { overflow: hidden; }
   }
 }
 
-/* Em telas muito pequenas, desabilita ticker (economiza CPU) */
+/* ============================================================ */
+/* MOBILE — ticker continua animado, mas mais leve              */
+/* ============================================================ */
+@media (max-width: 768px) {
+  .winners-ticker {
+    padding: 10px 0;
+  }
+
+  .winners-track {
+    animation-duration: 60s !important;
+    will-change: transform;
+  }
+
+  .winner-item {
+    font-size: 12px;
+  }
+
+  .winner-game {
+    display: none; /* esconde "ganhou" e "em X game" no mobile */
+  }
+}
+
 @media (max-width: 480px) {
   .winners-track {
-    animation: none !important;
+    animation-duration: 50s !important;
+    gap: 24px !important;
+    will-change: transform;
   }
 }
