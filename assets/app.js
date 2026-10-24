@@ -92,9 +92,7 @@ function renderHeader() {
     <a href="index.html" class="zkn-logo">
       <span class="z">Z</span><span class="rest">KNbet</span>
     </a>
-    <button class="bonus-chip" onclick="ZKN.abrirBonusDrawer()" title="Resgatar bônus">
-      🎁 Bônus
-    </button>
+    
     <nav class="zkn-nav">
       ${navItems.map(i => `<a href="${i.href}" class="${path === i.href ? 'active' : ''}">${i.label}</a>`).join('')}
     </nav>
@@ -109,9 +107,7 @@ function renderHeader() {
           <a href="index.html" class="zkn-logo">
             <span class="z">Z</span><span class="rest">KNbet</span>
           </a>
-    <button class="bonus-chip" onclick="ZKN.abrirBonusDrawer()" title="Resgatar bônus">
-      🎁 Bônus
-    </button>
+    
           <button class="drawer-close" onclick="ZKN.fecharDrawer()" aria-label="Fechar">✕</button>
         </div>
 
