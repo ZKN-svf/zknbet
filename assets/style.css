@@ -1287,3 +1287,48 @@ body.drawer-open { overflow: hidden; }
     box-shadow: 0 0 10px rgba(245, 190, 60, 0.4) !important;
   }
 }
+
+/* ============================================================ */
+/* MOBILE PERFORMANCE — remove efeitos pesados SO no celular    */
+/* Desktop fica 100% igual                                      */
+/* ============================================================ */
+@media (max-width: 768px) {
+  /* Remove blur do header (era blur(16px) — pesado no mobile) */
+  .zkn-header {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(5, 7, 13, 0.95) !important;
+  }
+
+  /* Remove blur do botao favoritar (era blur(8px)) */
+  .game-card-fav {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(10, 15, 26, 0.95) !important;
+  }
+
+  /* Remove blur do drawer backdrop */
+  .drawer-backdrop {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+  }
+
+  /* Remove hover transform (economiza repaint no celular) */
+  .game-card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Reduz velocidade do ticker de ganhadores */
+  .winners-track {
+    animation-duration: 80s !important;
+  }
+}
+
+/* Em telas muito pequenas, desabilita ticker (economiza CPU) */
+@media (max-width: 480px) {
+  .winners-track {
+    animation: none !important;
+  }
+}

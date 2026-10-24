@@ -149,7 +149,7 @@
           <div class="game-card" onclick="jogar('${j.game_code}', '${nomeEsc}')">
             ${favBtn}
             <div class="game-card-cover">
-              ${capa ? `<img src="${capa}" alt="${j.name}" loading="lazy" onerror="this.style.display='none';this.parentNode.insertBefore(document.createTextNode('${inicial}'),this.nextSibling)">` : inicial}
+              ${capa ? `<img src="${capa}" alt="${j.name}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentNode.insertBefore(document.createTextNode('${inicial}'),this.nextSibling)">` : inicial}
               <div class="game-card-play"><div class="play-btn">&#9654;</div></div>
             </div>
             <div class="game-card-info">
