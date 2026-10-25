@@ -548,31 +548,10 @@
     <!-- ============================================================ -->
     <!-- SEÇÃO 1 — ROLETA                                             -->
     <!-- ============================================================ -->
-    <div class="reward-section">
-      <div class="reward-section-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-        </svg>
-        <div>
-          <div class="reward-section-title">Roleta diária</div>
-          <div class="reward-section-sub">1 giro grátis por dia · R$ 1 a R$ 10</div>
-        </div>
-      </div>
+    
 
       <div class="reward-card">
-        <div class="roulette-container">
-  <div class="roulette-pointer"></div>
-  <div class="roulette-wheel" id="wheel">
-    <div class="roulette-segment">R$ 1</div>
-    <div class="roulette-segment">R$ 2</div>
-    <div class="roulette-segment">R$ 3</div>
-    <div class="roulette-segment">R$ 5</div>
-    <div class="roulette-segment">R$ 7</div>
-    <div class="roulette-segment">R$ 10</div>
-    <div class="roulette-center">
-      <div class="roulette-center-text">ZKN<br>BET</div>
-    </div>
-  </div>
+        
 </div>
 </div>
 
@@ -684,7 +663,68 @@
           </svg>
           <span id="bonusInfo">Rollover de 5x sobre o bônus</span>
         </div>
+      </div>    <!-- SEÇÃO 1 — ROLETA (CSS INLINE) -->
+    <div class="reward-section" id="roulette-section">
+      <div class="reward-section-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        <div>
+          <div class="reward-section-title">Roleta diária</div>
+          <div class="reward-section-sub">1 giro grátis por dia · R$ 1 a R$ 10</div>
+        </div>
       </div>
+
+      <div class="reward-card" style="text-align:center;">
+        <div style="position:relative;width:300px;height:300px;margin:0 auto 24px;">
+          <div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:28px solid #f5be3c;z-index:10;filter:drop-shadow(0 4px 12px rgba(245,190,60,0.8));"></div>
+          
+          <div id="rouletteWheel" style="
+            width:100%;height:100%;border-radius:50%;position:relative;
+            background: conic-gradient(
+              from 0deg,
+              #e74c3c 0deg 60deg,
+              #3498db 60deg 120deg,
+              #2ecc71 120deg 180deg,
+              #f39c12 180deg 240deg,
+              #9b59b6 240deg 300deg,
+              #e74c3c 300deg 360deg
+            );
+            box-shadow: 0 0 0 8px #0a0f1a, 0 0 0 12px #f5be3c, 0 12px 48px rgba(0,0,0,0.6), inset 0 0 60px rgba(0,0,0,0.4);
+            transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            transform: rotate(0deg);
+          ">
+            <div style="position:absolute;top:50%;left:50%;width:50%;height:2px;transform-origin:left center;transform:rotate(30deg);display:flex;align-items:center;justify-content:flex-end;padding-right:20px;font-family:'Sora','Inter',sans-serif;font-size:18px;font-weight:900;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.8);pointer-events:none;">R$ 1</div>
+            <div style="position:absolute;top:50%;left:50%;width:50%;height:2px;transform-origin:left center;transform:rotate(90deg);display:flex;align-items:center;justify-content:flex-end;padding-right:20px;font-family:'Sora','Inter',sans-serif;font-size:18px;font-weight:900;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.8);pointer-events:none;">R$ 2</div>
+            <div style="position:absolute;top:50%;left:50%;width:50%;height:2px;transform-origin:left center;transform:rotate(150deg);display:flex;align-items:center;justify-content:flex-end;padding-right:20px;font-family:'Sora','Inter',sans-serif;font-size:18px;font-weight:900;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.8);pointer-events:none;">R$ 3</div>
+            <div style="position:absolute;top:50%;left:50%;width:50%;height:2px;transform-origin:left center;transform:rotate(210deg);display:flex;align-items:center;justify-content:flex-end;padding-right:20px;font-family:'Sora','Inter',sans-serif;font-size:18px;font-weight:900;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.8);pointer-events:none;">R$ 5</div>
+            <div style="position:absolute;top:50%;left:50%;width:50%;height:2px;transform-origin:left center;transform:rotate(270deg);display:flex;align-items:center;justify-content:flex-end;padding-right:20px;font-family:'Sora','Inter',sans-serif;font-size:18px;font-weight:900;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.8);pointer-events:none;">R$ 7</div>
+            <div style="position:absolute;top:50%;left:50%;width:50%;height:2px;transform-origin:left center;transform:rotate(330deg);display:flex;align-items:center;justify-content:flex-end;padding-right:20px;font-family:'Sora','Inter',sans-serif;font-size:18px;font-weight:900;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.8);pointer-events:none;">R$ 10</div>
+            
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#1a2332 0%,#0a0f1a 100%);border:4px solid #f5be3c;display:flex;align-items:center;justify-content:center;box-shadow:0 0 32px rgba(245,190,60,0.5);z-index:5;">
+              <div style="font-family:'Sora','Inter',sans-serif;font-size:14px;font-weight:900;color:#f5be3c;text-align:center;line-height:1.2;">ZKN<br>BET</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="rouletteResult" style="font-family:'Sora','Inter',sans-serif;font-size:32px;font-weight:900;color:#00d67f;min-height:44px;margin-bottom:20px;text-align:center;letter-spacing:-1px;transition:all 0.3s ease;"></div>
+
+        <button id="spinBtn" onclick="girarRoleta()" style="
+          width:100%;max-width:320px;padding:18px 32px;
+          font-family:'Sora','Inter',sans-serif;font-size:18px;font-weight:900;letter-spacing:0.5px;
+          background:linear-gradient(135deg,#f5be3c 0%,#ffd76e 100%);
+          color:#0a0f1a;border:none;border-radius:14px;cursor:pointer;
+          display:flex;align-items:center;justify-content:center;gap:10px;
+          margin:0 auto;transition:all 0.2s ease;box-shadow:0 4px 20px rgba(245,190,60,0.4);
+        ">
+          Girar
+        </button>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;color:#8a94a6;font-size:13px;">
+          Rollover de 3x sobre o valor ganho
+        </div>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -703,68 +743,9 @@
     let girando = false;
     let rotacaoAtual = 0;
 
-    async function checkRoulette() {
-      try {
-        const r = await ZKNAuth.api('/roulette/status');
-        if (r.ok && r.data.available === false) {
-          document.getElementById('spinBtn').disabled = true;
-          document.getElementById('spinBtn').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Volte amanhã';
-          if (r.data.last_amount) {
-            const result = document.getElementById('rouletteResult');
-            result.textContent = 'R$ ' + r.data.last_amount.toFixed(2).replace('.', ',');
-            result.style.color = 'var(--gold)';
-          }
-        }
-      } catch (e) { console.warn(e); }
-    }
+    
 
-    async function girar() {
-      if (girando) return;
-      girando = true;
-      const btn = document.getElementById('spinBtn');
-      const wheel = document.getElementById('wheel');
-      const result = document.getElementById('rouletteResult');
-
-      btn.disabled = true;
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Girando...';
-      result.textContent = '';
-      result.classList.remove('win');
-
-      try {
-        const r = await ZKNAuth.api('/roulette/spin', { method: 'POST' });
-        if (!r.ok || !r.data.ok) {
-          result.textContent = r.data.message || 'Erro';
-          result.style.color = 'var(--red)';
-          btn.innerHTML = 'Girar';
-          btn.disabled = false;
-          girando = false;
-          return;
-        }
-        const valor = r.data.amount;
-        const valores = [1, 2, 3, 5, 7, 10];
-        const idx = valores.indexOf(valor);
-        const anguloSetor = (idx * 60) + 30;
-        const voltas = 6;
-        rotacaoAtual += voltas * 360 + (360 - anguloSetor);
-        wheel.style.transform = 'rotate(' + rotacaoAtual + 'deg)';
-
-        setTimeout(() => {
-          result.textContent = 'R$ ' + valor.toFixed(2).replace('.', ',');
-          result.style.color = 'var(--green)';
-          result.classList.add('win');
-          btn.innerHTML = 'Volte amanhã';
-          if (window.ZKNSaldo) window.ZKNSaldo.atualizar();
-          if (window.ZKNBottomNav) window.ZKNBottomNav.atualizarBadges();
-          girando = false;
-        }, 4600);
-      } catch (e) {
-        result.textContent = 'Erro de conexão';
-        result.style.color = 'var(--red)';
-        btn.innerHTML = 'Girar';
-        btn.disabled = false;
-        girando = false;
-      }
-    }
+    
 
     // ============================================================
     // CASHBACK (REBATE)
@@ -1017,7 +998,88 @@
 
     carregarRebate();
     carregarBonusPendente();
-    setTimeout(mostrarPopupsRecompensas, 1000);
-  </script>
-</body>
-</html>
+    setTimeout(mostrarPopupsRecompensas, 1000);    // ============================================================
+    // ROLETA — 6 setores (R$ 1, 2, 3, 5, 7, 10)
+    // ============================================================
+    let girando = false;
+    let rotacaoAtual = 0;
+    const valoresRoleta = [1, 2, 3, 5, 7, 10];
+
+    async function checkRoulette() {
+      try {
+        const r = await ZKNAuth.api('/roulette/status');
+        if (r.ok && r.data.available === false) {
+          const btn = document.getElementById('spinBtn');
+          if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Volte amanhã';
+          }
+          if (r.data.last_amount) {
+            const result = document.getElementById('rouletteResult');
+            if (result) {
+              result.textContent = 'R$ ' + r.data.last_amount.toFixed(2).replace('.', ',');
+              result.style.color = 'var(--gold)';
+            }
+          }
+        }
+      } catch (e) { console.warn(e); }
+    }
+
+    async function girarRoleta() {
+      if (girando) return;
+      girando = true;
+      
+      const btn = document.getElementById('spinBtn');
+      const wheel = document.getElementById('rouletteWheel');
+      const result = document.getElementById('rouletteResult');
+      
+      if (!btn || !wheel || !result) return;
+      
+      btn.disabled = true;
+      btn.textContent = 'Girando...';
+      result.textContent = '';
+      
+      try {
+        const r = await ZKNAuth.api('/roulette/spin', { method: 'POST' });
+        if (!r.ok || !r.data.ok) {
+          result.textContent = r.data.message || 'Erro';
+          result.style.color = 'var(--red)';
+          btn.textContent = 'Girar';
+          btn.disabled = false;
+          girando = false;
+          return;
+        }
+        
+        const valor = r.data.amount;
+        const idx = valoresRoleta.indexOf(valor);
+        // Cada setor tem 60° (360/6)
+        // O setor 0 (R$ 1) começa em 0° e vai até 60°, centro = 30°
+        const anguloSetor = (idx * 60) + 30;
+        // Para o ponteiro (topo, 0°) apontar para o centro do setor,
+        // a roleta precisa girar: 360 - anguloSetor
+        const voltas = 6;
+        rotacaoAtual += voltas * 360 + (360 - anguloSetor);
+        wheel.style.transform = 'rotate(' + rotacaoAtual + 'deg)';
+        
+        setTimeout(() => {
+          result.textContent = 'R$ ' + valor.toFixed(2).replace('.', ',');
+          result.style.color = 'var(--green)';
+          btn.textContent = 'Volte amanhã';
+          if (window.ZKNSaldo) window.ZKNSaldo.atualizar();
+          if (window.ZKNBottomNav) window.ZKNBottomNav.atualizarBadges();
+          girando = false;
+        }, 5200);
+      } catch (e) {
+        result.textContent = 'Erro de conexão';
+        result.style.color = 'var(--red)';
+        btn.textContent = 'Girar';
+        btn.disabled = false;
+        girando = false;
+      }
+    }
+
+    // Chama checkRoulette quando a página carregar
+    if (typeof checkRoulette === 'function') {
+      setTimeout(checkRoulette, 500);
+    }
+
