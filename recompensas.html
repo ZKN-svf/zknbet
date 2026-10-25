@@ -253,7 +253,145 @@
         font-size: 24px;
       }
     }
-  </style>
+  
+    /* ============================================================ */
+    /* REBATE - secao separada                                      */
+    /* ============================================================ */
+    .rebate-section {
+      max-width: 560px;
+      margin: 48px auto 0;
+      padding: 0 24px 48px;
+    }
+
+    .rebate-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .rebate-header svg {
+      width: 28px;
+      height: 28px;
+      color: var(--green);
+    }
+
+    .rebate-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.3px;
+    }
+
+    .rebate-subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .rebate-card {
+      background: linear-gradient(135deg, #111827 0%, #0a0f1a 100%);
+      border: 1px solid var(--border-gold);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .rebate-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .rebate-stat {
+      background: rgba(0, 214, 127, 0.08);
+      border: 1px solid rgba(0, 214, 127, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .rebate-stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .rebate-stat-value {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--green);
+      letter-spacing: -0.5px;
+    }
+
+    .rebate-stat-value.gold {
+      color: var(--gold);
+    }
+
+    .rebate-btn {
+      width: 100%;
+      padding: 16px;
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #00d67f 0%, #00b96d 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .rebate-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 214, 127, 0.5);
+    }
+
+    .rebate-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: var(--bg-3);
+      color: var(--text-muted);
+    }
+
+    .rebate-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .rebate-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .rebate-info svg {
+      width: 14px;
+      height: 14px;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 480px) {
+      .rebate-stats {
+        grid-template-columns: 1fr;
+      }
+    }
+</style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -316,7 +454,50 @@
     </div>
   </div>
 
-  <script src="assets/loading.js"></script>
+  
+  <!-- SECAO DE REBATE -->
+  <div class="rebate-section">
+    <div class="rebate-header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"/>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+      <h2 class="rebate-title">Cashback</h2>
+    </div>
+    <p class="rebate-subtitle">Você ganha de volta uma % do que perder nas apostas.</p>
+
+    <div class="rebate-card">
+      <div class="rebate-stats">
+        <div class="rebate-stat">
+          <div class="rebate-stat-label">Disponível</div>
+          <div class="rebate-stat-value" id="rebateBalance">R$ 0,00</div>
+        </div>
+        <div class="rebate-stat">
+          <div class="rebate-stat-label">Total acumulado</div>
+          <div class="rebate-stat-value gold" id="rebateTotal">R$ 0,00</div>
+        </div>
+      </div>
+
+      <button class="rebate-btn" id="rebateBtn" onclick="resgatarRebate()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+        Resgatar cashback
+      </button>
+
+      <div class="rebate-info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        <span id="rebateInfo">Carregando...</span>
+      </div>
+    </div>
+  </div>
+
+  
   <script src="assets/config.js"></script>
   <script src="assets/validators.js"></script>
   <script src="assets/auth.js"></script>
@@ -398,6 +579,59 @@
     }
 
     checkStatus();
-  </script>
+  
+    // ============================================================
+    // REBATE — cashback
+    // ============================================================
+    async function carregarRebate() {
+      try {
+        const r = await ZKNAuth.api('/rebate/status');
+        if (r.ok && r.data) {
+          const d = r.data;
+          document.getElementById('rebateBalance').textContent = 'R$ ' + d.balance.toFixed(2).replace('.', ',');
+          document.getElementById('rebateTotal').textContent = 'R$ ' + d.total.toFixed(2).replace('.', ',');
+          document.getElementById('rebateInfo').textContent =
+            'Taxa: ' + (d.rate * 100).toFixed(1) + '% · Mínimo: R$ ' + d.min_claim.toFixed(2).replace('.', ',') + ' · Rollover: ' + d.rollover_multiplier + 'x';
+
+          const btn = document.getElementById('rebateBtn');
+          if (d.balance < d.min_claim) {
+            btn.disabled = true;
+            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mínimo R$ ' + d.min_claim.toFixed(2).replace('.', ',');
+          } else {
+            btn.disabled = false;
+          }
+        }
+      } catch (e) {
+        console.warn('[rebate]', e);
+      }
+    }
+
+    async function resgatarRebate() {
+      const btn = document.getElementById('rebateBtn');
+      if (btn.disabled) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Resgatando...';
+
+      try {
+        const r = await ZKNAuth.api('/rebate/claim', { method: 'POST' });
+        if (r.ok && r.data.ok) {
+          ZKN.toast('Cashback resgatado!', 'R$ ' + r.data.amount.toFixed(2).replace('.', ',') + ' + rollover ' + r.data.rollover.toFixed(2).replace('.', ','));
+          if (window.ZKNSaldo) window.ZKNSaldo.atualizar();
+          setTimeout(carregarRebate, 1000);
+        } else {
+          ZKN.toast('Erro', r.data.message || 'Erro ao resgatar', 'error');
+          btn.disabled = false;
+          carregarRebate();
+        }
+      } catch (e) {
+        ZKN.toast('Erro', 'Erro de conexão', 'error');
+        btn.disabled = false;
+        carregarRebate();
+      }
+    }
+
+    // Chama ao carregar
+    carregarRebate();</script>
 </body>
 </html>
