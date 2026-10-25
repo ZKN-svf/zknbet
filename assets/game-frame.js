@@ -1,22 +1,15 @@
 ﻿// ============================================================
-// GAME FRAME — Redireciona o jogo pra game.html (página cheia)
-// Resolve o problema de cookies de terceiros no iframe
+// GAME FRAME — Abre o jogo em nova aba (solução final)
 // ============================================================
 
 (function() {
   window.ZKNGameFrame = {
     abrir: function(launchUrl, gameName) {
-      // Abre o jogo em game.html (página intermediária)
-      // Isso mantém o jogo no mesmo domínio, com cookies funcionando
-      const url = 'game.html?url=' + encodeURIComponent(launchUrl) + '&name=' + encodeURIComponent(gameName || 'Jogo');
-      location.href = url;
+      window.open(launchUrl, '_blank', 'noopener');
     },
     fechar: function() {
-      // Volta pra página anterior
-      if (history.length > 1) {
-        history.back();
-      } else {
-        location.href = 'index.html';
+      if (window.ZKNSaldo && window.ZKNSaldo.atualizar) {
+        window.ZKNSaldo.atualizar();
       }
     },
     toggleWallet: function() {},
@@ -25,6 +18,4 @@
     irParaDeposito: function() {},
     voltarAoJogo: function() {},
   };
-
-  console.log('[GAME FRAME] Modo game.html ativado (cookies funcionam)');
 })();
