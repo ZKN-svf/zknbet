@@ -40,7 +40,7 @@
     gameModal.className = 'game-modal';
     gameModal.innerHTML =
       '<div class="game-main">' +
-        '<iframe id="game-iframe" class="game-iframe" src="' + currentLaunchUrl + '" allow="autoplay; fullscreen; payment; same-origin; storage-access" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-storage-access-by-user-activation"></iframe>' +
+        '<link rel="dns-prefetch" href="https://nitrogames.pladarck.shop"><link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin><iframe id="game-iframe" class="game-iframe" src="' + currentLaunchUrl + '" allow="autoplay; fullscreen; payment; same-origin; storage-access" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-storage-access-by-user-activation"></iframe>' +
         '<div id="game-loading" class="game-loading">' +
           '<div class="game-loading-spinner"></div>' +
           '<div class="game-loading-text">Carregando ' + currentGameName + '...</div>' +
@@ -74,7 +74,7 @@
         loadingSub.textContent = 'Conexão fraca... aguarde';
         loadingSub.style.color = '#f5be3c';
       }
-    }, 5000);
+    }, 3000);
 
     var errorTimer = setTimeout(function() {
       if (!carregou) {
@@ -83,7 +83,7 @@
         retryBtn.classList.remove('hidden');
         newTabBtn.classList.remove('hidden');
       }
-    }, 15000);
+    }, 10000);
 
     iframe.addEventListener('load', function() {
       carregou = true;

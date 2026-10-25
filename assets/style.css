@@ -1542,6 +1542,7 @@ body.drawer-open { overflow: hidden; }
 }
 
 .game-main {
+  contain: layout style;
   flex: 1;
   position: relative;
   background: #000;
@@ -1557,6 +1558,7 @@ body.drawer-open { overflow: hidden; }
 
 /* Menu flutuante à direita */
 .game-floating-menu {
+  transition: opacity 0.2s ease;
   position: absolute;
   right: 16px;
   top: 50%;
@@ -1756,6 +1758,7 @@ body.drawer-open { overflow: hidden; }
 /* Mobile */
 @media (max-width: 768px) {
   .game-floating-menu {
+  transition: opacity 0.2s ease;
     right: 10px;
     top: 50%;
     padding: 8px;
@@ -1783,6 +1786,7 @@ body.drawer-open { overflow: hidden; }
 
 @media (max-width: 480px) {
   .game-floating-menu {
+  transition: opacity 0.2s ease;
     right: 6px;
     padding: 6px;
     gap: 6px;
@@ -1883,6 +1887,7 @@ body.drawer-open { overflow: hidden; }
 
 /* Área principal do jogo */
 .game-main {
+  contain: layout style;
   flex: 1;
   position: relative;
   background: #000;
@@ -2051,6 +2056,7 @@ body.drawer-open { overflow: hidden; }
 }
 
 .game-main {
+  contain: layout style;
   flex: 1;
   position: relative;
   background: #000;
@@ -2066,6 +2072,7 @@ body.drawer-open { overflow: hidden; }
 
 /* Menu flutuante à direita */
 .game-floating-menu {
+  transition: opacity 0.2s ease;
   position: absolute;
   right: 16px;
   top: 50%;
@@ -2221,6 +2228,7 @@ body.drawer-open { overflow: hidden; }
 /* Mobile */
 @media (max-width: 768px) {
   .game-floating-menu {
+  transition: opacity 0.2s ease;
     right: 10px;
     top: 50%;
     padding: 8px;
@@ -2244,6 +2252,7 @@ body.drawer-open { overflow: hidden; }
 
 @media (max-width: 480px) {
   .game-floating-menu {
+  transition: opacity 0.2s ease;
     right: 6px;
     padding: 6px;
     gap: 6px;
