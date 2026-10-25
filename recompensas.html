@@ -169,6 +169,10 @@
       line-height: 1.2;
     }
 
+    .wheel-center { pointer-events: none; }
+    .wheel-center-text { text-align: center; }
+    .wheel-center .logo-z { color: #fff; }
+
     .wheel-result {
       font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
       font-size: 32px;
@@ -459,8 +463,9 @@
       <div class="reward-card">
         <div class="wheel-container">
           <div class="wheel-pointer" aria-hidden="true"></div>
-          <div class="wheel" id="rouletteWheel" role="img" aria-label="Roleta com prêmios de R$ 1 a R$ 10">
-            <div class="wheel-center">ZKN<br>BET</div>
+          <div class="wheel" id="rouletteWheel" role="img" aria-label="Roleta com prêmios de R$ 1 a R$ 10"></div>
+          <div class="wheel-center" aria-hidden="true">
+            <div class="wheel-center-text"><span class="logo-z">Z</span>KN<br>BET</div>
           </div>
         </div>
 
@@ -609,7 +614,6 @@
 
     function montarRoleta() {
       const wheel = $('rouletteWheel');
-      const centro = wheel.querySelector('.wheel-center');
 
       // O conic-gradient começa no topo (12h) e vai no sentido horário
       const paradas = SETORES.map((s, i) => s.c + ' ' + (i * GRAUS) + 'deg ' + ((i + 1) * GRAUS) + 'deg');
@@ -624,7 +628,7 @@
         const label = document.createElement('span');
         label.textContent = 'R$ ' + s.v;
         seg.appendChild(label);
-        wheel.insertBefore(seg, centro);
+        wheel.appendChild(seg);
       });
     }
 
