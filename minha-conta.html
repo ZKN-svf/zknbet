@@ -11,13 +11,14 @@
   <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
   <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
   <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/icons.css">
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
 
   <div class="auth-wrap" style="max-width:600px;">
     <div class="card auth-card">
-      <h1>👤 Minha Conta</h1>
+      <h1><span class="ico ico-user"></span> Minha Conta</h1>
       <p class="subtitle">Gerencie seus dados e segurança.</p>
 
       <div id="userInfo" style="margin:24px 0;"></div>
@@ -25,11 +26,11 @@
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div id="stat-section" style="margin:16px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;"><div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Total depositado</div><div id="stat-total-deposited" style="font-size:18px;font-weight:800;color:var(--gold);">R$ 0,00</div></div><div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Total apostado</div><div id="stat-total-bet" style="font-size:18px;font-weight:800;color:var(--text);">R$ 0,00</div></div><div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Rollover</div><div id="stat-rollover" style="font-size:18px;font-weight:800;color:var(--green);">-</div></div></div>
 
-      <button class="btn-secondary btn-block" onclick="location.href='alterar-dados.html'">✏️ Alterar dados</button>
-        <button class="btn-secondary btn-block" onclick="location.href='alterar-senha.html'">🔒 Alterar senha</button>
-        <button class="btn-secondary btn-block" onclick="location.href='historico.html'">📜 Histórico de transações</button>
+      <button class="btn-secondary btn-block" onclick="location.href='alterar-dados.html'"><span class="ico ico-edit"></span> Alterar dados</button>
+        <button class="btn-secondary btn-block" onclick="location.href='alterar-senha.html'"><span class="ico ico-lock"></span> Alterar senha</button>
+        <button class="btn-secondary btn-block" onclick="location.href='historico.html'"><span class="ico ico-history"></span> Histórico de transações</button>
         <button class="btn-secondary btn-block" onclick="location.href='saque-primeiro-acesso.html'">🔑 Configurar dados de saque</button>
-        <button class="btn-secondary btn-block" onclick="location.href='indicacao.html'">🤝 Programa de indicação</button>
+        <button class="btn-secondary btn-block" onclick="location.href='indicacao.html'"><span class="ico ico-handshake"></span> Programa de indicação</button>
       </div>
 
       <!-- ESTATISTICAS -->

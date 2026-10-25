@@ -115,27 +115,27 @@ function renderHeader() {
 
         <nav class="drawer-nav">
           <div class="drawer-section-title">Conta</div>
-          <a class="drawer-link" href="index.html">🏠 Início</a>
-          <a class="drawer-link" href="minha-conta.html">👤 Minha conta</a>
-          <a class="drawer-link" href="alterar-dados.html">✏️ Alterar dados</a>
-          <a class="drawer-link" href="alterar-senha.html">🔒 Alterar senha</a>
+          <a class="drawer-link" href="index.html"><span class="ico ico-home"></span> Início</a>
+          <a class="drawer-link" href="minha-conta.html"><span class="ico ico-user"></span> Minha conta</a>
+          <a class="drawer-link" href="alterar-dados.html"><span class="ico ico-edit"></span> Alterar dados</a>
+          <a class="drawer-link" href="alterar-senha.html"><span class="ico ico-lock"></span> Alterar senha</a>
 
           <div class="drawer-section-title">Jogar</div>
-          <a class="drawer-link" href="jogos.html">🎮 Todos os jogos</a>
-          <a class="drawer-link" href="provedoras.html">🏆 Provedoras</a>
-          <a class="drawer-link" href="favoritos.html">⭐ Favoritos</a>
+          <a class="drawer-link" href="jogos.html"><span class="ico ico-gamepad"></span> Todos os jogos</a>
+          <a class="drawer-link" href="provedoras.html"><span class="ico ico-trophy"></span> Provedoras</a>
+          <a class="drawer-link" href="favoritos.html"><span class="ico ico-star"></span> Favoritos</a>
 
           <div class="drawer-section-title">Carteira</div>
-          <a class="drawer-link" href="deposito.html">💰 Depositar</a>
-          <a class="drawer-link" href="saque.html">💸 Sacar</a>
-          <a class="drawer-link" href="historico.html">📜 Histórico</a>
+          <a class="drawer-link" href="deposito.html"><span class="ico ico-money"></span> Depositar</a>
+          <a class="drawer-link" href="saque.html"><span class="ico ico-cash"></span> Sacar</a>
+          <a class="drawer-link" href="historico.html"><span class="ico ico-history"></span> Histórico</a>
 
           <div class="drawer-section-title">Indicação</div>
-          <a class="drawer-link" href="indicacao.html">🤝 Indique e ganhe</a>
+          <a class="drawer-link" href="indicacao.html"><span class="ico ico-handshake"></span> Indique e ganhe</a>
           <button class="drawer-link drawer-link-btn" onclick="ZKN.abrirIndicacaoDrawer()">🔗 Seu código de indicação</button>
 
           <div class="drawer-section-title">Ajuda</div>
-          <a class="drawer-link" href="https://t.me/Micaelasilva7" target="_blank" rel="noopener">💬 Suporte (Telegram)</a>
+          <a class="drawer-link" href="https://t.me/Micaelasilva7" target="_blank" rel="noopener"><span class="ico ico-telegram"></span> Suporte (Telegram)</a>
         </nav>
 
         <div class="drawer-footer" id="drawerFooter"></div>

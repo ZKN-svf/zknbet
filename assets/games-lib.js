@@ -174,7 +174,11 @@ async function abrirJogo(code, nome) {
 
   var res = await window.NitroGames.abrirJogo(code, email);
   if (res.sucesso && res.launch_url) {
-    window.open(res.launch_url, '_blank');
+    if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) {
+      window.ZKNGameFrame.abrir(res.launch_url, nome || code);
+    } else {
+      window.open(res.launch_url, '_blank', 'noopener');
+    }
   } else if (typeof ZKN !== 'undefined') {
     ZKN.toast('Erro ao abrir jogo', res.mensagem || 'Tente novamente.', 'error');
   }

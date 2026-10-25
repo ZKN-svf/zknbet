@@ -11,13 +11,14 @@
   <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
   <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
   <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/icons.css">
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
 
   <div class="auth-wrap">
     <div class="card auth-card">
-      <h1>🔒 Alterar senha</h1>
+      <h1><span class="ico ico-lock"></span> Alterar senha</h1>
       <p class="subtitle">Informe a senha atual e defina uma nova.</p>
 
       <label for="atual">Senha atual</label>
@@ -39,6 +40,7 @@
   <script src="assets/validators.js"></script>
   <script src="assets/auth.js"></script>
   <script src="assets/app.js"></script>
+  <script src="assets/game-frame.js"></script>
   <script>
     if (!ZKNAuth.requireLogin('alterar-senha.html')) throw new Error('redirecionado');
 

@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
   <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
   <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/icons.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
@@ -23,7 +24,7 @@
     </div>
 
     <div class="card" style="max-width:none;width:100%;">
-      <h1>💰 Depósito via PIX</h1>
+      <h1><span class="ico ico-money"></span> Depósito via PIX</h1>
       <p class="subtitle">Escolha o valor e pague com PIX. Seu saldo é liberado em segundos.</p>
 
       <label>Valor rápido</label>
@@ -43,13 +44,13 @@
         <div class="qr-wrap">
           <div class="qr-frame" id="qrcode"></div>
           <div class="timer">
-            <span>⏱️</span>
+            <span>⏱</span>
             <span id="timerText">30:00</span>
           </div>
         </div>
         <div class="copia-cola">
           <input type="text" id="copiaCola" readonly>
-          <button onclick="copiarPix()">📋 Copiar</button>
+          <button onclick="copiarPix()"><span class="ico ico-check"></span> Copiar</button>
         </div>
         <div class="status-box pending active" id="statusBox">
           <span class="spinner" style="border-color:rgba(245,190,60,0.3);border-top-color:var(--gold);"></span>
@@ -65,6 +66,7 @@
   <script src="assets/validators.js"></script>
   <script src="assets/auth.js"></script>
   <script src="assets/app.js"></script>
+  <script src="assets/game-frame.js"></script>
   <script src="assets/sigilopay.js"></script>
   <script>
     if (!ZKNAuth.requireLogin('deposito.html')) throw new Error('redirecionado');
@@ -148,14 +150,14 @@
       if (!identifierAtual || pixPago) return;
 
       pararTudo();
-      setStatus('error', '⏱️ PIX expirado após 3 minutos. Gere um novo QR Code.');
+      setStatus('error', '⏱ PIX expirado após 3 minutos. Gere um novo QR Code.');
       document.getElementById('progressFill').style.width = '100%';
 
       // Esconde o QR Code (mas mantem o copia e cola visivel caso o usuario queira tentar)
       const qrBlock = document.getElementById('qrBlock');
       const qrFrame = document.getElementById('qrcode');
       if (qrFrame) {
-        qrFrame.innerHTML = '<div style="color:#94a3b8;padding:40px;text-align:center;font-family:Inter,sans-serif;">⏱️<br><br>PIX expirado<br><small>Gere um novo QR Code</small></div>';
+        qrFrame.innerHTML = '<div style="color:#94a3b8;padding:40px;text-align:center;font-family:Inter,sans-serif;">⏱<br><br>PIX expirado<br><small>Gere um novo QR Code</small></div>';
       }
 
       // Avisa o backend para marcar como expirado

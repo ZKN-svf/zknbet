@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
   <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
   <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/icons.css">
   <style>
     body { padding-top: 0; }
     .admin-header {
@@ -673,7 +674,7 @@
 
           let acoes = '-';
           if (w.status === 'pending') {
-            acoes = `<button class="admin-btn" style="padding:6px 10px;font-size:11px;background:var(--grad-green);color:#fff;" onclick="aprovarSaque('${w.id}', ${w.amount})">✓ Aprovar</button>
+            acoes = `<button class="admin-btn" style="padding:6px 10px;font-size:11px;background:var(--grad-green);color:#fff;" onclick="aprovarSaque('${w.id}', ${w.amount})"><span class="ico ico-check"></span> Aprovar</button>
                      <button class="admin-btn danger" style="padding:6px 10px;font-size:11px;margin-left:4px;" onclick="rejeitarSaque('${w.id}', ${w.amount})">✗ Rejeitar</button>`;
           }
 

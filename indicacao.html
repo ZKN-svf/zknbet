@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
   <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
   <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/icons.css">
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -23,12 +24,12 @@
       <label style="font-size:12px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:block;">Seu link de indicação</label>
       <div class="ref-link-box">
         <input type="text" id="refLink" readonly>
-        <button onclick="copiarLink()">📋 Copiar</button>
+        <button onclick="copiarLink()"><span class="ico ico-check"></span> Copiar</button>
       </div>
 
       <div class="ref-share">
         <button class="ref-share-btn" onclick="compartilharWhatsApp()"><span>💚</span> WhatsApp</button>
-        <button class="ref-share-btn" onclick="compartilharTelegram()"><span>✈️</span> Telegram</button>
+        <button class="ref-share-btn" onclick="compartilharTelegram()"><span>✈</span> Telegram</button>
         <button class="ref-share-btn" onclick="gerarQR()"><span>📱</span> QR Code</button>
         <button class="ref-share-btn" onclick="navigator.share ? compartilharNativo() : copiarLink()"><span>📤</span> Compartilhar</button>
       </div>
@@ -69,6 +70,7 @@
   <script src="assets/validators.js"></script>
   <script src="assets/auth.js"></script>
   <script src="assets/app.js"></script>
+  <script src="assets/game-frame.js"></script>
   <script>
     if (!ZKNAuth.requireLogin('indicacao.html')) throw new Error('redirecionado');
 
