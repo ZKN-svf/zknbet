@@ -40,7 +40,7 @@
     gameModal.className = 'game-modal';
     gameModal.innerHTML =
       '<div class="game-main">' +
-        '<iframe id="game-iframe" class="game-iframe" src="' + currentLaunchUrl + '" allow="autoplay; fullscreen; payment" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals"></iframe>' +
+        '<iframe id="game-iframe" class="game-iframe" src="' + currentLaunchUrl + '" allow="autoplay; fullscreen; payment"></iframe>' +
         '<div id="game-loading" class="game-loading">' +
           '<div class="game-loading-spinner"></div>' +
           '<div class="game-loading-text">Carregando ' + currentGameName + '...</div>' +
