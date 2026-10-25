@@ -176,7 +176,7 @@ async function abrirJogo(code, nome) {
   if (res.sucesso && res.launch_url) {
     // SOLUÇÃO FINAL: abrir em nova aba (fora do iframe)
     // Isso resolve o problema de cookies de terceiros
-    window.open(res.launch_url, '_blank', 'noopener');
+    if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) { window.ZKNGameFrame.abrir(res.launch_url, nome || code); } else { window.open(res.launch_url, '_blank', 'noopener'); }
   } else if (typeof ZKN !== 'undefined') {
     ZKN.toast('Erro ao abrir jogo', res.mensagem || 'Tente novamente.', 'error');
   }
