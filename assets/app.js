@@ -125,6 +125,7 @@ function renderHeader() {
           <a class="drawer-link" href="provedoras.html"><span class="ico ico-trophy"></span> Provedoras</a>
           <a class="drawer-link" href="favoritos.html"><span class="ico ico-star"></span> Favoritos</a>
           <a class="drawer-link" href="recompensas.html">🎰 Recompensas</a>
+          <a class="drawer-link" href="ofertas.html">🎁 Ofertas</a>
 
           <div class="drawer-section-title">Carteira</div>
           <a class="drawer-link" href="deposito.html"><span class="ico ico-money"></span> Depositar</a>

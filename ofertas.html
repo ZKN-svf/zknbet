@@ -1,0 +1,250 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Ofertas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/icons.css">
+  <style>
+    .offers-hero {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+    .offers-title {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .offers-title svg {
+      width: 32px;
+      height: 32px;
+      color: var(--gold);
+    }
+    .offers-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+    .offers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .offer-card {
+      background: linear-gradient(135deg, #111827 0%, #0a0f1a 100%);
+      border: 1px solid var(--border-gold);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .offer-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(245, 190, 60, 0.3);
+      border-color: var(--gold);
+    }
+    .offer-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-2));
+    }
+    .offer-deposit {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .offer-amount {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+    .offer-amount small {
+      font-size: 15px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+    .offer-bonus {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 16px;
+      background: rgba(0, 214, 127, 0.1);
+      border: 1px solid rgba(0, 214, 127, 0.3);
+      border-radius: 10px;
+    }
+    .offer-bonus-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--grad-green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .offer-bonus-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+    .offer-bonus-text {
+      font-weight: 800;
+      color: var(--green);
+      font-size: 15px;
+    }
+    .offer-bonus-pct {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .offers-loading {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 40px;
+    }
+    .offers-empty {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 40px;
+      font-size: 14px;
+    }
+    .offers-info {
+      margin-top: 24px;
+      padding: 16px;
+      background: rgba(245, 190, 60, 0.08);
+      border: 1px solid rgba(245, 190, 60, 0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .offers-info svg {
+      width: 20px;
+      height: 20px;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+    @media (max-width: 480px) {
+      .offers-grid { grid-template-columns: 1fr; }
+      .offers-title { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+
+  <div class="offers-hero">
+    <h1 class="offers-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 12 20 22 4 22 4 12"/>
+        <rect x="2" y="7" width="20" height="5"/>
+        <line x1="12" y1="22" x2="12" y2="7"/>
+        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+      </svg>
+      Ofertas
+    </h1>
+    <p class="offers-subtitle">
+      Deposite e ganhe bônus! Quanto maior o depósito, maior o bônus.
+    </p>
+
+    <div class="offers-grid" id="offersGrid">
+      <div class="offers-loading">Carregando ofertas...</div>
+    </div>
+
+    <div class="offers-info" id="offersInfo" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <span id="offersInfoText"></span>
+    </div>
+  </div>
+
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/bottom-nav.js"></script>
+  <script>
+    if (!ZKNAuth.requireLogin('ofertas.html')) throw new Error('redirecionado');
+
+    async function carregarOfertas() {
+      try {
+        const r = await ZKNAuth.api('/deposit-bonus/list');
+        if (!r.ok || !r.data.tiers) {
+          document.getElementById('offersGrid').innerHTML = '<div class="offers-empty">Erro ao carregar ofertas.</div>';
+          return;
+        }
+
+        const tiers = r.data.tiers;
+        const cfg = r.data.config;
+
+        if (tiers.length === 0) {
+          document.getElementById('offersGrid').innerHTML = '<div class="offers-empty">Nenhuma oferta disponível no momento.</div>';
+          return;
+        }
+
+        document.getElementById('offersGrid').innerHTML = tiers.map(t => {
+          const pct = ((t.bonus_amount / t.deposit_amount) * 100).toFixed(1);
+          return '<a href="deposito.html?valor=' + t.deposit_amount + '" class="offer-card">' +
+            '<div class="offer-deposit">Deposite</div>' +
+            '<div class="offer-amount">R$ ' + t.deposit_amount.toFixed(2).replace('.', ',') + '</div>' +
+            '<div class="offer-bonus">' +
+              '<div class="offer-bonus-icon">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+              '</div>' +
+              '<div>' +
+                '<div class="offer-bonus-text">Ganhe R$ ' + t.bonus_amount.toFixed(2).replace('.', ',') + '</div>' +
+                '<div class="offer-bonus-pct">' + pct + '% de bônus</div>' +
+              '</div>' +
+            '</div>' +
+          '</a>';
+        }).join('');
+
+        const infoBox = document.getElementById('offersInfo');
+        const infoText = document.getElementById('offersInfoText');
+        infoBox.style.display = 'flex';
+        infoText.textContent = 'Rollover de ' + cfg.rollover_multiplier + 'x sobre o bônus' +
+          (cfg.first_deposit_only ? ' · Apenas no primeiro depósito' : ' · Válido em todos os depósitos');
+      } catch (e) {
+        console.error(e);
+        document.getElementById('offersGrid').innerHTML = '<div class="offers-empty">Erro ao carregar ofertas.</div>';
+      }
+    }
+
+    carregarOfertas();
+  </script>
+</body>
+</html>
