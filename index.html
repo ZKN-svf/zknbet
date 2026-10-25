@@ -263,7 +263,7 @@
       const res = await NitroGames.abrirJogo(code, email);
 
       if (res.sucesso && res.launch_url) {
-        window.open(res.launch_url, '_blank', 'noopener'); // FORCE_NEW_TAB else { window.open(res.launch_url, '_blank', 'noopener'); }
+        if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) { window.ZKNGameFrame.abrir(res.launch_url, nome || code); } else { window.open(res.launch_url, '_blank', 'noopener'); }
       } else {
         ZKN.toast('Erro ao abrir jogo', res.mensagem || 'Tente novamente.', 'error');
       }

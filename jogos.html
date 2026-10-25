@@ -45,7 +45,6 @@
   <script src="assets/validators.js"></script>
   <script src="assets/auth.js"></script>
   <script src="assets/app.js"></script>
-  <script src="assets/bottom-nav.js"></script>
   <script src="assets/game-frame.js"></script>
   <script src="assets/daily-bonus.js"></script>
   <script src="assets/providers-map.js"></script>
@@ -104,7 +103,7 @@
       const res = await NitroGames.abrirJogo(code, email);
 
       if (res.sucesso && res.launch_url) {
-        window.open(res.launch_url, '_blank', 'noopener'); // FORCE_NEW_TAB else { window.open(res.launch_url, '_blank', 'noopener'); // FORCE_NEW_TAB else { window.open(res.launch_url, '_blank', 'noopener'); } }
+        window.open(res.launch_url, '_blank');
       } else {
         ZKN.toast('Erro ao abrir jogo', res.mensagem || 'Tente novamente.', 'error');
       }
