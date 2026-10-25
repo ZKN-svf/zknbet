@@ -2036,3 +2036,225 @@ body.drawer-open { overflow: hidden; }
     font-size: 13px;
   }
 }
+
+/* ============================================================ */
+/* GAME MODAL — iframe flutuante (menu no canto direito)       */
+/* ============================================================ */
+.game-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #05070d;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.game-main {
+  flex: 1;
+  position: relative;
+  background: #000;
+  overflow: hidden;
+}
+
+.game-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Menu flutuante à direita */
+.game-floating-menu {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(10, 15, 26, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(245, 190, 60, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.game-float-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(245, 190, 60, 0.1);
+  border: 1px solid rgba(245, 190, 60, 0.3);
+  color: #f5be3c;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+  padding: 10px;
+}
+
+.game-float-btn:hover {
+  background: rgba(245, 190, 60, 0.25);
+  border-color: #f5be3c;
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px rgba(245, 190, 60, 0.4);
+}
+
+.game-float-btn:active {
+  transform: scale(0.95);
+}
+
+.game-float-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.game-float-close {
+  background: rgba(255, 71, 87, 0.15);
+  border-color: rgba(255, 71, 87, 0.4);
+  color: #ff4757;
+  margin-top: 4px;
+}
+
+.game-float-close:hover {
+  background: rgba(255, 71, 87, 0.3);
+  border-color: #ff4757;
+  box-shadow: 0 4px 16px rgba(255, 71, 87, 0.4);
+}
+
+/* Botão voltar ao jogo (quando no depósito) */
+.game-menu-back {
+  top: 50%;
+}
+
+.game-float-back {
+  background: rgba(0, 214, 127, 0.15);
+  border-color: rgba(0, 214, 127, 0.4);
+  color: #00d67f;
+}
+
+.game-float-back:hover {
+  background: rgba(0, 214, 127, 0.3);
+  border-color: #00d67f;
+  box-shadow: 0 4px 16px rgba(0, 214, 127, 0.4);
+}
+
+/* Loading */
+.game-loading {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #0a0f1a 0%, #05070d 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  z-index: 5;
+  transition: opacity 0.3s ease;
+}
+
+.game-loading.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.game-loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(245, 190, 60, 0.15);
+  border-top-color: #f5be3c;
+  border-radius: 50%;
+  animation: gm-spin 0.9s linear infinite;
+}
+
+@keyframes gm-spin {
+  to { transform: rotate(360deg); }
+}
+
+.game-loading-text {
+  font-family: 'Sora', 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: #f5be3c;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.game-loading-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #8a94a6;
+  font-weight: 600;
+  text-align: center;
+  min-height: 20px;
+}
+
+.game-loading-retry,
+.game-loading-newtab {
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  margin-top: 8px;
+}
+
+.game-loading-retry {
+  background: linear-gradient(135deg, #f5be3c, #ffd76e);
+  color: #0a0f1a;
+}
+
+.game-loading-newtab {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f5f7fa;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hidden { display: none !important; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .game-floating-menu {
+    right: 10px;
+    top: 50%;
+    padding: 8px;
+    gap: 8px;
+    border-radius: 14px;
+  }
+  .game-float-btn {
+    width: 44px;
+    height: 44px;
+    padding: 9px;
+    border-radius: 10px;
+  }
+  .game-float-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .game-loading-text {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-floating-menu {
+    right: 6px;
+    padding: 6px;
+    gap: 6px;
+  }
+  .game-float-btn {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+  }
+  .game-float-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+}
