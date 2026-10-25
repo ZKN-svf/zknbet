@@ -1,198 +1,30 @@
 ﻿// ============================================================
-// GAME FRAME - jogo em modal com menu flutuante
-// Botao Carteira: substitui o jogo por deposito.html no MESMO iframe
-// Botao Voltar: restaura o jogo
+// GAME FRAME — Redireciona o jogo pra game.html (página cheia)
+// Resolve o problema de cookies de terceiros no iframe
 // ============================================================
 
 (function() {
-  var gameModal = null;
-  var currentLaunchUrl = null;
-  var currentGameName = '';
-  var showingDeposit = false;
-
-  var SVG_HOME = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
-  var SVG_WALLET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>';
-  var SVG_REFRESH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>';
-  var SVG_CLOSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-  var SVG_DEPOSIT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
-  var SVG_BACK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>';
-
   window.ZKNGameFrame = {
     abrir: function(launchUrl, gameName) {
-      currentLaunchUrl = launchUrl;
-      currentGameName = gameName || 'Jogo';
-      showingDeposit = false;
-      render();
+      // Abre o jogo em game.html (página intermediária)
+      // Isso mantém o jogo no mesmo domínio, com cookies funcionando
+      const url = 'game.html?url=' + encodeURIComponent(launchUrl) + '&name=' + encodeURIComponent(gameName || 'Jogo');
+      location.href = url;
     },
-    fechar: fechar,
-    toggleWallet: toggleWallet,
-    reloadGame: reloadGame,
-    openInNewTab: openInNewTab,
-    irParaDeposito: irParaDeposito,
-    voltarAoJogo: voltarAoJogo,
+    fechar: function() {
+      // Volta pra página anterior
+      if (history.length > 1) {
+        history.back();
+      } else {
+        location.href = 'index.html';
+      }
+    },
+    toggleWallet: function() {},
+    reloadGame: function() {},
+    openInNewTab: function() {},
+    irParaDeposito: function() {},
+    voltarAoJogo: function() {},
   };
 
-  function render() {
-    if (gameModal) fechar();
-
-    gameModal = document.createElement('div');
-    gameModal.id = 'game-modal';
-    gameModal.className = 'game-modal';
-    gameModal.innerHTML =
-      '<div class="game-main">' +
-        '<iframe id="game-iframe" class="game-iframe" src="' + currentLaunchUrl + '" allow="autoplay; fullscreen; payment"></iframe>' +
-        '<div id="game-loading" class="game-loading">' +
-          '<div class="game-loading-spinner"></div>' +
-          '<div class="game-loading-text">Carregando ' + currentGameName + '...</div>' +
-          '<div class="game-loading-sub" id="game-loading-sub"></div>' +
-          '<button id="game-loading-retry" class="game-loading-retry hidden" onclick="ZKNGameFrame.reloadGame()">Tentar novamente</button>' +
-          '<button id="game-loading-newtab" class="game-loading-newtab hidden" onclick="ZKNGameFrame.openInNewTab()">Abrir em nova aba</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="game-floating-menu" id="game-menu">' +
-        '<button class="game-float-btn" onclick="ZKNGameFrame.toggleWallet()" title="Depositar">' + SVG_DEPOSIT + '</button>' +
-        '<button class="game-float-btn" onclick="ZKNGameFrame.reloadGame()" title="Recarregar">' + SVG_REFRESH + '</button>' +
-        '<button class="game-float-btn" onclick="ZKNGameFrame.fechar()" title="Voltar ao lobby">' + SVG_HOME + '</button>' +
-        '<button class="game-float-btn game-float-close" onclick="ZKNGameFrame.fechar()" title="Fechar">' + SVG_CLOSE + '</button>' +
-      '</div>' +
-      '<div class="game-floating-menu game-menu-back hidden" id="game-menu-back">' +
-        '<button class="game-float-btn game-float-back" onclick="ZKNGameFrame.voltarAoJogo()" title="Voltar ao jogo">' + SVG_BACK + '</button>' +
-      '</div>';
-    document.body.appendChild(gameModal);
-    document.body.style.overflow = 'hidden';
-
-    var iframe = document.getElementById('game-iframe');
-    var loading = document.getElementById('game-loading');
-    var loadingSub = document.getElementById('game-loading-sub');
-    var retryBtn = document.getElementById('game-loading-retry');
-    var newTabBtn = document.getElementById('game-loading-newtab');
-
-    var carregou = false;
-
-    var slowTimer = setTimeout(function() {
-      if (!carregou) {
-        loadingSub.textContent = 'Conexao fraca... aguarde';
-        loadingSub.style.color = '#f5be3c';
-      }
-    }, 5000);
-
-    var errorTimer = setTimeout(function() {
-      if (!carregou) {
-        loadingSub.textContent = 'O jogo esta demorando muito.';
-        loadingSub.style.color = '#ff4757';
-        retryBtn.classList.remove('hidden');
-        newTabBtn.classList.remove('hidden');
-      }
-    }, 15000);
-
-    iframe.addEventListener('load', function() {
-      carregou = true;
-      clearTimeout(slowTimer);
-      clearTimeout(errorTimer);
-      setTimeout(function() {
-        loading.classList.add('hidden');
-      }, 500);
-    });
-
-    iframe.addEventListener('error', function() {
-      carregou = false;
-      loadingSub.textContent = 'Nao foi possivel abrir.';
-      loadingSub.style.color = '#ff4757';
-      newTabBtn.classList.remove('hidden');
-    });
-  }
-
-  function fechar() {
-    if (!gameModal) return;
-    gameModal.remove();
-    gameModal = null;
-    showingDeposit = false;
-    document.body.style.overflow = '';
-    if (window.ZKNSaldo && window.ZKNSaldo.atualizar) {
-      window.ZKNSaldo.atualizar();
-    }
-  }
-
-  function toggleWallet() {
-    // Substitui o jogo por deposito.html dentro do MESMO iframe
-    var iframe = document.getElementById('game-iframe');
-    if (!iframe) return;
-
-    var loading = document.getElementById('game-loading');
-    var loadingSub = document.getElementById('game-loading-sub');
-
-    // Mostra loading
-    if (loading) {
-      loading.classList.remove('hidden');
-      if (loadingSub) {
-        loadingSub.textContent = 'Carregando deposito...';
-        loadingSub.style.color = '#f5be3c';
-      }
-    }
-
-    // Troca o iframe para deposito.html
-    iframe.src = 'deposito.html';
-    showingDeposit = true;
-
-    // Esconde menu do jogo, mostra botao voltar
-    document.getElementById('game-menu').classList.add('hidden');
-    document.getElementById('game-menu-back').classList.remove('hidden');
-
-    // Esconde loading após 1s
-    setTimeout(function() {
-      if (loading) loading.classList.add('hidden');
-    }, 1500);
-  }
-
-  function voltarAoJogo() {
-    var iframe = document.getElementById('game-iframe');
-    if (!iframe) return;
-
-    var loading = document.getElementById('game-loading');
-    var loadingSub = document.getElementById('game-loading-sub');
-
-    if (loading) {
-      loading.classList.remove('hidden');
-      if (loadingSub) {
-        loadingSub.textContent = 'Voltando ao jogo...';
-        loadingSub.style.color = '#f5be3c';
-      }
-    }
-
-    iframe.src = currentLaunchUrl;
-    showingDeposit = false;
-
-    document.getElementById('game-menu').classList.remove('hidden');
-    document.getElementById('game-menu-back').classList.add('hidden');
-
-    setTimeout(function() {
-      if (loading) loading.classList.add('hidden');
-    }, 1500);
-  }
-
-  function irParaDeposito() {
-    fechar();
-    window.location.href = 'deposito.html';
-  }
-
-  function reloadGame() {
-    var loading = document.getElementById('game-loading');
-    var iframe = document.getElementById('game-iframe');
-    if (!iframe || !loading) return;
-
-    loading.classList.remove('hidden');
-    loading.querySelector('.game-loading-sub').textContent = '';
-    loading.querySelector('#game-loading-retry').classList.add('hidden');
-    loading.querySelector('#game-loading-newtab').classList.add('hidden');
-
-    iframe.src = iframe.src;
-  }
-
-  function openInNewTab() {
-    window.open(currentLaunchUrl, '_blank', 'noopener');
-  }
-
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && gameModal) fechar();
-  });
+  console.log('[GAME FRAME] Modo game.html ativado (cookies funcionam)');
 })();
