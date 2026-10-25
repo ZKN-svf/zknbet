@@ -213,6 +213,13 @@
       }
     } catch (e) {}
 
+    try {
+      const pending = await ZKNAuth.api('/deposit-bonus/pending');
+      if (pending.ok && pending.data.pending && pending.data.pending.length > 0) {
+        rewardsCount++;
+      }
+    } catch (e) {}
+
     // Mostra badge se tiver algo
     const badgeRewards = document.getElementById('badge-rewards');
     if (badgeRewards) {
