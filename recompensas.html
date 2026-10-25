@@ -379,6 +379,151 @@
       .reward-section-title { font-size: 20px; }
       .reward-stats { grid-template-columns: 1fr; }
     }
+  
+    /* ============================================================ */
+    /* POPUPS DE RECOMPENSAS                                        */
+    /* ============================================================ */
+    .rewards-popup-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 99990;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .rewards-popup-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .rewards-popup {
+      background: linear-gradient(135deg, #1a2332 0%, #0a0f1a 100%);
+      border: 2px solid var(--gold);
+      border-radius: 24px;
+      padding: 32px 28px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 80px rgba(245, 190, 60, 0.5);
+      transform: scale(0.8) translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .rewards-popup-backdrop.open .rewards-popup {
+      transform: scale(1) translateY(0);
+    }
+
+    .rewards-popup-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: rewards-popup-bounce 1s ease-in-out infinite;
+    }
+
+    .rewards-popup-icon.gold {
+      background: rgba(245, 190, 60, 0.15);
+      border: 2px solid var(--gold);
+      color: var(--gold);
+    }
+
+    .rewards-popup-icon.green {
+      background: rgba(0, 214, 127, 0.15);
+      border: 2px solid var(--green);
+      color: var(--green);
+    }
+
+    .rewards-popup-icon svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    @keyframes rewards-popup-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .rewards-popup-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--gold);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .rewards-popup-text {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .rewards-popup-amount {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin: 16px 0;
+    }
+
+    .rewards-popup-amount.gold { color: var(--gold); }
+    .rewards-popup-amount.green { color: var(--green); }
+
+    .rewards-popup-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .rewards-popup-btn {
+      padding: 14px 24px;
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 900;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .rewards-popup-btn.primary {
+      background: linear-gradient(135deg, #f5be3c 0%, #ffd76e 100%);
+      color: #0a0f1a;
+      box-shadow: 0 4px 20px rgba(245, 190, 60, 0.4);
+    }
+
+    .rewards-popup-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(245, 190, 60, 0.6);
+    }
+
+    .rewards-popup-btn.secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-strong);
+    }
+
+    .rewards-popup-btn.secondary:hover {
+      color: var(--text);
+      border-color: var(--border-gold);
+    }
   </style>
 </head>
 <body>
@@ -729,20 +874,151 @@
           btn.disabled = false;
           btn.style.display = 'flex';
           carregarBonusPendente();
+    setTimeout(mostrarPopupsRecompensas, 1000);
         }
       } catch (e) {
         ZKN.toast('Erro', 'Erro de conexão', 'error');
         btn.disabled = false;
         carregarBonusPendente();
+    setTimeout(mostrarPopupsRecompensas, 1000);
       }
     }
 
     // ============================================================
     // INIT
     // ============================================================
-    checkRoulette();
+    // ============================================================
+    // POPUPS DE RECOMPENSAS
+    // ============================================================
+    function criarPopup(icon, titulo, texto, valor, corValor, btnPrimary, btnSecondary, onPrimary) {
+      const backdrop = document.createElement('div');
+      backdrop.className = 'rewards-popup-backdrop';
+      backdrop.innerHTML =
+        '<div class="rewards-popup">' +
+          '<div class="rewards-popup-icon ' + icon.cor + '">' + icon.svg + '</div>' +
+          '<h3 class="rewards-popup-title">' + titulo + '</h3>' +
+          '<p class="rewards-popup-text">' + texto + '</p>' +
+          (valor ? '<div class="rewards-popup-amount ' + corValor + '">' + valor + '</div>' : '') +
+          '<div class="rewards-popup-actions">' +
+            (btnPrimary ? '<button class="rewards-popup-btn primary" data-action="primary">' + btnPrimary + '</button>' : '') +
+            (btnSecondary ? '<button class="rewards-popup-btn secondary" data-action="secondary">' + btnSecondary + '</button>' : '') +
+          '</div>' +
+        '</div>';
+
+      document.body.appendChild(backdrop);
+      setTimeout(() => backdrop.classList.add('open'), 50);
+
+      const close = () => {
+        backdrop.classList.remove('open');
+        setTimeout(() => backdrop.remove(), 300);
+      };
+
+      backdrop.querySelector('[data-action="primary"]')?.addEventListener('click', () => {
+        close();
+        if (onPrimary) setTimeout(onPrimary, 350);
+      });
+      backdrop.querySelector('[data-action="secondary"]')?.addEventListener('click', close);
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) close();
+      });
+
+      return close;
+    }
+
+    const SVG_ROULETTE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+    const SVG_MONEY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
+    const SVG_GIFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>';
+
+    async function mostrarPopupsRecompensas() {
+      // Verifica cada recompensa em sequência
+      let rouletteAvailable = false;
+      let rebateAvailable = 0;
+      let bonusPending = 0;
+
+      try {
+        const r = await ZKNAuth.api('/roulette/status');
+        if (r.ok && r.data.available) rouletteAvailable = true;
+      } catch (e) {}
+
+      try {
+        const r = await ZKNAuth.api('/rebate/status');
+        if (r.ok && r.data && r.data.balance >= r.data.min_claim) {
+          rebateAvailable = r.data.balance;
+        }
+      } catch (e) {}
+
+      try {
+        const r = await ZKNAuth.api('/deposit-bonus/pending');
+        if (r.ok && r.data.pending && r.data.pending.length > 0) {
+          bonusPending = r.data.pending.reduce((s, p) => s + Number(p.bonus_amount), 0);
+        }
+      } catch (e) {}
+
+      // 1) Roleta
+      if (rouletteAvailable) {
+        await new Promise((resolve) => {
+          criarPopup(
+            { svg: SVG_ROULETTE, cor: 'gold' },
+            'Roleta disponível!',
+            'Você tem 1 giro grátis hoje. Gire e ganhe de R$ 1 a R$ 10!',
+            null, null,
+            'Girar agora',
+            'Ver depois',
+            () => {
+              document.getElementById('spinBtn').click();
+              resolve();
+            }
+          );
+          // Se fechar sem clicar, resolve também
+          setTimeout(resolve, 100);
+        });
+      }
+
+      // 2) Rebate
+      if (rebateAvailable > 0) {
+        await new Promise((resolve) => {
+          criarPopup(
+            { svg: SVG_MONEY, cor: 'green' },
+            'Cashback disponível!',
+            'Você tem cashback acumulado para resgatar.',
+            'R$ ' + rebateAvailable.toFixed(2).replace('.', ','),
+            'green',
+            'Resgatar agora',
+            'Ver depois',
+            () => {
+              resgatarRebate();
+              resolve();
+            }
+          );
+          setTimeout(resolve, 100);
+        });
+      }
+
+      // 3) Bônus de depósito
+      if (bonusPending > 0) {
+        await new Promise((resolve) => {
+          criarPopup(
+            { svg: SVG_GIFT, cor: 'gold' },
+            'Bônus disponível!',
+            'Você tem bônus de depósito para resgatar.',
+            'R$ ' + bonusPending.toFixed(2).replace('.', ','),
+            'gold',
+            'Resgatar agora',
+            'Ver depois',
+            () => {
+              resgatarBonus();
+              resolve();
+            }
+          );
+          setTimeout(resolve, 100);
+        });
+      }
+    }
+
+
     carregarRebate();
     carregarBonusPendente();
+    setTimeout(mostrarPopupsRecompensas, 1000);
   </script>
 </body>
 </html>
