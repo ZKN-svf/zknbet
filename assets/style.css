@@ -2085,3 +2085,20 @@ body.drawer-open { overflow: hidden; }
     height: 18px;
   }
 }
+
+/* Botao voltar ao jogo (quando no deposito) */
+.game-menu-back {
+  top: 50%;
+}
+
+.game-float-back {
+  background: rgba(0, 214, 127, 0.15);
+  border-color: rgba(0, 214, 127, 0.4);
+  color: #00d67f;
+}
+
+.game-float-back:hover {
+  background: rgba(0, 214, 127, 0.3);
+  border-color: #00d67f;
+  box-shadow: 0 4px 16px rgba(0, 214, 127, 0.4);
+}
