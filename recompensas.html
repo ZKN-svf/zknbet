@@ -11,13 +11,12 @@
   <link rel="stylesheet" href="assets/icons.css">
   <style>
     /* ============================================================ */
-    /* RECOMPENSAS - Roleta visual                                  */
+    /* RECOMPENSAS — layout unificado                               */
     /* ============================================================ */
     .rewards-hero {
       max-width: 560px;
       margin: 0 auto;
       padding: 32px 24px;
-      text-align: center;
     }
 
     .rewards-title {
@@ -43,17 +42,59 @@
       font-size: 15px;
       margin-bottom: 32px;
       line-height: 1.5;
+      text-align: center;
     }
 
-    /* Container da roleta */
+    /* Seções */
+    .reward-section {
+      margin-bottom: 40px;
+    }
+
+    .reward-section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .reward-section-header svg {
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .reward-section-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.3px;
+    }
+
+    .reward-section-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Card genérico */
+    .reward-card {
+      background: linear-gradient(135deg, #111827 0%, #0a0f1a 100%);
+      border: 1px solid var(--border-gold);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ============================================================ */
+    /* SEÇÃO 1 — ROLETA                                             */
+    /* ============================================================ */
     .wheel-container {
       position: relative;
-      width: 320px;
-      height: 320px;
-      margin: 0 auto 32px;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto 24px;
     }
 
-    /* Ponteiro dourado no topo */
     .wheel-pointer {
       position: absolute;
       top: -18px;
@@ -66,10 +107,8 @@
       border-top: 28px solid var(--gold);
       z-index: 10;
       filter: drop-shadow(0 4px 12px rgba(245, 190, 60, 0.8));
-      transition: transform 0.2s ease;
     }
 
-    /* Roda */
     .wheel {
       width: 100%;
       height: 100%;
@@ -92,7 +131,6 @@
       transition: transform 4.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
     }
 
-    /* Valores nos setores */
     .wheel-segment {
       position: absolute;
       top: 50%;
@@ -105,7 +143,7 @@
       justify-content: flex-end;
       padding-right: 20px;
       font-family: var(--font-display);
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 900;
       color: #fff;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
@@ -113,24 +151,19 @@
     }
 
     .wheel-segment:nth-child(1) { transform: rotate(30deg); }
-    .wheel-segment:nth-child(2) { transform: rotate(90deg); }
+    .wheel-segment:nth-child(2) { transform: rotate(90deg); color: #0a0f1a; text-shadow: none; }
     .wheel-segment:nth-child(3) { transform: rotate(150deg); }
     .wheel-segment:nth-child(4) { transform: rotate(210deg); }
     .wheel-segment:nth-child(5) { transform: rotate(270deg); }
     .wheel-segment:nth-child(6) { transform: rotate(330deg); }
 
-    .wheel-segment.gold { color: #0a0f1a; text-shadow: none; }
-    .wheel-segment.green { color: #fff; }
-    .wheel-segment.red { color: #fff; }
-
-    /* Centro da roda */
     .wheel-center {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 90px;
-      height: 90px;
+      width: 86px;
+      height: 86px;
       border-radius: 50%;
       background: linear-gradient(135deg, #1a2332 0%, #0a0f1a 100%);
       border: 4px solid var(--gold);
@@ -142,19 +175,19 @@
     }
 
     .wheel-center svg {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       color: var(--gold);
     }
 
-    /* Resultado */
     .wheel-result {
       font-family: var(--font-display);
       font-size: 28px;
       font-weight: 900;
       color: var(--green);
       min-height: 40px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
+      text-align: center;
       letter-spacing: -0.5px;
       transition: all 0.3s ease;
     }
@@ -169,150 +202,87 @@
       100% { transform: scale(1); opacity: 1; }
     }
 
-    /* Botão girar */
-    .wheel-btn {
+    /* Botão comum */
+    .reward-btn {
       width: 100%;
-      max-width: 320px;
-      padding: 18px 32px;
+      padding: 16px 24px;
       font-family: var(--font-display);
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 900;
-      letter-spacing: 0.5px;
-      background: linear-gradient(135deg, #f5be3c 0%, #ffd76e 100%);
-      color: #0a0f1a;
+      letter-spacing: 0.3px;
       border: none;
-      border-radius: 14px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
       transition: all 0.2s ease;
+    }
+
+    .reward-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .reward-btn.gold {
+      background: linear-gradient(135deg, #f5be3c 0%, #ffd76e 100%);
+      color: #0a0f1a;
       box-shadow: 0 4px 20px rgba(245, 190, 60, 0.4);
     }
 
-    .wheel-btn svg {
-      width: 22px;
-      height: 22px;
-    }
-
-    .wheel-btn:hover:not(:disabled) {
+    .reward-btn.gold:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 8px 32px rgba(245, 190, 60, 0.6);
     }
 
-    .wheel-btn:active:not(:disabled) {
-      transform: translateY(0);
+    .reward-btn.green {
+      background: linear-gradient(135deg, #00d67f 0%, #00b96d 100%);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(0, 214, 127, 0.4);
     }
 
-    .wheel-btn:disabled {
+    .reward-btn.green:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 214, 127, 0.6);
+    }
+
+    .reward-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      background: var(--bg-3);
+      color: var(--text-muted);
       box-shadow: none;
+      transform: none;
     }
 
-    /* Info do rollover */
-    .wheel-info {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 20px;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    .wheel-info svg {
-      width: 16px;
-      height: 16px;
-      color: var(--gold);
-    }
-
-    /* Mobile */
-    @media (max-width: 480px) {
-      .wheel-container {
-        width: 280px;
-        height: 280px;
-      }
-      .wheel-segment {
-        font-size: 16px;
-        padding-right: 16px;
-      }
-      .wheel-center {
-        width: 76px;
-        height: 76px;
-      }
-      .wheel-center svg {
-        width: 32px;
-        height: 32px;
-      }
-      .rewards-title {
-        font-size: 26px;
-      }
-      .wheel-result {
-        font-size: 24px;
-      }
-    }
-  
     /* ============================================================ */
-    /* REBATE - secao separada                                      */
+    /* SEÇÃO 2 e 3 — cards de stats                                 */
     /* ============================================================ */
-    .rebate-section {
-      max-width: 560px;
-      margin: 48px auto 0;
-      padding: 0 24px 48px;
-    }
-
-    .rebate-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-
-    .rebate-header svg {
-      width: 28px;
-      height: 28px;
-      color: var(--green);
-    }
-
-    .rebate-title {
-      font-family: var(--font-display);
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: -0.3px;
-    }
-
-    .rebate-subtitle {
-      color: var(--text-muted);
-      font-size: 14px;
-      margin-bottom: 24px;
-    }
-
-    .rebate-card {
-      background: linear-gradient(135deg, #111827 0%, #0a0f1a 100%);
-      border: 1px solid var(--border-gold);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    }
-
-    .rebate-stats {
+    .reward-stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 12px;
       margin-bottom: 20px;
     }
 
-    .rebate-stat {
-      background: rgba(0, 214, 127, 0.08);
-      border: 1px solid rgba(0, 214, 127, 0.2);
+    .reward-stat {
       border-radius: 12px;
       padding: 16px;
       text-align: center;
     }
 
-    .rebate-stat-label {
+    .reward-stat.green {
+      background: rgba(0, 214, 127, 0.08);
+      border: 1px solid rgba(0, 214, 127, 0.2);
+    }
+
+    .reward-stat.gold {
+      background: rgba(245, 190, 60, 0.08);
+      border: 1px solid rgba(245, 190, 60, 0.2);
+    }
+
+    .reward-stat-label {
       font-size: 11px;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -321,54 +291,17 @@
       margin-bottom: 6px;
     }
 
-    .rebate-stat-value {
+    .reward-stat-value {
       font-family: var(--font-display);
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 900;
-      color: var(--green);
       letter-spacing: -0.5px;
     }
 
-    .rebate-stat-value.gold {
-      color: var(--gold);
-    }
+    .reward-stat.green .reward-stat-value { color: var(--green); }
+    .reward-stat.gold .reward-stat-value { color: var(--gold); }
 
-    .rebate-btn {
-      width: 100%;
-      padding: 16px;
-      font-family: var(--font-display);
-      font-size: 16px;
-      font-weight: 900;
-      background: linear-gradient(135deg, #00d67f 0%, #00b96d 100%);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .rebate-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 214, 127, 0.5);
-    }
-
-    .rebate-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      background: var(--bg-3);
-      color: var(--text-muted);
-    }
-
-    .rebate-btn svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .rebate-info {
+    .reward-info {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -379,25 +312,80 @@
       color: var(--text-muted);
     }
 
-    .rebate-info svg {
+    .reward-info svg {
       width: 14px;
       height: 14px;
       color: var(--gold);
       flex-shrink: 0;
     }
 
-    @media (max-width: 480px) {
-      .rebate-stats {
-        grid-template-columns: 1fr;
-      }
+    /* Lista de bônus pendentes */
+    .pending-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
     }
-</style>
+
+    .pending-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: rgba(245, 190, 60, 0.06);
+      border: 1px solid rgba(245, 190, 60, 0.2);
+      border-radius: 10px;
+      gap: 12px;
+    }
+
+    .pending-item-info {
+      min-width: 0;
+    }
+
+    .pending-item-title {
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .pending-item-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .pending-item-value {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    .empty-msg {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 20px 0;
+    }
+
+    @media (max-width: 480px) {
+      .wheel-container { width: 260px; height: 260px; }
+      .wheel-segment { font-size: 15px; padding-right: 16px; }
+      .wheel-center { width: 72px; height: 72px; }
+      .wheel-center svg { width: 32px; height: 32px; }
+      .rewards-title { font-size: 26px; }
+      .wheel-result { font-size: 24px; }
+      .reward-section-title { font-size: 20px; }
+      .reward-stats { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
 
   <div class="rewards-hero">
-    <!-- Título com ícone SVG -->
+    <!-- TÍTULO -->
     <h1 class="rewards-title">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 12 20 22 4 22 4 12"/>
@@ -409,95 +397,154 @@
       Recompensas
     </h1>
     <p class="rewards-subtitle">
-      1 giro grátis por dia. Prêmios de R$ 1 a R$ 10!
+      Gire a roleta, resgate cashback e bônus de depósito.
     </p>
 
-    <!-- Roleta -->
-    <div class="wheel-container">
-      <div class="wheel-pointer"></div>
-      <div class="wheel" id="wheel">
-        <div class="wheel-segment">R$ 1</div>
-        <div class="wheel-segment gold">R$ 2</div>
-        <div class="wheel-segment">R$ 3</div>
-        <div class="wheel-segment green">R$ 5</div>
-        <div class="wheel-segment">R$ 7</div>
-        <div class="wheel-segment red">R$ 10</div>
-        <div class="wheel-center">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1 — ROLETA                                             -->
+    <!-- ============================================================ -->
+    <div class="reward-section">
+      <div class="reward-section-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        <div>
+          <div class="reward-section-title">Roleta diária</div>
+          <div class="reward-section-sub">1 giro grátis por dia · R$ 1 a R$ 10</div>
+        </div>
+      </div>
+
+      <div class="reward-card">
+        <div class="wheel-container">
+          <div class="wheel-pointer"></div>
+          <div class="wheel" id="wheel">
+            <div class="wheel-segment">R$ 1</div>
+            <div class="wheel-segment">R$ 2</div>
+            <div class="wheel-segment">R$ 3</div>
+            <div class="wheel-segment">R$ 5</div>
+            <div class="wheel-segment">R$ 7</div>
+            <div class="wheel-segment">R$ 10</div>
+            <div class="wheel-center">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="wheel-result" id="rouletteResult"></div>
+
+        <button class="reward-btn gold" id="spinBtn" onclick="girar()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/>
+            <polyline points="1 20 1 14 7 14"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
           </svg>
+          Girar
+        </button>
+
+        <div class="reward-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Rollover de 3x sobre o valor ganho
         </div>
       </div>
     </div>
 
-    <!-- Resultado -->
-    <div class="wheel-result" id="result"></div>
-
-    <!-- Botão girar -->
-    <button class="wheel-btn" id="spinBtn" onclick="girar()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="23 4 23 10 17 10"/>
-        <polyline points="1 20 1 14 7 14"/>
-        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-      </svg>
-      Girar
-    </button>
-
-    <!-- Info rollover -->
-    <div class="wheel-info">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="12" y1="16" x2="12" y2="12"/>
-        <line x1="12" y1="8" x2="12.01" y2="8"/>
-      </svg>
-      Rollover de 3x sobre o valor ganho
-    </div>
-  </div>
-
-  
-  <!-- SECAO DE REBATE -->
-  <div class="rebate-section">
-    <div class="rebate-header">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="1" x2="12" y2="23"/>
-        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-      </svg>
-      <h2 class="rebate-title">Cashback</h2>
-    </div>
-    <p class="rebate-subtitle">Você ganha de volta uma % do que perder nas apostas.</p>
-
-    <div class="rebate-card">
-      <div class="rebate-stats">
-        <div class="rebate-stat">
-          <div class="rebate-stat-label">Disponível</div>
-          <div class="rebate-stat-value" id="rebateBalance">R$ 0,00</div>
-        </div>
-        <div class="rebate-stat">
-          <div class="rebate-stat-label">Total acumulado</div>
-          <div class="rebate-stat-value gold" id="rebateTotal">R$ 0,00</div>
-        </div>
-      </div>
-
-      <button class="rebate-btn" id="rebateBtn" onclick="resgatarRebate()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2 — CASHBACK (REBATE)                                  -->
+    <!-- ============================================================ -->
+    <div class="reward-section">
+      <div class="reward-section-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="1" x2="12" y2="23"/>
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
         </svg>
-        Resgatar cashback
-      </button>
+        <div>
+          <div class="reward-section-title">Cashback</div>
+          <div class="reward-section-sub">Ganhe de volta uma % do que perder</div>
+        </div>
+      </div>
 
-      <div class="rebate-info">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="16" x2="12" y2="12"/>
-          <line x1="12" y1="8" x2="12.01" y2="8"/>
+      <div class="reward-card">
+        <div class="reward-stats">
+          <div class="reward-stat green">
+            <div class="reward-stat-label">Disponível</div>
+            <div class="reward-stat-value" id="rebateBalance">R$ 0,00</div>
+          </div>
+          <div class="reward-stat gold">
+            <div class="reward-stat-label">Total acumulado</div>
+            <div class="reward-stat-value" id="rebateTotal">R$ 0,00</div>
+          </div>
+        </div>
+
+        <button class="reward-btn green" id="rebateBtn" onclick="resgatarRebate()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          Resgatar cashback
+        </button>
+
+        <div class="reward-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span id="rebateInfo">Carregando...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3 — BÔNUS DE DEPÓSITO PENDENTE                         -->
+    <!-- ============================================================ -->
+    <div class="reward-section">
+      <div class="reward-section-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 12 20 22 4 22 4 12"/>
+          <rect x="2" y="7" width="20" height="5"/>
+          <line x1="12" y1="22" x2="12" y2="7"/>
+          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+          <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
         </svg>
-        <span id="rebateInfo">Carregando...</span>
+        <div>
+          <div class="reward-section-title">Bônus de depósito</div>
+          <div class="reward-section-sub">Resgate os bônus dos seus depósitos</div>
+        </div>
+      </div>
+
+      <div class="reward-card">
+        <div class="pending-list" id="pendingList">
+          <div class="empty-msg">Carregando...</div>
+        </div>
+
+        <button class="reward-btn gold" id="claimBonusBtn" onclick="resgatarBonus()" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12"/>
+            <rect x="2" y="7" width="20" height="5"/>
+            <line x1="12" y1="22" x2="12" y2="7"/>
+          </svg>
+          <span id="claimBonusText">Resgatar todos</span>
+        </button>
+
+        <div class="reward-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span id="bonusInfo">Rollover de 5x sobre o bônus</span>
+        </div>
       </div>
     </div>
   </div>
 
-  
+  <script src="assets/loading.js"></script>
   <script src="assets/config.js"></script>
   <script src="assets/validators.js"></script>
   <script src="assets/auth.js"></script>
@@ -506,33 +553,33 @@
   <script>
     if (!ZKNAuth.requireLogin('recompensas.html')) throw new Error('redirecionado');
 
+    // ============================================================
+    // ROLETA
+    // ============================================================
     let girando = false;
     let rotacaoAtual = 0;
 
-    async function checkStatus() {
+    async function checkRoulette() {
       try {
         const r = await ZKNAuth.api('/roulette/status');
         if (r.ok && r.data.available === false) {
           document.getElementById('spinBtn').disabled = true;
           document.getElementById('spinBtn').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Volte amanhã';
           if (r.data.last_amount) {
-            const result = document.getElementById('result');
+            const result = document.getElementById('rouletteResult');
             result.textContent = 'R$ ' + r.data.last_amount.toFixed(2).replace('.', ',');
             result.style.color = 'var(--gold)';
           }
         }
-      } catch (e) {
-        console.warn(e);
-      }
+      } catch (e) { console.warn(e); }
     }
 
     async function girar() {
       if (girando) return;
       girando = true;
-
       const btn = document.getElementById('spinBtn');
       const wheel = document.getElementById('wheel');
-      const result = document.getElementById('result');
+      const result = document.getElementById('rouletteResult');
 
       btn.disabled = true;
       btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Girando...';
@@ -544,20 +591,15 @@
         if (!r.ok || !r.data.ok) {
           result.textContent = r.data.message || 'Erro';
           result.style.color = 'var(--red)';
-          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Girar';
+          btn.innerHTML = 'Girar';
           btn.disabled = false;
           girando = false;
           return;
         }
-
         const valor = r.data.amount;
-
-        // Mapeia valor para ângulo (0=R$1, 1=R$2, etc)
         const valores = [1, 2, 3, 5, 7, 10];
         const idx = valores.indexOf(valor);
-        const anguloSetor = (idx * 60) + 30;  // centro do setor
-
-        // Voltas + ângulo
+        const anguloSetor = (idx * 60) + 30;
         const voltas = 6;
         rotacaoAtual += voltas * 360 + (360 - anguloSetor);
         wheel.style.transform = 'rotate(' + rotacaoAtual + 'deg)';
@@ -566,23 +608,22 @@
           result.textContent = 'R$ ' + valor.toFixed(2).replace('.', ',');
           result.style.color = 'var(--green)';
           result.classList.add('win');
-          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Volte amanhã';
+          btn.innerHTML = 'Volte amanhã';
           if (window.ZKNSaldo) window.ZKNSaldo.atualizar();
+          if (window.ZKNBottomNav) window.ZKNBottomNav.atualizarBadges();
           girando = false;
         }, 4600);
       } catch (e) {
         result.textContent = 'Erro de conexão';
         result.style.color = 'var(--red)';
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Girar';
+        btn.innerHTML = 'Girar';
         btn.disabled = false;
         girando = false;
       }
     }
 
-    checkStatus();
-  
     // ============================================================
-    // REBATE — cashback
+    // CASHBACK (REBATE)
     // ============================================================
     async function carregarRebate() {
       try {
@@ -597,20 +638,18 @@
           const btn = document.getElementById('rebateBtn');
           if (d.balance < d.min_claim) {
             btn.disabled = true;
-            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mínimo R$ ' + d.min_claim.toFixed(2).replace('.', ',');
+            btn.innerHTML = 'Mínimo R$ ' + d.min_claim.toFixed(2).replace('.', ',');
           } else {
             btn.disabled = false;
+            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Resgatar cashback';
           }
         }
-      } catch (e) {
-        console.warn('[rebate]', e);
-      }
+      } catch (e) { console.warn('[rebate]', e); }
     }
 
     async function resgatarRebate() {
       const btn = document.getElementById('rebateBtn');
       if (btn.disabled) return;
-
       btn.disabled = true;
       btn.textContent = 'Resgatando...';
 
@@ -619,6 +658,7 @@
         if (r.ok && r.data.ok) {
           ZKN.toast('Cashback resgatado!', 'R$ ' + r.data.amount.toFixed(2).replace('.', ',') + ' + rollover ' + r.data.rollover.toFixed(2).replace('.', ','));
           if (window.ZKNSaldo) window.ZKNSaldo.atualizar();
+          if (window.ZKNBottomNav) window.ZKNBottomNav.atualizarBadges();
           setTimeout(carregarRebate, 1000);
         } else {
           ZKN.toast('Erro', r.data.message || 'Erro ao resgatar', 'error');
@@ -632,7 +672,77 @@
       }
     }
 
-    // Chama ao carregar
-    carregarRebate();</script>
+    // ============================================================
+    // BÔNUS DE DEPÓSITO PENDENTE
+    // ============================================================
+    let totalBonusPendente = 0;
+
+    async function carregarBonusPendente() {
+      try {
+        const r = await ZKNAuth.api('/deposit-bonus/pending');
+        const listEl = document.getElementById('pendingList');
+        const btn = document.getElementById('claimBonusBtn');
+        const btnText = document.getElementById('claimBonusText');
+
+        if (!r.ok || !r.data.pending || r.data.pending.length === 0) {
+          listEl.innerHTML = '<div class="empty-msg">Nenhum bônus pendente no momento.</div>';
+          btn.style.display = 'none';
+          totalBonusPendente = 0;
+          return;
+        }
+
+        totalBonusPendente = r.data.pending.reduce((s, p) => s + Number(p.bonus_amount), 0);
+
+        listEl.innerHTML = r.data.pending.map(p => {
+          const data = new Date(p.created_at).toLocaleDateString('pt-BR');
+          return '<div class="pending-item">' +
+            '<div class="pending-item-info">' +
+              '<div class="pending-item-title">Bônus de depósito</div>' +
+              '<div class="pending-item-sub">Depósito de R$ ' + p.deposit_amount.toFixed(2).replace('.', ',') + ' · ' + data + '</div>' +
+            '</div>' +
+            '<div class="pending-item-value">R$ ' + p.bonus_amount.toFixed(2).replace('.', ',') + '</div>' +
+          '</div>';
+        }).join('');
+
+        btn.style.display = 'flex';
+        btnText.textContent = 'Resgatar R$ ' + totalBonusPendente.toFixed(2).replace('.', ',');
+      } catch (e) {
+        console.warn('[bonus pending]', e);
+      }
+    }
+
+    async function resgatarBonus() {
+      const btn = document.getElementById('claimBonusBtn');
+      if (btn.disabled) return;
+      btn.disabled = true;
+      btn.textContent = 'Resgatando...';
+
+      try {
+        const r = await ZKNAuth.api('/deposit-bonus/claim', { method: 'POST' });
+        if (r.ok && r.data.ok) {
+          ZKN.toast('Bônus resgatado!', 'R$ ' + r.data.amount.toFixed(2).replace('.', ',') + ' + rollover ' + r.data.rollover.toFixed(2).replace('.', ','));
+          if (window.ZKNSaldo) window.ZKNSaldo.atualizar();
+          if (window.ZKNBottomNav) window.ZKNBottomNav.atualizarBadges();
+          setTimeout(carregarBonusPendente, 1000);
+        } else {
+          ZKN.toast('Erro', r.data.message || 'Erro ao resgatar', 'error');
+          btn.disabled = false;
+          btn.style.display = 'flex';
+          carregarBonusPendente();
+        }
+      } catch (e) {
+        ZKN.toast('Erro', 'Erro de conexão', 'error');
+        btn.disabled = false;
+        carregarBonusPendente();
+      }
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    checkRoulette();
+    carregarRebate();
+    carregarBonusPendente();
+  </script>
 </body>
 </html>
