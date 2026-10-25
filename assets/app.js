@@ -4,7 +4,7 @@
 
 const ZKN_USER = {
   get balance() {
-    return window.ZKNAuth?.getUser?.()?.balance ?? 0;
+    return 0; // Força buscar da API
   },
   set balance(v) {
     const u = window.ZKNAuth?.getUser?.();
@@ -220,7 +220,7 @@ function abrirIndicacaoDrawer() {
 
 document.addEventListener('DOMContentLoaded', () => {
   renderHeader();
-  ZKN_USER.balance = ZKN_USER.balance;
+  if (window.ZKNAuth?.isLoggedIn?.()) { window.ZKNAuth.getSaldo().catch(() => {}); }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharDrawer(); });
   window.addEventListener('pageshow', () => { if (window.ZKNAuth?.isLoggedIn?.()) iniciarPollingSaldo(); });
 });
