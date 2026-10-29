@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // BONUS DIARIO — botao flutuante + popup
 // Aparece raramente (20% de chance) na pagina de jogos
 // 1x por dia por usuario
@@ -225,7 +225,7 @@
           <div class="daily-bonus-popup-icon">🎉</div>
           <h3 class="daily-bonus-popup-title">Parabéns!</h3>
           <p class="daily-bonus-popup-text">Você ganhou</p>
-          <div class="daily-bonus-popup-amount">R$ ${data.amount.toFixed(2).replace('.', ',')}</div>
+          <div class="daily-bonus-popup-amount">R$ ${Number(data.amount || 0).toFixed(2).replace('.', ',')}</div>
           <p class="daily-bonus-popup-text" style="font-size:13px;color:#8a94a6;">O valor foi adicionado ao seu saldo!</p>
           <button class="daily-bonus-popup-btn" onclick="this.closest('.daily-bonus-popup-backdrop').remove()">Continuar jogando</button>
         `;
@@ -237,7 +237,7 @@
 
         // Toast
         if (window.ZKN?.toast) {
-          ZKN.toast('Bônus resgatado!', `R$ ${data.amount.toFixed(2).replace('.', ',')} no seu saldo.`);
+          ZKN.toast('Bônus resgatado!', `R$ ${Number(data.amount || 0).toFixed(2).replace('.', ',')} no seu saldo.`);
         }
 
         // Remove botao

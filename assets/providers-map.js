@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // ZKNbet - Mapa de provedoras reais (CORRIGIDO)
 // Fonte: pesquisa em Gaming Intelligence, Pragmatic Play, etc.
 // ============================================================
@@ -70,10 +70,10 @@ const PROVIDER_OVERRIDES = {
   "tales of egypt": "Pragmatic Play",
 
   // ===== REEL KINGDOM (parceira da Pragmatic) =====
-  "big bass bonanza": "Reel Kingdom",
-  "big bass splash": "Reel Kingdom",
+  "big bass bonanza": "Pragmatic Play",
+  "big bass splash": "Pragmatic Play",
   "big bass bonanza - keeping it reel": "Reel Kingdom",
-  "bigger bass bonanza": "Reel Kingdom",
+  "bigger bass bonanza": "Pragmatic Play",
   "bigger bass blizzard - christmas catch": "Reel Kingdom",
   "christmas big bass bonanza": "Reel Kingdom",
   "big bass secrets of the golden lake": "Reel Kingdom",

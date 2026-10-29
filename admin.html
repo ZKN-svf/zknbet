@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -672,11 +672,7 @@
           const pixDisplay = w.pix_key ? `${w.pix_key_type}: ${w.pix_key}` : '-';
           const titular = w.holder_name ? `${w.holder_name} (${w.holder_cpf || '?'})` : '-';
 
-          let acoes = '-';
-          if (w.status === 'pending') {
-            acoes = `<button class="admin-btn" style="padding:6px 10px;font-size:11px;background:var(--grad-green);color:#fff;" onclick="aprovarSaque('${w.id}', ${w.amount})"><span class="ico ico-check"></span> Aprovar</button>
-                     <button class="admin-btn danger" style="padding:6px 10px;font-size:11px;margin-left:4px;" onclick="rejeitarSaque('${w.id}', ${w.amount})">✗ Rejeitar</button>`;
-          }
+          let acoes = '<span style="font-size:11px;color:var(--text-muted);padding:4px 8px;border:1px solid var(--border-strong);border-radius:6px;display:inline-block;">Saque processado automaticamente</span>';
 
           return `
             <tr>
@@ -695,31 +691,9 @@
       }
     }
 
-    async function aprovarSaque(txId, amount) {
-      if (!confirm(`Aprovar saque de ${fmtBRL(amount)}? Isso vai chamar a SigiloPay e debitar da sua conta.`)) return;
-      try {
-        toast('Processando...', 'Chamando SigiloPay', 'pending');
-        const d = await api(`/admin/withdraws/${txId}/approve`, { method: 'POST' });
-        toast('Saque aprovado!', `Withdraw ID: ${d.withdraw?.id || '-'}`, 'success');
-        carregarWithdraws();
-        carregarDashboard();
-      } catch (e) {
-        toast('Erro ao aprovar', e.message, 'error');
-      }
-    }
+    // [removido] aprovarSaque - saque automatico
 
-    async function rejeitarSaque(txId, amount) {
-      const reason = prompt(`Motivo da rejeição (saldo ${fmtBRL(amount)} será devolvido ao jogador):`);
-      if (reason === null) return;
-      try {
-        await api(`/admin/withdraws/${txId}/reject`, { method: 'POST', body: JSON.stringify({ reason: reason || 'Rejeitado pelo admin' }) });
-        toast('Saque rejeitado', `Saldo de ${fmtBRL(amount)} devolvido ao jogador`, 'warning');
-        carregarWithdraws();
-        carregarDashboard();
-      } catch (e) {
-        toast('Erro ao rejeitar', e.message, 'error');
-      }
-    }
+    // [removido] rejeitarSaque - saque automatico
 
     
     // ---------- Renderiza celula de rollover ----------

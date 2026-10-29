@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -65,7 +65,7 @@
       tbody.innerHTML = lista.map(t => {
         const positivo = t.type === 'deposit' || t.type === 'win';
         const sinal = positivo ? '+' : '-';
-        const dt = new Date(t.createdAt);
+        const dt = new Date(t.created_at);
         return `
           <tr>
             <td style="font-weight:700;">${LABELS[t.type] || t.type}</td>

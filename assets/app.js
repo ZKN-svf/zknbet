@@ -1,11 +1,9 @@
-﻿// ============================================================
+// ============================================================
 // ZKNbet — App core (header, saldo, toasts, sessão, drawer)
 // ============================================================
 
 const ZKN_USER = {
-  get balance() {
-    return 0; // Força buscar da API
-  },
+  get balance() { return Number((window.ZKNAuth?.getUser?.() || {}).balance || 0); },
   set balance(v) {
     const u = window.ZKNAuth?.getUser?.();
     if (u) { u.balance = v; window.ZKNAuth.setUser(u); }

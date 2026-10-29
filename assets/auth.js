@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // ZKNbet — Auth (sessão + chamadas API)
 // ============================================================
 const AUTH_CONFIG = {
@@ -45,8 +45,8 @@ async function api(path, { method = 'GET', body, auth = true } = {}) {
 }
 
 // ---------- Público ----------
-async function register({ name, phone, email, password }) {
-  const { ok, data } = await api('/auth/register', { method: 'POST', body: { name, phone, email, password }, auth: false });
+async function register({ name, phone, email, password, ref }) {
+  const { ok, data } = await api('/auth/register', { method: 'POST', body: { name, phone, email, password, ref }, auth: false });
   if (!ok) return { sucesso: false, mensagem: data.message || 'Erro ao cadastrar.' };
   setToken(data.token);
   setUser(data.user);
