@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -28,10 +28,10 @@
       </div>
 
       <div class="ref-share">
-        <button class="ref-share-btn" onclick="compartilharWhatsApp()"><span>💚</span> WhatsApp</button>
-        <button class="ref-share-btn" onclick="compartilharTelegram()"><span>✈</span> Telegram</button>
-        <button class="ref-share-btn" onclick="gerarQR()"><span>📱</span> QR Code</button>
-        <button class="ref-share-btn" onclick="navigator.share ? compartilharNativo() : copiarLink()"><span>📤</span> Compartilhar</button>
+        <button class="ref-share-btn" onclick="compartilharWhatsApp()"><span><span class="ico ico-whatsapp" style="width:1.2em;height:1.2em;vertical-align:middle;"></span></span> WhatsApp</button>
+        <button class="ref-share-btn" onclick="compartilharTelegram()"><span><span class="ico ico-telegram" style="width:1.2em;height:1.2em;vertical-align:middle;"></span></span> Telegram</button>
+        <button class="ref-share-btn" onclick="gerarQR()"><span><span class="ico ico-qr" style="width:1.2em;height:1.2em;vertical-align:middle;"></span></span> QR Code</button>
+        <button class="ref-share-btn" onclick="navigator.share ? compartilharNativo() : copiarLink()"><span><span class="ico ico-refresh" style="width:1.2em;height:1.2em;vertical-align:middle;"></span></span> Compartilhar</button>
       </div>
     </div>
 
@@ -87,11 +87,11 @@
       ZKN.toast('Link copiado!', 'Compartilhe com seus amigos.');
     }
     function compartilharWhatsApp() {
-      const msg = encodeURIComponent(`🎰 Entre na ZKNbet pelo meu link!\n${refURL}`);
+      const msg = encodeURIComponent(`<span class="ico ico-trophy" style="width:1.2em;height:1.2em;vertical-align:middle;"></span> Entre na ZKNbet pelo meu link!\n${refURL}`);
       window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
     function compartilharTelegram() {
-      const msg = encodeURIComponent(`🎰 Entre na ZKNbet pelo meu link!\n${refURL}`);
+      const msg = encodeURIComponent(`<span class="ico ico-trophy" style="width:1.2em;height:1.2em;vertical-align:middle;"></span> Entre na ZKNbet pelo meu link!\n${refURL}`);
       window.open(`https://t.me/share/url?url=${refURL}&text=${msg}`, '_blank');
     }
     function compartilharNativo() {

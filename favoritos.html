@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -28,7 +28,7 @@
 
   <section class="section" id="recentesSection" style="display:none;padding-top:0;">
     <div class="section-header">
-      <h2 class="section-title">🕘 Jogados recentemente</h2>
+      <h2 class="section-title"><span class="ico ico-history" style="width:1.2em;height:1.2em;vertical-align:middle;"></span> Jogados recentemente</h2>
     </div>
     <div class="games-carousel" id="recentesGrid"></div>
   </section>
@@ -65,7 +65,7 @@
         grid.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;">' +
           '<div style="font-size:44px;margin-bottom:12px;"><span class="ico ico-star"></span></div>' +
           '<div style="font-weight:800;font-size:16px;margin-bottom:6px;">Nenhum favorito ainda</div>' +
-          '<div style="color:var(--text-muted);font-size:14px;margin-bottom:20px;">Toque na estrela ☆ em qualquer jogo para salvar aqui.</div>' +
+          '<div style="color:var(--text-muted);font-size:14px;margin-bottom:20px;">Toque na estrela <span class="ico ico-star" style="width:1.2em;height:1.2em;vertical-align:middle;"></span> em qualquer jogo para salvar aqui.</div>' +
           '<a href="jogos.html" class="btn-primary" style="text-decoration:none;display:inline-flex;">Explorar jogos</a>' +
           '</div>';
         return;
