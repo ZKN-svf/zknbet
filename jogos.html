@@ -38,6 +38,14 @@
     </div>
   </section>
 
+    <section class="section" id="provedorasSectionJogos" style="padding-top:0;">
+    <div class="section-header">
+      <h2 class="section-title">Provedoras parceiras</h2>
+      <a href="provedoras.html" class="section-link">Ver todas &rarr;</a>
+    </div>
+    <div class="providers-strip" id="providersStripJogos"></div>
+  </section>
+
   <footer class="zkn-footer">
     <div class="zkn-footer-inner">
       <p><strong>ZKNbet</strong> (c) 2026 - Todos os direitos reservados</p>
@@ -53,6 +61,7 @@
   <script src="assets/game-frame.js"></script>
   <script src="assets/daily-bonus.js"></script>
   <script src="assets/providers-map.js"></script>
+  <script src="assets/bottom-nav.js"></script>
   <script src="assets/nitrogames.js"></script>
   <script src="assets/games-lib.js"></script>
   <script>
@@ -168,6 +177,65 @@
       atualizarChipFiltro();
     }
 
+    function limparFiltroProvider() {
+      const url = new URL(location.href);
+      url.searchParams.delete('provider');
+      history.replaceState(null, '', url.toString());
+      filtro = '';
+      document.getElementById('busca').value = '';
+      document.getElementById('filtroProviderChip').style.display = 'none';
+      renderGrid();
+    }
+
+    function atualizarChipFiltro() {
+      const chip = document.getElementById('filtroProviderChip');
+      const nome = document.getElementById('filtroProviderNome');
+      const urlProvider = new URLSearchParams(location.search).get('provider');
+      if (urlProvider && chip && nome) {
+        chip.style.display = 'flex';
+        nome.textContent = urlProvider;
+      }
+    }
+
+    if (_providerFiltro) {
+      const _buscaInput = document.getElementById('busca');
+      if (_buscaInput) _buscaInput.value = _providerFiltro;
+      atualizarChipFiltro();
+    }
+
+    function renderProvidersStripJogos() {
+      const strip = document.getElementById('providersStripJogos');
+      if (!strip) return;
+      if (!window.ZKNProviders || !window.ZKNProviders.aplicarProvidersReais) return;
+
+      const jogosReais = window.ZKNProviders.aplicarProvidersReais(ALL_GAMES);
+      const contagem = {};
+      jogosReais.forEach(function(j) {
+        const p = (j.provider_name || 'Outra').trim();
+        if (!p) return;
+        contagem[p] = (contagem[p] || 0) + 1;
+      });
+      const lista = Object.keys(contagem)
+        .map(function(name) { return { name: name, count: contagem[name] }; })
+        .sort(function(a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
+
+      if (lista.length === 0) { strip.innerHTML = ''; return; }
+
+      strip.innerHTML = lista.map(function(p) {
+        const url = 'jogos.html?provider=' + encodeURIComponent(p.name);
+        return '<div class="provider-chip" onclick="location.href=\'' + url + '\'" style="cursor:pointer;">' +
+          '<div style="font-weight:800;font-size:14px;color:#fff;">' + p.name + '</div>' +
+          '<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">' + p.count + ' jogos</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    // Envolve iniciar() para chamar renderProvidersStripJogos depois
+    const _origIniciar = iniciar;
+    iniciar = async function() {
+      await _origIniciar();
+      renderProvidersStripJogos();
+    };
     iniciar();
   </script>
 </body>
