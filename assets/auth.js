@@ -88,6 +88,7 @@ async function getSaldo() {
     document.querySelectorAll('[data-balance]').forEach(el => {
       el.textContent = window.ZKN?.formatBRL?.(data.balance) ?? ('R$ ' + data.balance.toFixed(2));
     });
+    setTimeout(() => { if (typeof window._animarSaldo === 'function') window._animarSaldo(); }, 50);
     return data.balance;
   }
   return getUser()?.balance ?? 0;

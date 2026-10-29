@@ -1,3 +1,22 @@
+// Animacao do saldo
+let _ultimoSaldoAnim = null;
+function _animarSaldo() {
+  const els = document.querySelectorAll('[data-balance]');
+  if (!els.length) return;
+  els.forEach(el => {
+    const t = el.textContent.trim();
+    if (t === _ultimoSaldoAnim) return;
+    el.classList.remove('saldo-atualizado');
+    void el.offsetWidth;
+    el.classList.add('saldo-atualizado');
+    const chip = el.closest('.balance-chip');
+    if (chip) { chip.classList.remove('saldo-atualizado'); void chip.offsetWidth; chip.classList.add('saldo-atualizado'); }
+    setTimeout(() => { el.classList.remove('saldo-atualizado'); if (chip) chip.classList.remove('saldo-atualizado'); }, 1000);
+  });
+  _ultimoSaldoAnim = els[0]?.textContent.trim();
+}
+window._animarSaldo = _animarSaldo;
+
 // ============================================================
 // ZKNbet — App core (header, saldo, toasts, sessão, drawer)
 // ============================================================
@@ -283,6 +302,7 @@ async function atualizarSaldoBtn(btn) {
       document.querySelectorAll('[data-balance]').forEach(el => {
         el.textContent = formatBRL(saldo);
       });
+      if (typeof _animarSaldo === 'function') _animarSaldo();
     }
     // Feedback visual
     btn.style.color = 'var(--green)';

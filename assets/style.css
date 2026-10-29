@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    ZKNbet — Design System v3 (unificado para todas as páginas)
    ============================================================ */
 :root {
@@ -2267,3 +2267,8 @@ body.drawer-open { overflow: hidden; }
     height: 18px;
   }
 }
+/* Animacao do saldo */
+@keyframes saldo-pulse { 0%{transform:scale(1);color:inherit} 40%{transform:scale(1.15);color:#ffd76e;text-shadow:0 0 20px rgba(255,215,110,0.8)} 100%{transform:scale(1);color:inherit} }
+@keyframes saldo-glow { 0%,100%{box-shadow:0 0 0 rgba(245,190,60,0)} 50%{box-shadow:0 0 24px rgba(245,190,60,0.6)} }
+.saldo-atualizado { animation: saldo-pulse 0.6s ease-out; }
+.balance-chip.saldo-atualizado { animation: saldo-glow 0.8s ease-out; }
