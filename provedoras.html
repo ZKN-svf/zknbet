@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -46,20 +46,34 @@
   <script src="assets/nitrogames.js"></script>
   <script>
     async function iniciar() {
-      const provs = await NitroGames.listarProvedores();
-      if (!provs.sucesso) {
+      // Usa lista de jogos + providers-map (a API da NitroGames retorna tudo como PGSOFT)
+      const res = await NitroGames.listarJogos();
+      if (!res.sucesso) {
         document.getElementById('grid').innerHTML =
-          `<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">${provs.mensagem || 'Erro.'}</div>`;
+          <div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);"> + (res.mensagem || 'Erro.') + </div>;
         return;
       }
-      document.getElementById('count').textContent = `${provs.provedores.length} provedoras`;
-      document.getElementById('grid').innerHTML = provs.provedores.map(p => `
-        <div class="provider-chip" onclick="location.href='jogos.html'" style="padding:28px 20px;">
-          <div style="font-size:32px;margin-bottom:8px;">🎰</div>
-          <div style="font-size:15px;margin-bottom:4px;">${p.name}</div>
-          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;">${p.games_count} jogos</div>
-        </div>
-      `).join('');
+      // Aplica providers reais (map do providers-map.js)
+      const jogos = window.ZKNProviders ? window.ZKNProviders.aplicarProvidersReais(res.jogos) : res.jogos;
+      // Agrupa por provedora
+      const contagem = {};
+      jogos.forEach(j => {
+        const p = j.provider_name || 'Outra';
+        contagem[p] = (contagem[p] || 0) + 1;
+      });
+      // Ordena por quantidade (maior primeiro)
+      const lista = Object.entries(contagem)
+        .map(function(e) { return { name: e[0], count: e[1] }; })
+        .sort(function(a, b) { return b.count - a.count; });
+
+      document.getElementById('count').textContent = lista.length + ' provedoras';
+      document.getElementById('grid').innerHTML = lista.map(function(p) {
+        return '<div class="provider-chip" onclick="location.href=\'jogos.html\'" style="padding:28px 20px;">' +
+          '<div style="font-size:32px;margin-bottom:8px;">' + String.fromCodePoint(0x1F3B0) + '</div>' +
+          '<div style="font-size:15px;margin-bottom:4px;">' + p.name + '</div>' +
+          '<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;">' + p.count + ' jogos</div>' +
+        '</div>';
+      }).join('');
     }
     iniciar();
   </script>
