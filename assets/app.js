@@ -386,3 +386,23 @@ window._animarSaldo = function() {
     if (typeof animar === 'function') animar(el);
   });
 };
+
+// Forca a animacao mesmo se o saldo nao mudou (uso no botao de recarregar)
+function forcarAnimacaoSaldo() {
+  document.querySelectorAll('[data-balance]').forEach(el => {
+    el.classList.remove('saldo-atualizado');
+    void el.offsetWidth;
+    el.classList.add('saldo-atualizado');
+    const chip = el.closest('.balance-chip');
+    if (chip) {
+      chip.classList.remove('saldo-atualizado');
+      void chip.offsetWidth;
+      chip.classList.add('saldo-atualizado');
+    }
+    setTimeout(() => {
+      el.classList.remove('saldo-atualizado');
+      if (chip) chip.classList.remove('saldo-atualizado');
+    }, 1000);
+  });
+}
+window.forcarAnimacaoSaldo = forcarAnimacaoSaldo;
