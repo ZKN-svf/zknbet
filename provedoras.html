@@ -46,34 +46,64 @@
   <script src="assets/nitrogames.js"></script>
   <script>
     async function iniciar() {
-      // Usa lista de jogos + providers-map (a API da NitroGames retorna tudo como PGSOFT)
-      const res = await NitroGames.listarJogos();
-      if (!res.sucesso) {
-        document.getElementById('grid').innerHTML =
-          <div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);"> + (res.mensagem || 'Erro.') + </div>;
-        return;
-      }
-      // Aplica providers reais (map do providers-map.js)
-      const jogos = window.ZKNProviders ? window.ZKNProviders.aplicarProvidersReais(res.jogos) : res.jogos;
-      // Agrupa por provedora
-      const contagem = {};
-      jogos.forEach(j => {
-        const p = j.provider_name || 'Outra';
-        contagem[p] = (contagem[p] || 0) + 1;
-      });
-      // Ordena por quantidade (maior primeiro)
-      const lista = Object.entries(contagem)
-        .map(function(e) { return { name: e[0], count: e[1] }; })
-        .sort(function(a, b) { return b.count - a.count; });
+      const grid = document.getElementById('grid');
+      const countEl = document.getElementById('count');
 
-      document.getElementById('count').textContent = lista.length + ' provedoras';
-      document.getElementById('grid').innerHTML = lista.map(function(p) {
-        return '<div class="provider-chip" onclick="location.href=\'jogos.html\'" style="padding:28px 20px;">' +
-          '<div style="font-size:32px;margin-bottom:8px;">' + String.fromCodePoint(0x1F3B0) + '</div>' +
-          '<div style="font-size:15px;margin-bottom:4px;">' + p.name + '</div>' +
-          '<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;">' + p.count + ' jogos</div>' +
-        '</div>';
-      }).join('');
+      try {
+        console.log('[PROVEDORAS] iniciando...');
+        console.log('[PROVEDORAS] ZKNProviders existe?', typeof window.ZKNProviders);
+        console.log('[PROVEDORAS] NitroGames existe?', typeof NitroGames);
+
+        if (typeof NitroGames === 'undefined' || !NitroGames.listarJogos) {
+          throw new Error('NitroGames nao carregou');
+        }
+
+        const res = await NitroGames.listarJogos();
+        console.log('[PROVEDORAS] resposta:', res);
+
+        if (!res || !res.sucesso) {
+          throw new Error((res && res.mensagem) || 'Erro ao carregar jogos');
+        }
+
+        const jogosBrutos = res.jogos || [];
+        console.log('[PROVEDORAS] jogos brutos:', jogosBrutos.length);
+
+        const jogos = (window.ZKNProviders && window.ZKNProviders.aplicarProvidersReais)
+          ? window.ZKNProviders.aplicarProvidersReais(jogosBrutos)
+          : jogosBrutos;
+
+        const contagem = {};
+        jogos.forEach(function(j) {
+          const p = j.provider_name || 'Outra';
+          contagem[p] = (contagem[p] || 0) + 1;
+        });
+
+        const lista = Object.keys(contagem)
+          .map(function(name) { return { name: name, count: contagem[name] }; })
+          .sort(function(a, b) { return b.count - a.count; });
+
+        console.log('[PROVEDORAS] lista:', lista);
+
+        countEl.textContent = lista.length + ' provedoras';
+
+        if (lista.length === 0) {
+          grid.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Nenhuma provedora encontrada.</div>';
+          return;
+        }
+
+        grid.innerHTML = lista.map(function(p) {
+          return '<div class="provider-chip" onclick="location.href=\'jogos.html\'" style="padding:28px 20px;">' +
+            '<div style="font-size:32px;margin-bottom:8px;">' + String.fromCodePoint(0x1F3B0) + '</div>' +
+            '<div style="font-size:15px;margin-bottom:4px;">' + p.name + '</div>' +
+            '<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;">' + p.count + ' jogos</div>' +
+          '</div>';
+        }).join('');
+
+      } catch (e) {
+        console.error('[PROVEDORAS] erro:', e);
+        grid.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">Erro: ' + (e.message || 'desconhecido') + '</div>';
+        countEl.textContent = 'erro';
+      }
     }
     iniciar();
   </script>
