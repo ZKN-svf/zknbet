@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -594,21 +594,59 @@
           <td data-label="Celular">${u.phone}</td>
           <td data-label="Saldo" style="font-weight:700;color:var(--gold);">${fmtBRL(u.balance)}</td>
           <td data-label="Rollover">${renderRollover(u)}</td>
-          <td><button class="admin-btn secondary" style="padding:6px 10px;font-size:11px;" onclick="ajustarSaldo('${u.uid}', '${u.name}')">Ajustar saldo</button></td>
+          <td><button class="admin-btn secondary" style="padding:6px 10px;font-size:11px;" onclick="ajustarSaldo('${u.uid}', '${u.name}', ${Number(u.balance) || 0})">Ajustar saldo</button></td>
         </tr>
       `).join('');
     }
-    async function ajustarSaldo(uid, nome) {
-      const v = prompt(`Ajustar saldo de ${nome}\n\nDigite o valor (+ para adicionar, - para remover):`);
-      if (!v) return;
-      const amount = parseFloat(v.replace(',', '.'));
-      if (isNaN(amount)) return toast('Valor inválido', '', 'error');
-      const reason = prompt('Motivo do ajuste:') || '';
-      try {
-        await api('/admin/users/' + uid + '/balance', { method: 'PUT', body: JSON.stringify({ amount, reason }) });
-        toast('Saldo ajustado', '', 'success');
-        carregarUsers();
-      } catch (e) { toast('Erro', e.message, 'error'); }
+    async function ajustarSaldo(uid, nome, saldoAtual) {
+      const backdrop = document.createElement('div');
+      backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+      backdrop.innerHTML = '<div style="background:var(--bg-2);border:2px solid var(--gold);border-radius:20px;padding:32px 24px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.6);"><h3 style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--gold);margin-bottom:8px;">Ajustar Saldo</h3><p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Usuario: <strong style="color:#fff;">' + nome + '</strong><br>Saldo atual: <strong style="color:var(--gold);">' + fmtBRL(saldoAtual) + '</strong></p><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px;font-weight:600;">Acao</label><div style="display:flex;gap:8px;margin-bottom:16px;"><button id="btnAdd" style="flex:1;padding:12px;border-radius:10px;background:rgba(0,214,127,0.3);border:1px solid var(--green);color:var(--green);font-weight:800;font-size:14px;cursor:pointer;">+ Adicionar</button><button id="btnRem" style="flex:1;padding:12px;border-radius:10px;background:rgba(255,71,87,0.15);border:1px solid var(--red);color:var(--red);font-weight:800;font-size:14px;cursor:pointer;">- Remover</button></div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px;font-weight:600;">Valor (R\$)</label><input id="inpValor" type="number" step="0.01" min="0.01" placeholder="0,00" style="width:100%;padding:14px;background:var(--bg-input);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:16px;font-weight:700;margin-bottom:12px;outline:none;"><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px;font-weight:600;">Motivo (opcional)</label><input id="inpMotivo" type="text" placeholder="Ex: bonus manual" style="width:100%;padding:14px;background:var(--bg-input);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:14px;margin-bottom:20px;outline:none;"><div style="display:flex;gap:8px;"><button id="btnCancel" style="flex:1;padding:12px;border-radius:10px;background:var(--bg-3);border:1px solid var(--border-strong);color:var(--text);font-weight:700;font-size:14px;cursor:pointer;">Cancelar</button><button id="btnConfirm" style="flex:1;padding:12px;border-radius:10px;background:var(--grad-gold);border:none;color:#0a0f1a;font-weight:800;font-size:14px;cursor:pointer;">Confirmar</button></div></div>';
+      document.body.appendChild(backdrop);
+
+      let action = 'add';
+      const btnAdd = backdrop.querySelector('#btnAdd');
+      const btnRem = backdrop.querySelector('#btnRem');
+      const btnCancel = backdrop.querySelector('#btnCancel');
+      const btnConfirm = backdrop.querySelector('#btnConfirm');
+
+      btnAdd.onclick = () => {
+        action = 'add';
+        btnAdd.style.background = 'rgba(0,214,127,0.3)';
+        btnAdd.style.borderColor = 'var(--green)';
+        btnRem.style.background = 'rgba(255,71,87,0.15)';
+        btnRem.style.borderColor = 'var(--red)';
+      };
+      btnRem.onclick = () => {
+        action = 'remove';
+        btnRem.style.background = 'rgba(255,71,87,0.3)';
+        btnRem.style.borderColor = 'var(--red)';
+        btnAdd.style.background = 'rgba(0,214,127,0.15)';
+        btnAdd.style.borderColor = 'var(--green)';
+      };
+      btnCancel.onclick = () => backdrop.remove();
+      backdrop.onclick = (e) => { if (e.target === backdrop) backdrop.remove(); };
+
+      btnConfirm.onclick = async () => {
+        const amount = parseFloat(backdrop.querySelector('#inpValor').value);
+        const reason = backdrop.querySelector('#inpMotivo').value.trim();
+        if (!amount || amount <= 0) { toast('Valor invalido', 'Digite um valor maior que zero', 'error'); return; }
+        if (action === 'remove' && amount > saldoAtual) { toast('Saldo insuficiente', 'O usuario so tem ' + fmtBRL(saldoAtual), 'error'); return; }
+        
+        btnConfirm.disabled = true;
+        btnConfirm.textContent = 'Processando...';
+        
+        try {
+          await api('/admin/users/' + uid + '/balance', { method: 'PUT', body: JSON.stringify({ amount, action, reason }) });
+          toast(action === 'add' ? 'Saldo adicionado' : 'Saldo removido', fmtBRL(amount) + ' ' + (action === 'add' ? 'creditado' : 'debitado'), 'success');
+          backdrop.remove();
+          carregarUsers();
+        } catch (e) {
+          toast('Erro', e.message, 'error');
+          btnConfirm.disabled = false;
+          btnConfirm.textContent = 'Confirmar';
+        }
+      };
     }
 
     // ---------- TRANSACTIONS ----------
