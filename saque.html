@@ -86,15 +86,24 @@
       const r = await ZKNAuth.getRollover();
       if (!r) return;
       if (!r.total_deposited || r.total_deposited === 0) return;
+      if (r.liberado || r.remaining <= 0) return;
 
-      // Se falta algo, avisa discretamente via toast (nao trava a tela)
-      if (!r.liberado && r.remaining > 0) {
-        ZKN.toast(
-          'Rollover pendente',
-          'Falta apostar ' + ZKN.formatBRL(r.remaining) + ' para liberar o saque.',
-          'warning'
-        );
-      }
+      // Modal bloqueante igual ao "EM MANUTENÇÃO"
+      const faltante = ZKN.formatBRL(r.remaining);
+      const backdrop = document.createElement('div');
+      backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+      backdrop.innerHTML =
+        '<div style="background:var(--bg-2);border:2px solid var(--gold);border-radius:20px;padding:32px 24px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6);">' +
+          '<div style="font-size:56px;margin-bottom:16px;">⚠️</div>' +
+          '<h3 style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--gold);margin-bottom:12px;">Rollover Pendente</h3>' +
+          '<p style="font-size:15px;color:var(--text);margin-bottom:20px;line-height:1.5;">Você ainda precisa apostar para liberar o saque.</p>' +
+          '<div style="font-family:var(--font-display);font-size:32px;font-weight:800;color:var(--green);margin:20px 0;">' + faltante + '</div>' +
+          '<p style="font-size:13px;color:var(--text-muted);margin-bottom:24px;">é o valor restante que falta apostar.</p>' +
+          '<button id="btnFecharRollover" style="width:100%;padding:14px;border-radius:12px;background:var(--grad-gold);color:#0a0f1a;border:none;font-weight:800;font-size:15px;cursor:pointer;">Entendi</button>' +
+        '</div>';
+      document.body.appendChild(backdrop);
+      document.getElementById('btnFecharRollover').onclick = function() { backdrop.remove(); };
+      backdrop.onclick = function(e) { if (e.target === backdrop) backdrop.remove(); };
     }
 
     // Chama ao carregar
