@@ -1,4 +1,11 @@
-﻿// ============================================================
+// Traduz mensagens do backend para o usuario
+function _traduzirMensagem(msg) {
+  if (!msg) return msg;
+  var m = String(msg);
+  if (m.indexOf("AGENT_WALLET_EMPTY") !== -1) return "EM MANUTENÇÃO!!";
+  return m;
+}
+// ============================================================
 // ZKNbet — Favoritos + Recentes + Render de cards
 // ============================================================
 
@@ -178,7 +185,7 @@ async function abrirJogo(code, nome) {
     // Isso resolve o problema de cookies de terceiros
     if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) { window.ZKNGameFrame.abrir(res.launch_url, nome || code); } else { if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) { window.ZKNGameFrame.abrir(res.launch_url, nome || code); } else { window.open(res.launch_url, '_blank', 'noopener'); } }
   } else if (typeof ZKN !== 'undefined') {
-    ZKN.toast('Erro ao abrir jogo', res.mensagem || 'Tente novamente.', 'error');
+    ZKN.toast("Erro ao abrir jogo", _traduzirMensagem(res.mensagem) || "Tente novamente.", "error");
   }
 }
 
