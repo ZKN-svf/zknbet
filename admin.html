@@ -634,7 +634,17 @@
     async function carregarNitroBalance() {
       try {
         const d = await api('/admin/nitrogames/balance');
-        document.getElementById('statNitroBalance').textContent = JSON.stringify(d.balance || {});
+        const el = document.getElementById('statNitroBalance');
+        // Tenta extrair numero do payload { data: {...} } ou { balance: ... }
+        let val = 0;
+        const raw = d && d.balance ? d.balance : (d || {});
+        if (typeof raw === 'number') val = raw;
+        else if (raw && typeof raw.balance === 'number') val = raw.balance;
+        else if (raw && raw.data) {
+          if (typeof raw.data === 'number') val = raw.data;
+          else if (typeof raw.data.balance === 'number') val = raw.data.balance;
+        }
+        el.textContent = 'R$ ' + Number(val).toFixed(2).replace('.', ',');
       } catch (e) { toast('Erro', e.message, 'error'); }
     }
 

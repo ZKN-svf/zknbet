@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -143,15 +143,16 @@ document.getElementById('btnSaque').onclick = async () => {
       const valor = parseFloat(document.getElementById('valorSaque').value);
       const pin = pinEl.value;
 
-      // Validacoes ANTES de tocar no botao
+      // Validacoes: PIN primeiro, depois valor, depois saldo (lido do backend)
+      if (!/^\d{6}$/.test(pin)) {
+        return setStatus('error', 'Informe o PIN de 6 dígitos.');
+      }
       if (!valor || valor < 20) {
         return setStatus('error', 'Valor minimo de saque: R$ 20,00.');
       }
-      if (valor > ZKN.ZKN_USER.balance) {
-        return setStatus('error', `Saldo insuficiente. Você tem ${ZKN.formatBRL(ZKN.ZKN_USER.balance)}.`);
-      }
-      if (!/^\d{6}$/.test(pin)) {
-        return setStatus('error', 'Informe o PIN de 6 dígitos.');
+      const saldoReal = await ZKNAuth.getSaldo();
+      if (valor > saldoReal) {
+        return setStatus('error', `Saldo insuficiente. Você tem ${ZKN.formatBRL(saldoReal)}.`);
       }
 
       btn.disabled = true;

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -71,15 +71,8 @@
       btn.disabled = true;
       btn.textContent = 'Entrando...';
 
-      // PRIORIZA PHONE (se preenchido), senao usa email
-      let payload;
-      if (phoneOk) {
-        payload = { phone, password };
-        console.log('[LOGIN] Usando PHONE:', JSON.stringify(payload));
-      } else {
-        payload = { email, password };
-        console.log('[LOGIN] Usando EMAIL:', JSON.stringify(payload));
-      }
+      // Fallback: tenta telefone primeiro; se falhar, tenta e-mail
+      let payload = phoneOk ? { phone, password } : { email, password };
 
       // Debug: mostra o body que sera enviado
       const bodyStr = JSON.stringify(payload);
