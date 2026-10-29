@@ -50,39 +50,30 @@
       const countEl = document.getElementById('count');
 
       try {
-        console.log('[PROVEDORAS] iniciando...');
-        console.log('[PROVEDORAS] ZKNProviders existe?', typeof window.ZKNProviders);
-        console.log('[PROVEDORAS] NitroGames existe?', typeof NitroGames);
-
         if (typeof NitroGames === 'undefined' || !NitroGames.listarJogos) {
           throw new Error('NitroGames nao carregou');
         }
 
         const res = await NitroGames.listarJogos();
-        console.log('[PROVEDORAS] resposta:', res);
-
         if (!res || !res.sucesso) {
           throw new Error((res && res.mensagem) || 'Erro ao carregar jogos');
         }
 
         const jogosBrutos = res.jogos || [];
-        console.log('[PROVEDORAS] jogos brutos:', jogosBrutos.length);
-
         const jogos = (window.ZKNProviders && window.ZKNProviders.aplicarProvidersReais)
           ? window.ZKNProviders.aplicarProvidersReais(jogosBrutos)
           : jogosBrutos;
 
         const contagem = {};
         jogos.forEach(function(j) {
-          const p = j.provider_name || 'Outra';
+          const p = (j.provider_name || 'Outra').trim();
+          if (!p) return;
           contagem[p] = (contagem[p] || 0) + 1;
         });
 
         const lista = Object.keys(contagem)
           .map(function(name) { return { name: name, count: contagem[name] }; })
-          .sort(function(a, b) { return b.count - a.count; });
-
-        console.log('[PROVEDORAS] lista:', lista);
+          .sort(function(a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
 
         countEl.textContent = lista.length + ' provedoras';
 
@@ -92,7 +83,8 @@
         }
 
         grid.innerHTML = lista.map(function(p) {
-          return '<div class="provider-chip" onclick="location.href=\'jogos.html\'" style="padding:28px 20px;">' +
+          const url = 'jogos.html?provider=' + encodeURIComponent(p.name);
+          return '<div class="provider-chip" onclick="location.href=\'' + url + '\'" style="padding:28px 20px;cursor:pointer;">' +
             '<div style="font-size:32px;margin-bottom:8px;">' + String.fromCodePoint(0x1F3B0) + '</div>' +
             '<div style="font-size:15px;margin-bottom:4px;">' + p.name + '</div>' +
             '<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;">' + p.count + ' jogos</div>' +

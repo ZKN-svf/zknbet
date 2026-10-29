@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -22,6 +22,11 @@
       <span id="gamesCount" style="color:var(--text-muted);font-size:14px;font-weight:600;"></span>
     </div>
 
+    <div id="filtroProviderChip" style="display:none;margin-bottom:16px;align-items:center;gap:8px;background:rgba(245,190,60,0.1);border:1px solid var(--border-gold);border-radius:10px;padding:10px 14px;max-width:420px;">
+      <span style="font-size:13px;color:var(--text-muted);">Provedora:</span>
+      <strong id="filtroProviderNome" style="font-size:13px;color:var(--gold);"></strong>
+      <button onclick="limparFiltroProvider()" style="margin-left:auto;background:transparent;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:0;line-height:1;">&times;</button>
+    </div>
     <div style="position:relative;margin-bottom:20px;max-width:420px;">
       <input type="text" id="busca" placeholder="Buscar jogo..."
              style="width:100%;padding:12px 16px 12px 44px;background:var(--bg-2);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;">
@@ -53,6 +58,13 @@
   <script>
     let ALL_GAMES = [];
     let filtro = '';
+
+    // Filtro por provedora via URL (?provider=PG%20Soft)
+    const _params = new URLSearchParams(location.search);
+    const _providerFiltro = _params.get('provider');
+    if (_providerFiltro) {
+      filtro = _providerFiltro;
+    }
 
     function renderGrid() {
       const grid = document.getElementById('grid');
@@ -125,6 +137,36 @@
       filtro = e.target.value;
       renderGrid();
     });
+
+    function limparFiltroProvider() {
+      const url = new URL(location.href);
+      url.searchParams.delete('provider');
+      history.replaceState(null, '', url.toString());
+      filtro = '';
+      document.getElementById('busca').value = '';
+      document.getElementById('filtroProviderChip').style.display = 'none';
+      renderGrid();
+    }
+
+    function atualizarChipFiltro() {
+      const chip = document.getElementById('filtroProviderChip');
+      const nome = document.getElementById('filtroProviderNome');
+      const urlProvider = new URLSearchParams(location.search).get('provider');
+      if (urlProvider) {
+        chip.style.display = 'flex';
+        nome.textContent = urlProvider;
+      } else {
+        chip.style.display = 'none';
+      }
+    }
+
+    // Preenche o input de busca com o provider da URL (se houver)
+    // e mostra o chip. Roda antes de iniciar() carregar os jogos.
+    if (_providerFiltro) {
+      const _buscaInput = document.getElementById('busca');
+      if (_buscaInput) _buscaInput.value = _providerFiltro;
+      atualizarChipFiltro();
+    }
 
     iniciar();
   </script>
