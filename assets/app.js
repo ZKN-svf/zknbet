@@ -322,3 +322,67 @@ window.ZKN = {
   ZKN_USER, formatBRL, toast, gerarIniciais,
   renderHeader, abrirDrawer, fecharDrawer, abrirIndicacaoDrawer, atualizarSaldoBtn,
 };
+
+
+// ============================================================
+// ANIMACAO AUTOMATICA NO SALDO
+// Observa todos os [data-balance] e dispara animacao quando
+// o texto mudar (deposito, saque, aposta, bonus, polling, etc).
+// ============================================================
+(function() {
+  function animar(el) {
+    el.classList.remove('saldo-atualizado');
+    void el.offsetWidth; // force reflow
+    el.classList.add('saldo-atualizado');
+    const chip = el.closest('.balance-chip');
+    if (chip) {
+      chip.classList.remove('saldo-atualizado');
+      void chip.offsetWidth;
+      chip.classList.add('saldo-atualizado');
+    }
+    setTimeout(() => {
+      el.classList.remove('saldo-atualizado');
+      if (chip) chip.classList.remove('saldo-atualizado');
+    }, 1000);
+  }
+
+  function observar() {
+    const els = document.querySelectorAll('[data-balance]');
+    els.forEach(el => {
+      if (el.__animObs) return;
+      el.__animObs = true;
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach(m => {
+          if (m.type === 'characterData' || m.type === 'childList') {
+            const atual = el.textContent.trim();
+            if (el.__animLast !== undefined && el.__animLast !== atual) {
+              animar(el);
+            }
+            el.__animLast = atual;
+          }
+        });
+      });
+      observer.observe(el, { characterData: true, childList: true, subtree: true });
+      el.__animLast = el.textContent.trim();
+    });
+  }
+
+  // Observa elementos existentes
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', observar);
+  } else {
+    observar();
+  }
+  // Re-observa se novos [data-balance] forem adicionados (ex: apos drawer)
+  new MutationObserver(() => {
+    document.querySelectorAll('[data-balance]').forEach(el => {
+      if (!el.__animObs) observar();
+    });
+  }).observe(document.body, { childList: true, subtree: true });
+})();
+
+window._animarSaldo = function() {
+  document.querySelectorAll('[data-balance]').forEach(el => {
+    if (typeof animar === 'function') animar(el);
+  });
+};
