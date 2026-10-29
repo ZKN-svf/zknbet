@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -601,12 +601,16 @@
     // Os valores e as cores ficam num único lugar: a roda é montada por aqui.
     // ============================================================
     const SETORES = [
-      { v: 1,  c: '#e74c3c' },
-      { v: 2,  c: '#3498db' },
-      { v: 3,  c: '#2ecc71' },
-      { v: 5,  c: '#f39c12' },
-      { v: 7,  c: '#9b59b6' },
-      { v: 10, c: '#1abc9c' }
+      { v: 0.10, c: '#e74c3c', label: '🎁' },
+      { v: 0.20, c: '#3498db', label: '🎁' },
+      { v: 0.30, c: '#2ecc71', label: '🎁' },
+      { v: 0.50, c: '#f39c12', label: '🎁' },
+      { v: 0.75, c: '#9b59b6', label: '🎁' },
+      { v: 1.00, c: '#1abc9c', label: 'R\$ 1' },
+      { v: 2.00, c: '#e67e22', label: 'R\$ 2' },
+      { v: 3.00, c: '#c0392b', label: 'R\$ 3' },
+      { v: 5.00, c: '#8e44ad', label: 'R\$ 5' },
+      { v: 10.00, c: '#f1c40f', label: 'R\$ 10' }
     ];
     const GRAUS = 360 / SETORES.length;
     const VOLTAS = 6;
@@ -627,7 +631,7 @@
         seg.className = 'wheel-segment' + (angulo > 90 && angulo < 270 ? ' flip' : '');
         seg.style.transform = 'rotate(' + angulo + 'deg)';
         const label = document.createElement('span');
-        label.textContent = 'R$ ' + s.v;
+        label.textContent = s.label || ('R\$ ' + s.v);
         seg.appendChild(label);
         wheel.appendChild(seg);
       });
