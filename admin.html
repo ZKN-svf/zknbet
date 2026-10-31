@@ -477,7 +477,7 @@
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
             <div>
               <label style="font-size:11px; color:var(--text-muted);">Imagem (JPG/PNG)</label>
-              <input id="marketingImage" type="file" accept="image/*" class="admin-input">
+              <input id="marketingImage" type="file" accept="image/*" class="admin-input" multiple>
             </div>
             <div>
               <label style="font-size:11px; color:var(--text-muted);">Link de Destino (opcional)</label>
@@ -939,31 +939,28 @@
           var type = document.getElementById('marketingType').value;
           
           if (!fileInput.files.length) {
-            toast('Erro', 'Selecione uma imagem.', 'error');
+            toast('Erro', 'Selecione ao menos uma imagem.', 'error');
             return;
           }
           
           btnEnviar.disabled = true;
-          btnEnviar.textContent = 'Enviando...';
-          
-          var formData = new FormData();
-          formData.append('image', fileInput.files[0]);
-          formData.append('link', link);
-          formData.append('type', type);
+          btnEnviar.textContent = 'Enviando ' + fileInput.files.length + '...';
           
           try {
-            var res = await fetch(API + '/admin/marketing/upload', {
-              method: 'POST',
-              headers: { 'Authorization': 'Bearer ' + adminToken },
-              body: formData
-            });
-            
-            if (!res.ok) {
-              var err = await res.json().catch(function() { return {}; });
-              throw new Error(err.message || 'Erro ao enviar');
+            for (var i = 0; i < fileInput.files.length; i++) {
+              var formData = new FormData();
+              formData.append('image', fileInput.files[i]);
+              formData.append('link', link);
+              formData.append('type', type);
+              
+              await fetch(API + '/admin/marketing/upload', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + adminToken },
+                body: formData
+              });
             }
             
-            toast('Sucesso', 'Banner enviado!', 'success');
+            toast('Sucesso', 'Banners enviados!', 'success');
             document.getElementById('marketingImage').value = '';
             document.getElementById('marketingLink').value = '';
             carregarMarketing();
