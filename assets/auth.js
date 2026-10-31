@@ -45,17 +45,17 @@ async function api(path, { method = 'GET', body, auth = true } = {}) {
 }
 
 // ---------- Público ----------
-async function register({ name, phone, email, password, ref }) {
-  const { ok, data } = await api('/auth/register', { method: 'POST', body: { name, phone, email, password, ref }, auth: false });
+async function register({ name, phone, email, password, ref, turnstileToken }) {
+  const { ok, data } = await api('/auth/register', { method: 'POST', body: { name, phone, email, password, ref, turnstileToken }, auth: false });
   if (!ok) return { sucesso: false, mensagem: data.message || 'Erro ao cadastrar.' };
   setToken(data.token);
   setUser(data.user);
   return { sucesso: true, user: data.user };
 }
 
-async function login({ phone, password }) {
-  const { ok, data } = await api('/auth/login', { method: 'POST', body: { phone, password }, auth: false });
-  if (!ok) return { sucesso: false, mensagem: data.message || 'Celular ou senha incorretos.' };
+async function login({ phone, email, password, turnstileToken }) {
+  const { ok, data } = await api('/auth/login', { method: 'POST', body: { phone, email, password, turnstileToken }, auth: false });
+  if (!ok) return { sucesso: false, mensagem: data.message || 'Credenciais incorretas.' };
   setToken(data.token);
   setUser(data.user);
   return { sucesso: true, user: data.user };
