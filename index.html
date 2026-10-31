@@ -17,14 +17,38 @@
 
 
 
+
 <style>
-  #carrosselBanners { width: 100%; max-width: 1000px; margin: 24px auto 0; padding: 0 16px; box-sizing: border-box; }
-  #carrosselTrack { display: flex; flex-wrap: nowrap; transition: transform 0.5s ease; border-radius: 16px; overflow: hidden; }
-  #carrosselTrack > div { flex: 0 0 100%; min-width: 100%; width: 100%; cursor: pointer; }
-  #carrosselTrack img { width: 100%; height: 260px; object-fit: cover; display: block; }
+  #carrosselBanners {
+    width: 100% !important;
+    max-width: 1000px !important;
+    margin: 24px auto 0 !important;
+    padding: 0 16px !important;
+    box-sizing: border-box;
+  }
+  #carrosselTrack {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    transition: transform 0.5s ease !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  #carrosselTrack > div {
+    flex: 0 0 100% !important;
+    min-width: 100% !important;
+    width: 100% !important;
+    cursor: pointer;
+  }
+  #carrosselTrack img {
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    object-fit: contain !important;
+  }
   @media (max-width: 768px) {
-    #carrosselBanners { padding: 0 12px; }
-    #carrosselTrack img { height: auto; max-height: 300px; }
+    #carrosselBanners {
+      padding: 0 12px !important;
+    }
   }
 </style>
 </head>
