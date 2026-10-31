@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Verificar Email</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/icons.css">
+</head>
+<body>
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+
+  <div class="auth-wrap">
+    <div class="card auth-card" style="text-align:center;">
+      <div id="icon" style="font-size:56px;margin-bottom:16px;">⏳</div>
+      <h1 id="titulo" style="font-family:var(--font-display);">Verificando...</h1>
+      <p class="subtitle" id="msg">Aguarde um instante.</p>
+      <a href="index.html" class="btn-primary btn-block" style="text-decoration:none;display:inline-flex;justify-content:center;" id="btnVoltar">Ir para o início</a>
+    </div>
+  </div>
+
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    (async function() {
+      const token = new URLSearchParams(location.search).get("token");
+      const icon = document.getElementById("icon");
+      const titulo = document.getElementById("titulo");
+      const msg = document.getElementById("msg");
+
+      if (!token) {
+        icon.textContent = "❌";
+        titulo.textContent = "Link inválido";
+        msg.textContent = "O link de verificação está incompleto.";
+        return;
+      }
+
+      try {
+        const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || '';
+        const res = await fetch(apiBase + '/auth/verify-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok) {
+          icon.textContent = "✅";
+          titulo.textContent = "Email verificado!";
+          msg.textContent = "Sua conta está liberada para saques.";
+          if (window.ZKNAuth && ZKNAuth.getUser && ZKNAuth.getUser()) {
+            const u = ZKNAuth.getUser();
+            u.emailVerified = true;
+            ZKNAuth.setUser(u);
+          }
+        } else {
+          icon.textContent = "⚠️";
+          titulo.textContent = "Não foi possível verificar";
+          msg.textContent = data.message || "O link pode ter expirado.";
+        }
+      } catch (e) {
+        icon.textContent = "⚠️";
+        titulo.textContent = "Erro";
+        msg.textContent = e.message;
+      }
+    })();
+  </script>
+</body>
+</html>

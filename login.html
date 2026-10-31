@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -31,6 +32,19 @@
       <label for="password">Senha</label>
       <input type="password" id="password" placeholder="Sua senha" autocomplete="current-password">
       <div class="cf-turnstile" data-sitekey="0x4AAAAAAFuJgB2DNgZO7dLw" data-action="login" style="margin-bottom:16px;"></div>
+
+      <div id="g_id_onload"
+           data-client_id="643374147618-8cfpb3gkfbl2pi7n4obujbpfdo6haikt.apps.googleusercontent.com"
+           data-callback="handleGoogleLogin"
+           data-auto_prompt="false"></div>
+      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+           data-text="signin_with" data-shape="rectangular" data-logo_alignment="left"
+           style="margin: 16px 0;"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <span style="color:var(--text-muted);font-size:12px;">ou</span>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
       <button id="btnEntrar" class="btn-primary btn-block">Entrar</button>
 
       <p class="auth-alt">Não tem conta? <a href="cadastro.html">Cadastre-se</a></p>
@@ -45,10 +59,34 @@
   <script src="assets/bottom-nav.js"></script>
   <script src="assets/game-frame.js"></script>
   <script>
+
+    window.handleGoogleLogin = async function(response) {
+      if (!response || !response.credential) {
+        return ZKN.toast('Erro', 'Falha no Google.', 'error');
+      }
+      const back = new URLSearchParams(location.search).get('back') || 'index.html';
+      ZKN.toast('Entrando...', 'Validando conta Google');
+      const r = await ZKNAuth.loginGoogle({ credential: response.credential });
+      if (!r.sucesso) return ZKN.toast('Erro', r.mensagem, 'error');
+      ZKN.toast('Bem-vindo!', 'Login com Google realizado.');
+      setTimeout(() => location.href = back, 600);
+    };
     const phoneEl = document.getElementById('phone');
     phoneEl.addEventListener('input', () => window.ZKNVal.mascaraCelular(phoneEl));
 
     document.getElementById('btnEntrar').onclick = async () => {
+
+    window.handleGoogleLogin = async function(response) {
+      if (!response || !response.credential) {
+        return ZKN.toast('Erro', 'Falha no Google.', 'error');
+      }
+      const back = new URLSearchParams(location.search).get('back') || 'index.html';
+      ZKN.toast('Entrando...', 'Validando conta Google');
+      const r = await ZKNAuth.loginGoogle({ credential: response.credential });
+      if (!r.sucesso) return ZKN.toast('Erro', r.mensagem, 'error');
+      ZKN.toast('Bem-vindo!', 'Login com Google realizado.');
+      setTimeout(() => location.href = back, 600);
+    };
       const phoneEl = document.getElementById('phone');
       const emailEl = document.getElementById('email');
       const passEl = document.getElementById('password');

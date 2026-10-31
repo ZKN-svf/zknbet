@@ -164,6 +164,19 @@ function renderHeader() {
   }
 
   atualizarDrawerUser();
+
+  // Banner de verificação de email
+  (function() {
+    const u = window.ZKNAuth?.getUser?.();
+    if (!u || u.emailVerified || document.getElementById('zknEmailBanner')) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'zknEmailBanner';
+    banner.style.cssText = 'position:fixed;top:68px;left:0;right:0;z-index:99;background:linear-gradient(90deg,#f5be3c,#ffd76e);color:#0a0f1a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
+    banner.innerHTML = '<span>&#9888;&#65039; Verifique seu email para liberar saques.</span>' +
+      '<button onclick="ZKN.reenviarEmail(this)" style="background:#0a0f1a;color:#f5be3c;border:none;padding:8px 16px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;">Reenviar</button>';
+    document.body.appendChild(banner);
+  })();
 }
 
 function abrirDrawer() {
@@ -172,6 +185,19 @@ function abrirDrawer() {
   document.getElementById('zknDrawer')?.setAttribute('aria-hidden', 'false');
   document.body.classList.add('drawer-open');
   atualizarDrawerUser();
+
+  // Banner de verificação de email
+  (function() {
+    const u = window.ZKNAuth?.getUser?.();
+    if (!u || u.emailVerified || document.getElementById('zknEmailBanner')) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'zknEmailBanner';
+    banner.style.cssText = 'position:fixed;top:68px;left:0;right:0;z-index:99;background:linear-gradient(90deg,#f5be3c,#ffd76e);color:#0a0f1a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
+    banner.innerHTML = '<span>&#9888;&#65039; Verifique seu email para liberar saques.</span>' +
+      '<button onclick="ZKN.reenviarEmail(this)" style="background:#0a0f1a;color:#f5be3c;border:none;padding:8px 16px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;">Reenviar</button>';
+    document.body.appendChild(banner);
+  })();
 }
 function fecharDrawer() {
   document.getElementById('zknDrawer')?.classList.remove('open');
@@ -320,6 +346,22 @@ async function atualizarSaldoBtn(btn) {
 }
 
 window.ZKN = {
+  reenviarEmail: async function(btn) {
+    if (!btn || btn.disabled) return;
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    const r = await window.ZKNAuth.reenviarVerificacao();
+    if (r.sucesso) {
+      toast('Email enviado!', 'Verifique sua caixa de entrada.');
+      btn.textContent = 'Enviado \u2713';
+      setTimeout(() => { btn.disabled = false; btn.textContent = 'Reenviar'; }, 30000);
+    } else {
+      toast('Erro', r.mensagem, 'error');
+      btn.disabled = false;
+      btn.textContent = 'Reenviar';
+    }
+  },
+
   ZKN_USER, formatBRL, toast, gerarIniciais,
   renderHeader, abrirDrawer, fecharDrawer, abrirIndicacaoDrawer, atualizarSaldoBtn,
 };

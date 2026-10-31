@@ -175,6 +175,30 @@ async function getRollover() {
     return null;
   }
 }
+
+// ---------- Google Login ----------
+async function loginGoogle({ credential, ref }) {
+  const qs = ref ? '?ref=' + encodeURIComponent(ref) : '';
+  const { ok, data } = await api('/auth/google' + qs, {
+    method: 'POST', body: { credential }, auth: false,
+  });
+  if (!ok) return { sucesso: false, mensagem: data.message || 'Erro no login Google.' };
+  setToken(data.token);
+  setUser(data.user);
+  return { sucesso: true, user: data.user };
+}
+
+// ---------- Reenviar verificação ----------
+async function reenviarVerificacao() {
+  const { ok, data } = await api('/auth/resend-verification', { method: 'POST' });
+  return ok ? { sucesso: true } : { sucesso: false, mensagem: data.message || 'Erro ao reenviar.' };
+}
+
+// ---------- Definir senha (Google-only) ----------
+async function definirSenha(newPassword) {
+  const { ok, data } = await api('/me/set-password', { method: 'POST', body: { newPassword } });
+  return ok ? { sucesso: true } : { sucesso: false, mensagem: data.message || 'Erro ao definir senha.' };
+}
 window.ZKNAuth = {
   CONFIG: AUTH_CONFIG,
   api,
@@ -185,4 +209,5 @@ window.ZKNAuth = {
   getRecentes, addRecente,
   salvarPinSaque, verificarPinSaque, temPinSaque, getDadosSaque,
   getTransacoes, getIndicacoes,
+  loginGoogle, reenviarVerificacao, definirSenha,
 };

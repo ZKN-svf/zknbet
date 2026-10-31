@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -40,6 +41,19 @@
       <label for="refCode">Código de indicação (opcional)</label>
       <input type="text" id="refCode" placeholder="Ex: ZKN1A2B3C" maxlength="10">
       <div class="cf-turnstile" data-sitekey="0x4AAAAAAFuJgB2DNgZO7dLw" data-action="register" style="margin-bottom:16px;"></div>
+
+      <div id="g_id_onload"
+           data-client_id="643374147618-8cfpb3gkfbl2pi7n4obujbpfdo6haikt.apps.googleusercontent.com"
+           data-callback="handleGoogleRegister"
+           data-auto_prompt="false"></div>
+      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+           data-text="signup_with" data-shape="rectangular" data-logo_alignment="left"
+           style="margin: 16px 0;"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <span style="color:var(--text-muted);font-size:12px;">ou</span>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
       <button id="btnCadastrar" class="btn-primary btn-block">Criar conta</button>
 
       <p class="auth-alt">Já tem conta? <a href="login.html">Entrar</a></p>
@@ -54,6 +68,18 @@
   <script src="assets/bottom-nav.js"></script>
   <script src="assets/game-frame.js"></script>
   <script>
+
+    window.handleGoogleRegister = async function(response) {
+      if (!response || !response.credential) {
+        return ZKN.toast('Erro', 'Falha no Google.', 'error');
+      }
+      const urlRef = new URLSearchParams(location.search).get('ref');
+      ZKN.toast('Criando conta...', 'Validando Google');
+      const r = await ZKNAuth.loginGoogle({ credential: response.credential, ref: urlRef || undefined });
+      if (!r.sucesso) return ZKN.toast('Erro', r.mensagem, 'error');
+      ZKN.toast('Conta criada!', 'Bem-vindo à ZKNbet.');
+      setTimeout(() => location.href = 'index.html', 600);
+    };
     const phoneEl = document.getElementById('phone');
     phoneEl.addEventListener('input', () => window.ZKNVal.mascaraCelular(phoneEl));
 

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -139,6 +139,10 @@
     // Chama ao carregar
     carregarRollover();
 document.getElementById('btnSaque').onclick = async () => {
+      const _u = ZKNAuth.getUser();
+      if (_u && !_u.emailVerified) {
+        return setStatus('error', '&#9888;&#65039; Verifique seu email antes de sacar. <a href="#" onclick="ZKN.reenviarEmail(this);return false;" style="color:var(--gold);">Reenviar link</a>');
+      }
       const btn = document.getElementById('btnSaque');
       const valor = parseFloat(document.getElementById('valorSaque').value);
       const pin = pinEl.value;
