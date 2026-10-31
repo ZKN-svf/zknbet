@@ -393,6 +393,7 @@
         <button class="admin-tab" data-tab="withdraws">Saques pendentes</button>
         <button class="admin-tab" data-tab="marketing">Marketing</button>
         <button class="admin-tab" data-tab="events">🎃 Eventos</button>
+        <button class="admin-tab" data-tab="settings">⚙️ Configurações</button>
         <button class="admin-tab" data-tab="promo">Promo Codes</button>
         <button class="admin-tab" data-tab="audit">Auditoria</button>
       </div>
@@ -519,6 +520,35 @@
             <tbody id="promoTable"><tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
           </table>
         </div>
+      </div>
+
+      <!-- CONFIGURAÇÕES -->
+      <div id="tab-settings" class="tab-content hidden">
+        <div style="background:var(--bg-2); padding:24px; border-radius:12px; border:1px solid var(--border); max-width:600px;">
+          <h3 style="font-family:var(--font-display); font-size:18px; margin-bottom:8px;">Link do Suporte (Telegram)</h3>
+          <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Cole o link do seu grupo ou canal do Telegram.</p>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <input type="text" id="telegramLinkInput" class="admin-input" placeholder="https://t.me/seu_grupo" style="flex:1;">
+            <button class="admin-btn" id="btnSalvarTelegram">Salvar Link</button>
+          </div>
+        </div>
+        <script>
+          document.getElementById('btnSalvarTelegram').onclick = async function() {
+            const link = document.getElementById('telegramLinkInput').value.trim();
+            if (!link) return toast('Erro', 'Cole um link válido.', 'error');
+            const btn = this;
+            btn.disabled = true; btn.textContent = 'Salvando...';
+            try {
+              const res = await fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? window.ZKN_CONFIG.api : 'https://zknbet-api.gabrielrobin63.workers.dev/api') + '/admin/settings/telegram', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('zkn_admin_token') || '') },
+                body: JSON.stringify({ link })
+              });
+              if (res.ok) { toast('Sucesso', 'Link salvo!', 'success'); } else { const e = await res.json().catch(()=>({})); toast('Erro', e.message || 'Falha', 'error'); }
+            } catch(e) { toast('Erro', e.message, 'error'); }
+            btn.disabled = false; btn.textContent = 'Salvar Link';
+          };
+        </script>
       </div>
 
       <!-- EVENTOS -->
@@ -712,15 +742,19 @@
         if (tab === 'promo') carregarPromo();
         if (tab === 'marketing') carregarMarketing();
         if (tab === 'events') window.carregarTema();
+        if (tab === 'settings') { fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? window.ZKN_CONFIG.api : 'https://zknbet-api.gabrielrobin63.workers.dev/api') + '/settings/telegram').then(r=>r.json()).then(d=>{ if(d.link) document.getElementById('telegramLinkInput').value = d.link; }); }
         if (tab === 'promo') carregarPromo();
         if (tab === 'marketing') carregarMarketing();
         if (tab === 'events') window.carregarTema();
+        if (tab === 'settings') { fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? window.ZKN_CONFIG.api : 'https://zknbet-api.gabrielrobin63.workers.dev/api') + '/settings/telegram').then(r=>r.json()).then(d=>{ if(d.link) document.getElementById('telegramLinkInput').value = d.link; }); }
         if (tab === 'promo') carregarPromo();
         if (tab === 'marketing') carregarMarketing();
         if (tab === 'events') window.carregarTema();
+        if (tab === 'settings') { fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? window.ZKN_CONFIG.api : 'https://zknbet-api.gabrielrobin63.workers.dev/api') + '/settings/telegram').then(r=>r.json()).then(d=>{ if(d.link) document.getElementById('telegramLinkInput').value = d.link; }); }
         if (tab === 'promo') carregarPromo();
         if (tab === 'marketing') carregarMarketing();
         if (tab === 'events') window.carregarTema();
+        if (tab === 'settings') { fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? window.ZKN_CONFIG.api : 'https://zknbet-api.gabrielrobin63.workers.dev/api') + '/settings/telegram').then(r=>r.json()).then(d=>{ if(d.link) document.getElementById('telegramLinkInput').value = d.link; }); }
       };
     });
 
