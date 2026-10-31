@@ -1,0 +1,45 @@
+﻿/* ============================================================
+   TEMAS SAZONAIS (EVENTOS)
+   ============================================================ */
+
+/* --- HALLOWEEN --- */
+body.theme-halloween {
+  background-color: #0b0a10;
+  background-image: radial-gradient(circle at 50% 0%, rgba(255, 100, 0, 0.15) 0%, transparent 70%), url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M20 0 L40 20 L20 40 L0 20 Z" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></svg>');
+}
+body.theme-halloween::before {
+  content: "🕷️"; position: fixed; top: -10px; left: -10px; font-size: 40px;
+  transform: rotate(45deg); opacity: 0.6; z-index: 9999; pointer-events: none;
+}
+body.theme-halloween .card, body.theme-halloween .zkn-header, body.theme-halloween .drawer, body.theme-halloween .game-card {
+  border-color: rgba(255, 100, 0, 0.4) !important; box-shadow: 0 4px 20px rgba(255, 100, 0, 0.1) !important;
+}
+body.theme-halloween .btn-primary { background: linear-gradient(135deg, #ff6b00, #ff9100) !important; color: #000 !important; }
+
+/* --- NATAL --- */
+body.theme-christmas {
+  background-color: #051005;
+  background-image: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.1) 1px, transparent 1px), radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.1) 1px, transparent 1px), radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.05) 0%, transparent 60%);
+}
+body.theme-christmas::before {
+  content: "🎅"; position: fixed; top: 10px; right: 10px; font-size: 40px; opacity: 0.8; z-index: 9999; pointer-events: none;
+}
+body.theme-christmas .card, body.theme-christmas .zkn-header, body.theme-christmas .game-card { border-color: rgba(255, 50, 50, 0.4) !important; }
+body.theme-christmas .btn-primary { background: linear-gradient(135deg, #e74c3c, #c0392b) !important; }
+
+/* --- PÁSCOA --- */
+body.theme-easter { background-color: #0d100d; background-image: radial-gradient(circle at 50% 50%, rgba(100, 255, 100, 0.05) 0%, transparent 60%); }
+body.theme-easter::before {
+  content: "🐇"; position: fixed; bottom: 10px; right: 10px; font-size: 40px; opacity: 0.8; z-index: 9999; pointer-events: none;
+}
+body.theme-easter .btn-primary { background: linear-gradient(135deg, #2ecc71, #27ae60) !important; }
+
+/* --- ANO NOVO --- */
+body.theme-newyear {
+  background-color: #0a0a0a;
+  background-image: radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.15) 2px, transparent 2px), radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.15) 2px, transparent 2px);
+}
+body.theme-newyear::before {
+  content: "🥂"; position: fixed; top: 10px; left: 10px; font-size: 40px; opacity: 0.8; z-index: 9999; pointer-events: none;
+}
+body.theme-newyear .btn-primary { background: linear-gradient(135deg, #f1c40f, #f39c12) !important; }

@@ -634,3 +634,25 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   });
 });
+
+// ============================================================
+// CARREGAR TEMA SAZONAL
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || '';
+    const res = await fetch(apiBase + '/settings/theme');
+    const data = await res.json();
+    
+    if (data.theme && data.theme !== 'default') {
+      if (!document.getElementById('event-theme-css')) {
+        const link = document.createElement('link');
+        link.id = 'event-theme-css';
+        link.rel = 'stylesheet';
+        link.href = 'assets/events.css';
+        document.head.appendChild(link);
+      }
+      document.body.classList.add('theme-' + data.theme);
+    }
+  } catch(e) { console.error('Erro ao carregar tema', e); }
+});

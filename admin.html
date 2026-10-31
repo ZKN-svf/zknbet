@@ -392,6 +392,7 @@
         <button class="admin-tab" data-tab="nitrogames">NitroGames</button>
         <button class="admin-tab" data-tab="withdraws">Saques pendentes</button>
         <button class="admin-tab" data-tab="marketing">Marketing</button>
+        <button class="admin-tab" data-tab="events">🎃 Eventos</button>
         <button class="admin-tab" data-tab="promo">Promo Codes</button>
         <button class="admin-tab" data-tab="audit">Auditoria</button>
       </div>
@@ -517,6 +518,24 @@
             <thead><tr><th>Código</th><th>Valor</th><th>Usos</th><th>Expira</th><th>Status</th><th>Ações</th></tr></thead>
             <tbody id="promoTable"><tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- EVENTOS -->
+      <div id="tab-events" class="tab-content hidden">
+        <div style="background:var(--bg-2); padding:24px; border-radius:12px; border:1px solid var(--border); max-width:500px;">
+          <h3 style="font-family:var(--font-display); font-size:18px; margin-bottom:8px;">Tema do Site</h3>
+          <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Escolha um tema para ser aplicado em todo o site.</p>
+          
+          <select id="themeSelect" class="admin-input" style="margin-bottom:16px; font-size:16px; padding:12px;">
+            <option value="default">Padrão (ZKNbet)</option>
+            <option value="halloween">🎃 Halloween</option>
+            <option value="christmas">🎄 Natal</option>
+            <option value="easter">🐇 Páscoa</option>
+            <option value="newyear">🥂 Ano Novo</option>
+          </select>
+          
+          <button class="admin-btn" onclick="aplicarTema(event)">Aplicar Tema</button>
         </div>
       </div>
       <!-- AUDITORIA -->
