@@ -148,7 +148,7 @@ function renderHeader() {
           <a class="drawer-link" href="deposito.html"><span class="ico ico-money"></span> Depositar</a>
           <a class="drawer-link" href="saque.html"><span class="ico ico-cash"></span> Sacar</a>
           <a class="drawer-link" href="historico.html"><span class="ico ico-history"></span> Histórico</a>
-          <button class="drawer-link drawer-link-btn" onclick="ZKN.abrirResgatarCodigo()">🎟️ Resgatar Código</button>
+          <button class="drawer-link drawer-link-btn" onclick="ZKN.abrirResgatarCodigo()"><span class="ico ico-ticket" style="width:1.2em;height:1.2em;vertical-align:middle;"></span> Resgatar Código</button>
 
           <div class="drawer-section-title">Indicação</div>
           <a class="drawer-link" href="indicacao.html"><span class="ico ico-handshake"></span> Indique e ganhe</a>
@@ -431,7 +431,7 @@ window.ZKN.abrirResgatarCodigo = function() {
   backdrop.innerHTML = `
     <div style="background:linear-gradient(180deg, #1a2332 0%, #0a0f1a 100%); border:2px solid #f5be3c; border-radius:24px; padding:32px 24px; max-width:400px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(245,190,60,0.3); position:relative;">
       <button id="btnFecharModal" style="position:absolute;top:12px;right:16px;background:transparent;border:none;color:#8a94a6;font-size:24px;cursor:pointer;">&times;</button>
-      <div style="font-size:56px;margin-bottom:16px;">🎟️</div>
+      <div style="font-size:56px;margin-bottom:16px;"><span class="ico ico-ticket" style="width:3.5rem;height:3.5rem;vertical-align:middle;"></span></div>
       <h3 style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#f5be3c;margin-bottom:8px;">Resgatar Código</h3>
       <p style="font-size:14px;color:#8a94a6;margin-bottom:20px;">Digite o código promocional para receber seu bônus.</p>
       

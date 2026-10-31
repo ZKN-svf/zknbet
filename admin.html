@@ -392,6 +392,7 @@
         <button class="admin-tab" data-tab="transactions">Transações</button>
         <button class="admin-tab" data-tab="nitrogames">NitroGames</button>
         <button class="admin-tab" data-tab="withdraws">Saques pendentes</button>
+        <button class="admin-tab" data-tab="marketing">Marketing</button>
         <button class="admin-tab" data-tab="promo">Promo Codes</button>
         <button class="admin-tab" data-tab="audit">Auditoria</button>
       </div>
@@ -469,6 +470,37 @@
 
       
 
+      <!-- MARKETING -->
+      <div id="tab-marketing" class="tab-content hidden">
+        <div style="margin-bottom:24px; background:var(--bg-2); padding:20px; border-radius:var(--radius); border:1px solid var(--border);">
+          <h3 style="font-family:var(--font-display); font-size:16px; margin-bottom:16px;">Adicionar Banner</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div>
+              <label style="font-size:11px; color:var(--text-muted);">Imagem (JPG/PNG)</label>
+              <input id="marketingImage" type="file" accept="image/*" class="admin-input">
+            </div>
+            <div>
+              <label style="font-size:11px; color:var(--text-muted);">Link de Destino (opcional)</label>
+              <input id="marketingLink" class="admin-input" placeholder="https://...">
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:11px; color:var(--text-muted);">Tipo</label>
+            <select id="marketingType" class="admin-input">
+              <option value="carousel">Carrossel (passa no topo)</option>
+              <option value="popup">Pop-up (aparece ao entrar)</option>
+            </select>
+          </div>
+          <button id="btnEnviarBanner" class="admin-btn">Enviar Banner</button>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Imagem</th><th>Tipo</th><th>Link</th><th>AÃ§Ãµes</th></tr></thead>
+            <tbody id="marketingTable"><tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
       <!-- PROMO CODES -->
       <div id="tab-promo" class="tab-content hidden">
         <div style="margin-bottom:24px; background:var(--bg-2); padding:20px; border-radius:var(--radius); border:1px solid var(--border);">
@@ -601,9 +633,13 @@
         if (tab === 'withdraws') carregarWithdraws();
         if (tab === 'audit') carregarAudit();
         if (tab === 'promo') carregarPromo();
+        if (tab === 'marketing') carregarMarketing();
         if (tab === 'promo') carregarPromo();
+        if (tab === 'marketing') carregarMarketing();
         if (tab === 'promo') carregarPromo();
+        if (tab === 'marketing') carregarMarketing();
         if (tab === 'promo') carregarPromo();
+        if (tab === 'marketing') carregarMarketing();
       };
     });
 

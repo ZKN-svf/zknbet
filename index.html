@@ -17,6 +17,12 @@
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
 
   <!-- TICKER -->
+    <!-- CARROSSEL DE BANNERS -->
+  <div id="carrosselBanners" style="display:none; margin-top: 24px; padding: 0 24px;">
+    <div style="max-width: 1280px; margin: 0 auto; position: relative; border-radius: 16px; overflow: hidden;">
+      <div id="carrosselTrack" style="display: flex; transition: transform 0.5s ease;"></div>
+    </div>
+  </div>
   <div class="winners-ticker" style="margin-top: 24px;"><div class="winners-track" id="tickerTrack"></div></div>
 
   <!-- FAVORITOS (so aparece se tiver) -->
@@ -349,6 +355,60 @@
     }, 1500);
   });
 })();
+</script>
+<script>
+  // Carrossel de Banners
+  (async function() {
+    try {
+      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+      const res = await fetch(apiBase + '/marketing/banners');
+      const data = await res.json();
+      const banners = (data.banners || []).filter(b => b.type === 'carousel');
+      
+      if (!banners.length) return;
+      
+      const container = document.getElementById('carrosselBanners');
+      const track = document.getElementById('carrosselTrack');
+      container.style.display = 'block';
+      
+      track.innerHTML = banners.map(b => 
+        '<div style="min-width: 100%; position: relative; cursor: pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
+          '<img src="' + b.image_url + '" style="width: 100%; height: auto; display: block;">' +
+        '</div>'
+      ).join('');
+      
+      let idx = 0;
+      setInterval(() => {
+        idx = (idx + 1) % banners.length;
+        track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+      }, 4000);
+    } catch(e) { console.warn('[Carrossel] erro:', e); }
+  })();
+</script>
+<script>
+  // Pop-up de Marketing
+  (async function() {
+    if (localStorage.getItem('zkn_popup_shown') === 'true') return;
+    try {
+      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+      const res = await fetch(apiBase + '/marketing/banners');
+      const data = await res.json();
+      const banners = (data.banners || []).filter(b => b.type === 'popup');
+      
+      if (!banners.length) return;
+      const b = banners[0];
+      
+      setTimeout(() => {
+        const backdrop = document.createElement('div');
+        backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+        backdrop.innerHTML = '<div style="position:relative; max-width:500px; width:100%;">' +
+          '<button onclick="this.parentNode.parentNode.remove(); localStorage.setItem(\'zkn_popup_shown\', \'true\')" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:none;font-size:24px;cursor:pointer;font-weight:bold;">&times;</button>' +
+          '<img src="' + b.image_url + '" style="width:100%; border-radius:16px; display:block; cursor:pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
+        '</div>';
+        document.body.appendChild(backdrop);
+      }, 3000);
+    } catch(e) { console.warn('[Popup] erro:', e); }
+  })();
 </script>
 </body>
 </html>
