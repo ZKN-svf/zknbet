@@ -470,13 +470,14 @@
 
       
 
+      <!-- PROMO CODES -->
       <div id="tab-promo" class="tab-content hidden">
         <div style="margin-bottom:24px; background:var(--bg-2); padding:20px; border-radius:var(--radius); border:1px solid var(--border);">
           <h3 style="font-family:var(--font-display); font-size:16px; margin-bottom:16px;">Criar novo código</h3>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
-            <div><label style="font-size:11px; color:var(--text-muted);">Código</label><input id="promoCode" class="admin-input" placeholder="ZKN10"></div>
+            <div><label style="font-size:11px; color:var(--text-muted);">Código (ex: ZKN10)</label><input id="promoCode" class="admin-input" placeholder="ZKN10"></div>
             <div><label style="font-size:11px; color:var(--text-muted);">Valor (R$)</label><input id="promoValue" type="number" step="0.01" class="admin-input" placeholder="10.00"></div>
-            <div><label style="font-size:11px; color:var(--text-muted);">Limite usos (0=ilimitado)</label><input id="promoMaxUses" type="number" class="admin-input" value="0"></div>
+            <div><label style="font-size:11px; color:var(--text-muted);">Limite usos (0 = ilimitado)</label><input id="promoMaxUses" type="number" class="admin-input" value="0"></div>
             <div><label style="font-size:11px; color:var(--text-muted);">Expira em (dias)</label><input id="promoDays" type="number" class="admin-input" value="30"></div>
           </div>
           <button id="btnCriarPromo" class="admin-btn">Criar Código</button>
@@ -574,6 +575,7 @@
         if (tab === 'nitrogames') carregarNitroBalance();
         if (tab === 'withdraws') carregarWithdraws();
         if (tab === 'audit') carregarAudit();
+        if (tab === 'promo') carregarPromo();
         if (tab === 'promo') carregarPromo();
         if (tab === 'promo') carregarPromo();
         if (tab === 'promo') carregarPromo();
@@ -786,177 +788,7 @@
     // ---------- Renderiza celula de rollover ----------
     function renderRollover(u) {const saldo=Number(u.balance||0);const dep=Number(u.deposited||0);const betSince=Number(u.bet_since_deposit||0);if(saldo<=0)return '<span style="color:var(--text-muted);font-size:11px;">sem saldo</span>';if(dep===0)return '<span style="color:var(--text-muted);font-size:11px;">sem deposito</span>';const req=dep*0.60;const falta=Math.max(0,req-betSince);const pct=Math.min(100,Math.round((betSince/req)*100));if(falta===0)return '<span class="badge completed">OK '+pct+'%</span>';return '<span class="badge pending">'+pct+'% falta '+fmtBRL(falta)+'</span>';}
 
-    // ---------- PROMO CODES ----------
-    async function carregarPromo() {
-      try {
-        const d = await api('/admin/promo/list');
-        const tb = document.getElementById('promoTable');
-        const list = d.codes || [];
-        if (!list.length) {
-          tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Nenhum cÃ³digo criado.</td></tr>';
-          return;
-        }
-        tb.innerHTML = list.map(p => {
-          const status = p.active ? '<span class="badge completed">Ativo</span>' : '<span class="badge withdraw">Desativado</span>';
-          const expira = new Date(p.expires_at).toLocaleDateString('pt-BR');
-          return `<tr>
-            <td><strong>${p.code}</strong></td>
-            <td style="color:var(--gold); font-weight:700;">${fmtBRL(p.value)}</td>
-            <td>${p.total_uses} / ${p.max_uses === 0 ? 'âˆž' : p.max_uses}</td>
-            <td>${expira}</td>
-            <td>${status}</td>
-            <td>${p.active ? `<button class="admin-btn danger" style="padding:4px 8px;font-size:11px;" onclick="desativarPromo('${p.id}')">Desativar</button>` : '-'}</td>
-          </tr>`;
-        }).join('');
-      } catch(e) { toast('Erro', e.message, 'error'); }
-    }
-
-    document.getElementById('btnCriarPromo').onclick = async () => {
-      const code = document.getElementById('promoCode').value.trim().toUpperCase();
-      const value = parseFloat(document.getElementById('promoValue').value);
-      const maxUses = parseInt(document.getElementById('promoMaxUses').value);
-      const days = parseInt(document.getElementById('promoDays').value);
-      
-      if (!code || !value || value <= 0) return toast('Erro', 'Preencha cÃ³digo e valor vÃ¡lido.', 'error');
-      
-      const expiresAt = Date.now() + (days * 24 * 60 * 60 * 1000);
-      try {
-        await api('/admin/promo/create', { method: 'POST', body: JSON.stringify({ code, value, maxUses, expiresAt }) });
-        toast('Sucesso', 'CÃ³digo criado!', 'success');
-        carregarPromo();
-      } catch(e) { toast('Erro', e.message, 'error'); }
-    };
-
-    async function desativarPromo(id) {
-      if (!confirm('Desativar este cÃ³digo?')) return;
-      try {
-        await api('/admin/promo/' + id + '/disable', { method: 'POST' });
-        toast('Desativado', '', 'success');
-        carregarPromo();
-      } catch(e) { toast('Erro', e.message, 'error'); }
-    }
-    async function carregarPromo() {
-      try {
-        const d = await api('/admin/promo/list');
-        const tb = document.getElementById('promoTable');
-        const list = d.codes || [];
-        if (!list.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Nenhum código criado.</td></tr>'; return; }
-        tb.innerHTML = list.map(p => {
-          const status = p.active ? '<span class="badge completed">Ativo</span>' : '<span class="badge withdraw">Desativado</span>';
-          const expira = new Date(p.expires_at).toLocaleDateString('pt-BR');
-          return '<tr><td><strong>' + p.code + '</strong></td><td style="color:var(--gold);font-weight:700;">' + fmtBRL(p.value) + '</td><td>' + p.total_uses + ' / ' + (p.max_uses === 0 ? '∞' : p.max_uses) + '</td><td>' + expira + '</td><td>' + status + '</td><td>' + (p.active ? '<button class="admin-btn danger" style="padding:4px 8px;font-size:11px;" onclick="desativarPromo(\'' + p.id + '\')">Desativar</button>' : '-') + '</td></tr>';
-        }).join('');
-      } catch(e) { toast('Erro', e.message, 'error'); }
-    }
-
-    document.getElementById('btnCriarPromo').onclick = async () => {
-      const code = document.getElementById('promoCode').value.trim().toUpperCase();
-      const value = parseFloat(document.getElementById('promoValue').value);
-      const maxUses = parseInt(document.getElementById('promoMaxUses').value);
-      const days = parseInt(document.getElementById('promoDays').value);
-      if (!code || !value || value <= 0) return toast('Erro', 'Preencha código e valor válido.', 'error');
-      const expiresAt = Date.now() + (days * 24 * 60 * 60 * 1000);
-      try {
-        await api('/admin/promo/create', { method: 'POST', body: JSON.stringify({ code, value, maxUses, expiresAt }) });
-        toast('Sucesso', 'Código criado!', 'success');
-        carregarPromo();
-      } catch(e) { toast('Erro', e.message, 'error'); }
-    };
-
-    async function desativarPromo(id) {
-      if (!confirm('Desativar este código?')) return;
-      try { await api('/admin/promo/' + id + '/disable', { method: 'POST' }); toast('Desativado', '', 'success'); carregarPromo(); } catch(e) { toast('Erro', e.message, 'error'); }
-    }
-    // ============================================================
-// PROMO CODES (Injetado automaticamente)
-// ============================================================
-async function carregarPromo() {
-  const tab = document.getElementById('tab-promo');
-  if (!tab) return;
-  
-  // Cria o HTML da aba se não existir
-  if (!document.getElementById('promoTable')) {
-    tab.innerHTML = `
-      <div style="margin-bottom:24px; background:var(--bg-2); padding:20px; border-radius:var(--radius); border:1px solid var(--border);">
-        <h3 style="font-family:var(--font-display); font-size:16px; margin-bottom:16px;">Criar novo código</h3>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
-          <div><label style="font-size:11px; color:var(--text-muted);">Código</label><input id="promoCode" class="admin-input" placeholder="ZKN10"></div>
-          <div><label style="font-size:11px; color:var(--text-muted);">Valor (R$)</label><input id="promoValue" type="number" step="0.01" class="admin-input" placeholder="10.00"></div>
-          <div><label style="font-size:11px; color:var(--text-muted);">Limite usos (0=ilimitado)</label><input id="promoMaxUses" type="number" class="admin-input" value="0"></div>
-          <div><label style="font-size:11px; color:var(--text-muted);">Expira em (dias)</label><input id="promoDays" type="number" class="admin-input" value="30"></div>
-        </div>
-        <button id="btnCriarPromo" class="admin-btn">Criar Código</button>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="admin-table">
-          <thead><tr><th>Código</th><th>Valor</th><th>Usos</th><th>Expira</th><th>Status</th><th>Ações</th></tr></thead>
-          <tbody id="promoTable"><tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
-        </table>
-      </div>
-    `;
-  }
-  
-  // Carrega a lista
-  try {
-    const d = await api('/admin/promo/list');
-    const tb = document.getElementById('promoTable');
-    const list = d.codes || [];
-    if (!list.length) { 
-      tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Nenhum código criado.</td></tr>'; 
-      return; 
-    }
     
-    tb.innerHTML = list.map(p => {
-      const status = p.active ? '<span class="badge completed">Ativo</span>' : '<span class="badge withdraw">Desativado</span>';
-      const expira = new Date(p.expires_at).toLocaleDateString('pt-BR');
-      const max = p.max_uses === 0 ? '∞' : p.max_uses;
-      const btn = p.active ? '<button class="admin-btn danger" style="padding:4px 8px;font-size:11px;" onclick="desativarPromo(\'' + p.id + '\')">Desativar</button>' : '-';
-      return '<tr><td><strong>' + p.code + '</strong></td><td style="color:var(--gold);font-weight:700;">' + fmtBRL(p.value) + '</td><td>' + p.total_uses + ' / ' + max + '</td><td>' + expira + '</td><td>' + status + '</td><td>' + btn + '</td></tr>';
-    }).join('');
-  } catch(e) { 
-    document.getElementById('promoTable').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--red);">Erro: ' + e.message + '</td></tr>';
-  }
-}
-
-// Evento de criar código
-document.addEventListener('click', async (e) => {
-  if (e.target && e.target.id === 'btnCriarPromo') {
-    const code = document.getElementById('promoCode').value.trim().toUpperCase();
-    const value = parseFloat(document.getElementById('promoValue').value);
-    const maxUses = parseInt(document.getElementById('promoMaxUses').value);
-    const days = parseInt(document.getElementById('promoDays').value);
-    
-    if (!code || !value || value <= 0) return toast('Erro', 'Preencha código e valor.', 'error');
-    
-    e.target.disabled = true;
-    e.target.textContent = 'Criando...';
-    const expiresAt = Date.now() + (days * 24 * 60 * 60 * 1000);
-    
-    try {
-      await api('/admin/promo/create', { method: 'POST', body: JSON.stringify({ code, value, maxUses, expiresAt }) });
-      toast('Sucesso', 'Código ' + code + ' criado!', 'success');
-      document.getElementById('promoCode').value = '';
-      document.getElementById('promoValue').value = '';
-      carregarPromo();
-    } catch(err) { 
-      toast('Erro', err.message, 'error'); 
-    } finally {
-      e.target.disabled = false;
-      e.target.textContent = 'Criar Código';
-    }
-  }
-});
-
-// Desativar código
-window.desativarPromo = async (id) => {
-  if (!confirm('Desativar este código?')) return;
-  try {
-    await api('/admin/promo/' + id + '/disable', { method: 'POST' });
-    toast('Desativado', '', 'success');
-    carregarPromo();
-  } catch(e) { toast('Erro', e.message, 'error'); }
-};
-// ---------- INIT ----------
     if (adminToken && adminUser) {
       entrarNoPainel();
     }
