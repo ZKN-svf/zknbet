@@ -447,7 +447,7 @@
 <script>
   // Pop-up de Marketing
   (async function() {
-    if (localStorage.getItem('zkn_popup_shown') === 'true') return;
+    
     try {
       const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
       const res = await fetch(apiBase + '/marketing/banners');
@@ -465,7 +465,7 @@
           '<img src="' + b.image_url + '" style="width:100%; border-radius:16px; display:block; cursor:pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
         '</div>';
         document.body.appendChild(backdrop);
-      }, 3000);
+      }, 5000);
     } catch(e) { console.warn('[Popup] erro:', e); }
   })();
 </script>
