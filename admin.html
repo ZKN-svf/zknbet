@@ -973,6 +973,15 @@
       }
     });
 
+window.editarLinkBanner = async function(id) {
+  const linkAtual = prompt('Digite o novo link (deixe vazio para remover):');
+  if (linkAtual === null) return;
+  try {
+    await api('/admin/marketing/link/' + id, { method: 'PUT', body: JSON.stringify({ link: linkAtual.trim() }) });
+    toast('Link atualizado', '', 'success');
+    carregarMarketing();
+  } catch (e) { toast('Erro', e.message, 'error'); }
+};
     window.deletarBanner = async function(id) {
       if (!confirm('Excluir este banner?')) return;
       try {
