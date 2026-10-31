@@ -447,7 +447,10 @@
 <script>
   // Pop-up de Marketing (Mostra todos, um por um)
   (async function() {
-    if (localStorage.getItem('zkn_popup_shown') === 'true') return;
+    // Verifica se ja mostrou nas ultimas 24 horas
+    const lastShown = localStorage.getItem('zkn_popup_shown');
+    const now = new Date().getTime();
+    if (lastShown && (now - parseInt(lastShown)) < 24 * 60 * 60 * 1000) return;
     try {
       const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
       const res = await fetch(apiBase + '/marketing/banners');
@@ -461,7 +464,7 @@
       function mostrarProximo() {
         if (index >= banners.length) {
           // Terminou de mostrar todos, trava para não aparecer de novo
-          localStorage.setItem('zkn_popup_shown', 'true');
+          localStorage.setItem('zkn_popup_shown', new Date().getTime().toString());
           return;
         }
         
