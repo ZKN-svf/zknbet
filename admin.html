@@ -650,6 +650,38 @@
       }
     };
 
+    // ============================================================
+    // EVENTOS (TEMAS SAZONAIS)
+    // ============================================================
+    window.carregarTema = async function() {
+      try {
+        const res = await fetch(API + '/settings/theme');
+        const data = await res.json();
+        const select = document.getElementById('themeSelect');
+        if (select) select.value = data.theme || 'default';
+      } catch(e) {
+        console.error("Erro ao carregar tema", e);
+      }
+    };
+
+    window.aplicarTema = async function(ev) {
+      const theme = document.getElementById('themeSelect').value;
+      const btn = ev.target;
+      btn.disabled = true;
+      btn.textContent = 'Aplicando...';
+      
+      try {
+        await api('/admin/settings/theme', { method: 'POST', body: JSON.stringify({ theme }) });
+        toast('Sucesso', 'Tema aplicado em todo o site!', 'success');
+      } catch(e) {
+        toast('Erro', e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Aplicar Tema';
+      }
+    };
+
+
     function entrarNoPainel() {
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('adminPanel').classList.remove('hidden');
@@ -679,12 +711,16 @@
         if (tab === 'audit') carregarAudit();
         if (tab === 'promo') carregarPromo();
         if (tab === 'marketing') carregarMarketing();
+        if (tab === 'events') window.carregarTema();
         if (tab === 'promo') carregarPromo();
         if (tab === 'marketing') carregarMarketing();
+        if (tab === 'events') window.carregarTema();
         if (tab === 'promo') carregarPromo();
         if (tab === 'marketing') carregarMarketing();
+        if (tab === 'events') window.carregarTema();
         if (tab === 'promo') carregarPromo();
         if (tab === 'marketing') carregarMarketing();
+        if (tab === 'events') window.carregarTema();
       };
     });
 
