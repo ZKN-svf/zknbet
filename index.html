@@ -447,20 +447,28 @@
 
 
 
+
 <script>
-  // Pop-up de Marketing
+  // Pop-up de Marketing (Múltiplos)
   (async function() {
-    if (localStorage.getItem('zkn_popup_shown') === 'true') return;
     try {
       const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
       const res = await fetch(apiBase + '/marketing/banners');
       const data = await res.json();
-      const banners = (data.banners || []).filter(b => b.type === 'popup');
+      
+      // Pega todos os pop-ups que ainda não foram vistos nesta sessão
+      const vistos = JSON.parse(sessionStorage.getItem('zkn_popups_vistos') || '[]');
+      const banners = (data.banners || []).filter(b => b.type === 'popup' && !vistos.includes(b.id));
       
       if (!banners.length) return;
-      const b = banners[0];
       
-      setTimeout(() => {
+      let index = 0;
+      
+      function mostrarProximo() {
+        if (index >= banners.length) return;
+        const b = banners[index];
+        index++;
+        
         const backdrop = document.createElement('div');
         backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
         backdrop.innerHTML = '<div style="position:relative; max-width:500px; width:100%;">' +
@@ -470,10 +478,19 @@
         document.body.appendChild(backdrop);
         
         backdrop.querySelector('#btnFecharPopup').onclick = function() {
+          // Marca este popup como visto
+          const vistosAtual = JSON.parse(sessionStorage.getItem('zkn_popups_vistos') || '[]');
+          vistosAtual.push(b.id);
+          sessionStorage.setItem('zkn_popups_vistos', JSON.stringify(vistosAtual));
+          
           backdrop.remove();
-          localStorage.setItem('zkn_popup_shown', 'true');
+          setTimeout(mostrarProximo, 500); // Pequeno delay antes do próximo
         };
-      }, 3000);
+      }
+      
+      // Inicia a sequência após 3 segundos
+      setTimeout(mostrarProximo, 3000);
+      
     } catch(e) { console.warn('[Popup] erro:', e); }
   })();
 </script>
