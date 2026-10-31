@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Alterar Senha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
+  <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
+  <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/icons.css">
+</head>
+<body>
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+
+  <div class="auth-wrap">
+    <div class="card auth-card">
+      <h1><span class="ico ico-lock"></span> Alterar senha</h1>
+      <p class="subtitle">Informe a senha atual e defina uma nova.</p>
+
+      <label for="atual">Senha atual</label>
+      <input type="password" id="atual" autocomplete="current-password">
+
+      <label for="nova">Nova senha</label>
+      <input type="password" id="nova" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+
+      <label for="nova2">Confirmar nova senha</label>
+      <input type="password" id="nova2" autocomplete="new-password">
+
+      <button id="btnSalvar" class="btn-primary btn-block">Alterar senha</button>
+      <p class="auth-alt"><a href="minha-conta.html">← Voltar</a></p>
+    </div>
+  </div>
+
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/bottom-nav.js"></script>
+  <script src="assets/game-frame.js"></script>
+  <script>
+    if (!ZKNAuth.requireLogin('alterar-senha.html')) throw new Error('redirecionado');
+
+    document.getElementById('btnSalvar').onclick = async () => {
+      const atual = document.getElementById('atual').value;
+      const nova = document.getElementById('nova').value;
+      const nova2 = document.getElementById('nova2').value;
+
+      if (!atual || atual.length < 6) return ZKN.toast('Senha atual inválida', 'Digite sua senha atual.', 'error');
+      if (!nova || nova.length < 6) return ZKN.toast('Senha muito curta', 'Mínimo de 6 caracteres.', 'error');
+      if (nova !== nova2) return ZKN.toast('Senhas não coincidem', 'Confirme a nova senha.', 'error');
+      if (nova === atual) return ZKN.toast('Senha igual', 'A nova senha deve ser diferente da atual.', 'error');
+
+      const btn = document.getElementById('btnSalvar');
+      btn.disabled = true;
+      btn.textContent = 'Alterando...';
+
+      const r = await ZKNAuth.alterarSenha({ currentPassword: atual, newPassword: nova });
+      btn.disabled = false;
+      btn.textContent = 'Alterar senha';
+
+      if (!r.sucesso) return ZKN.toast('Erro', r.mensagem, 'error');
+      ZKN.toast('Senha alterada!', 'Use a nova senha no próximo login.');
+      setTimeout(() => location.href = 'minha-conta.html', 800);
+    };
+  </script>
+</body>
+</html>

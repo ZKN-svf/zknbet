@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Nova Senha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+  <div class="auth-wrap">
+    <div class="card auth-card">
+      <h1>Nova Senha</h1>
+      <p class="subtitle">Defina sua nova senha abaixo.</p>
+      <label for="nova">Nova Senha</label>
+      <input type="password" id="nova" placeholder="Mínimo 6 caracteres">
+      <label for="nova2">Confirmar Nova Senha</label>
+      <input type="password" id="nova2" placeholder="Repita a senha">
+      <button id="btnSalvar" class="btn-primary btn-block">Salvar Senha</button>
+      <div id="statusBox" class="status-box" style="margin-top:16px;"></div>
+    </div>
+  </div>
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('token');
+
+    if (!token) {
+      document.querySelector('.auth-card').innerHTML = '<h1>Link Inválido</h1><p class="subtitle">O link de redefinição está incompleto.</p><a href="login.html" class="btn-primary btn-block" style="text-decoration:none;display:inline-flex;justify-content:center;">Ir para Login</a>';
+    }
+
+    document.getElementById('btnSalvar').onclick = async () => {
+      const pass = document.getElementById('nova').value;
+      const pass2 = document.getElementById('nova2').value;
+      const btn = document.getElementById('btnSalvar');
+      const box = document.getElementById('statusBox');
+
+      if (!pass || pass.length < 6) return ZKN.toast('Erro', 'Senha muito curta (min 6).', 'error');
+      if (pass !== pass2) return ZKN.toast('Erro', 'As senhas não coincidem.', 'error');
+
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+
+      try {
+        const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || '';
+        const res = await fetch(apiBase + '/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, newPassword: pass })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          box.className = 'status-box active success';
+          box.innerHTML = '✅ Senha alterada com sucesso! Você já pode fazer login.';
+          document.getElementById('nova').value = '';
+          document.getElementById('nova2').value = '';
+          setTimeout(() => location.href = 'login.html', 3000);
+        } else {
+          box.className = 'status-box active error';
+          box.innerHTML = data.message || 'Erro ao redefinir senha.';
+        }
+      } catch (e) {
+        box.className = 'status-box active error';
+        box.innerHTML = 'Erro de conexão.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Salvar Senha';
+      }
+    };
+  </script>
+</body>
+</html>
