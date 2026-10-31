@@ -443,8 +443,9 @@
     } catch(e) { console.warn('[Carrossel] erro:', e); }
   })();
 </script>
+
 <script>
-  // Pop-up de Marketing
+  // Pop-up de Marketing (Mostra todos, um por um)
   (async function() {
     if (localStorage.getItem('zkn_popup_shown') === 'true') return;
     try {
@@ -454,9 +455,19 @@
       const banners = (data.banners || []).filter(b => b.type === 'popup');
       
       if (!banners.length) return;
-      const b = banners[0];
       
-      setTimeout(() => {
+      let index = 0;
+      
+      function mostrarProximo() {
+        if (index >= banners.length) {
+          // Terminou de mostrar todos, trava para não aparecer de novo
+          localStorage.setItem('zkn_popup_shown', 'true');
+          return;
+        }
+        
+        const b = banners[index];
+        index++;
+        
         const backdrop = document.createElement('div');
         backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
         backdrop.innerHTML = '<div style="position:relative; max-width:500px; width:100%;">' +
@@ -467,9 +478,13 @@
         
         backdrop.querySelector('#btnFecharPopup').onclick = function() {
           backdrop.remove();
-          localStorage.setItem('zkn_popup_shown', 'true');
+          setTimeout(mostrarProximo, 500); // Pequeno delay antes do próximo
         };
-      }, 3000);
+      }
+      
+      // Inicia a sequência após 3 segundos
+      setTimeout(mostrarProximo, 3000);
+      
     } catch(e) { console.warn('[Popup] erro:', e); }
   })();
 </script>
