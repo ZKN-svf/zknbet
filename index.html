@@ -455,17 +455,18 @@
       const banners = (data.banners || []).filter(b => b.type === 'popup');
       
       if (!banners.length) return;
+      if (localStorage.getItem('zkn_popup_shown') === 'true') return;
       const b = banners[0];
       
       setTimeout(() => {
         const backdrop = document.createElement('div');
         backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
         backdrop.innerHTML = '<div style="position:relative; max-width:500px; width:100%;">' +
-          '<button onclick="this.parentNode.parentNode.remove(); localStorage.setItem(\'zkn_popup_shown\', \'true\')" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:none;font-size:24px;cursor:pointer;font-weight:bold;">&times;</button>' +
+          '<button onclick="this.parentNode.parentNode.remove(); localStorage.setItem('zkn_popup_shown', 'true'); localStorage.setItem(\'zkn_popup_shown\', \'true\')" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:none;font-size:24px;cursor:pointer;font-weight:bold;">&times;</button>' +
           '<img src="' + b.image_url + '" style="width:100%; border-radius:16px; display:block; cursor:pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
         '</div>';
         document.body.appendChild(backdrop);
-      }, 5000);
+      }, 3000);
     } catch(e) { console.warn('[Popup] erro:', e); }
   })();
 </script>
