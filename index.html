@@ -16,43 +16,15 @@
 
 
 
+
 <style>
-  #carrosselBanners {
-    width: 100% !important;
-    max-width: 1000px !important;
-    margin: 24px auto 0 !important;
-    padding: 0 16px !important;
-    box-sizing: border-box;
-  }
-  #carrosselTrack {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    transition: transform 0.5s ease !important;
-    border-radius: 16px;
-    overflow: hidden;
-  }
-  #carrosselTrack > div {
-    flex: 0 0 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-    width: 100% !important;
-    position: relative;
-    cursor: pointer;
-  }
-  #carrosselTrack img {
-    width: 100% !important;
-    height: 260px !important;
-    object-fit: cover !important;
-    display: block !important;
-  }
+  #carrosselBanners { width: 100%; max-width: 1000px; margin: 24px auto 0; padding: 0 16px; box-sizing: border-box; }
+  #carrosselTrack { display: flex; flex-wrap: nowrap; transition: transform 0.5s ease; border-radius: 16px; overflow: hidden; }
+  #carrosselTrack > div { flex: 0 0 100%; min-width: 100%; width: 100%; cursor: pointer; }
+  #carrosselTrack img { width: 100%; height: 260px; object-fit: cover; display: block; }
   @media (max-width: 768px) {
-    #carrosselBanners {
-      padding: 0 12px !important;
-    }
-    #carrosselTrack img {
-      height: auto !important;
-      max-height: 300px !important;
-    }
+    #carrosselBanners { padding: 0 12px; }
+    #carrosselTrack img { height: auto; max-height: 300px; }
   }
 </style>
 </head>
@@ -404,55 +376,11 @@
 
 
 
-<script>
-  // Pop-up de Marketing (Múltiplos)
-  (async function() {
-    try {
-      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
-      const res = await fetch(apiBase + '/marketing/banners');
-      const data = await res.json();
-      
-      // Pega todos os pop-ups que ainda não foram vistos nesta sessão
-      const vistos = JSON.parse(sessionStorage.getItem('zkn_popups_vistos') || '[]');
-      const banners = (data.banners || []).filter(b => b.type === 'popup' && !vistos.includes(b.id));
-      
-      if (!banners.length) return;
-      
-      let index = 0;
-      
-      function mostrarProximo() {
-        if (index >= banners.length) return;
-        const b = banners[index];
-        index++;
-        
-        const backdrop = document.createElement('div');
-        backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
-        backdrop.innerHTML = '<div style="position:relative; max-width:500px; width:100%;">' +
-          '<button id="btnFecharPopup" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:none;font-size:24px;cursor:pointer;font-weight:bold;">&times;</button>' +
-          '<img src="' + b.image_url + '" style="width:100%; border-radius:16px; display:block; cursor:pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
-        '</div>';
-        document.body.appendChild(backdrop);
-        
-        backdrop.querySelector('#btnFecharPopup').onclick = function() {
-          // Marca este popup como visto
-          const vistosAtual = JSON.parse(sessionStorage.getItem('zkn_popups_vistos') || '[]');
-          vistosAtual.push(b.id);
-          sessionStorage.setItem('zkn_popups_vistos', JSON.stringify(vistosAtual));
-          
-          backdrop.remove();
-          setTimeout(mostrarProximo, 500); // Pequeno delay antes do próximo
-        };
-      }
-      
-      // Inicia a sequência após 3 segundos
-      setTimeout(mostrarProximo, 3000);
-      
-    } catch(e) { console.warn('[Popup] erro:', e); }
-  })();
-</script>
+
+
 
 <script>
-  // Carrossel de Banners
+  // Carrossel de Banners (createElement)
   (async function() {
     try {
       const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
@@ -464,14 +392,24 @@
       
       const container = document.getElementById('carrosselBanners');
       const track = document.getElementById('carrosselTrack');
-      container.style.display = 'block';
+      if (!container || !track) return;
       
-      // Cria cada imagem em uma div separada
-      track.innerHTML = banners.map(function(b) {
-        return '<div style="flex:0 0 100%; min-width:100%; width:100%; cursor:pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
-          '<img src="' + b.image_url + '" alt="Banner" style="width:100%; height:260px; object-fit:cover; display:block;">' +
-        '</div>';
-      }).join('');
+      container.style.display = 'block';
+      track.innerHTML = ''; // Limpa qualquer conteúdo antigo
+      
+      banners.forEach(function(b) {
+        const div = document.createElement('div');
+        div.style.cssText = 'flex:0 0 100%; min-width:100%; width:100%; cursor:pointer;';
+        div.onclick = function() { location.href = b.link || '#'; };
+        
+        const img = document.createElement('img');
+        img.src = b.image_url;
+        img.alt = 'Banner';
+        img.style.cssText = 'width:100%; height:260px; object-fit:cover; display:block;';
+        
+        div.appendChild(img);
+        track.appendChild(div);
+      });
       
       let idx = 0;
       setInterval(function() {
