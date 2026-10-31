@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Esqueci a Senha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+  <div class="auth-wrap">
+    <div class="card auth-card">
+      <h1>Recuperar Senha</h1>
+      <p class="subtitle">Digite seu e-mail para receber o link de redefinição.</p>
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="seu@email.com">
+      <button id="btnEnviar" class="btn-primary btn-block">Enviar Link</button>
+      <div id="statusBox" class="status-box" style="margin-top:16px;"></div>
+      <p class="auth-alt"><a href="login.html">← Voltar ao login</a></p>
+    </div>
+  </div>
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    document.getElementById('btnEnviar').onclick = async () => {
+      const email = document.getElementById('email').value.trim();
+      const btn = document.getElementById('btnEnviar');
+      const box = document.getElementById('statusBox');
+
+      if (!email) return ZKN.toast('Erro', 'Digite seu e-mail.', 'error');
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      try {
+        const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || '';
+        const res = await fetch(apiBase + '/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        if (res.ok) {
+          box.className = 'status-box active success';
+          box.innerHTML = '✅ Link enviado! Verifique sua caixa de entrada (e o spam).';
+          document.getElementById('email').value = '';
+        } else {
+          box.className = 'status-box active error';
+          box.innerHTML = 'Erro ao solicitar link.';
+        }
+      } catch (e) {
+        box.className = 'status-box active error';
+        box.innerHTML = 'Erro de conexão.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enviar Link';
+      }
+    };
+  </script>
+</body>
+</html>
