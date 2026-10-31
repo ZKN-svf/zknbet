@@ -443,5 +443,35 @@
     } catch(e) { console.warn('[Carrossel] erro:', e); }
   })();
 </script>
+<script>
+  // Pop-up de Marketing
+  (async function() {
+    if (localStorage.getItem('zkn_popup_shown') === 'true') return;
+    try {
+      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+      const res = await fetch(apiBase + '/marketing/banners');
+      const data = await res.json();
+      const banners = (data.banners || []).filter(b => b.type === 'popup');
+      
+      if (!banners.length) return;
+      const b = banners[0];
+      
+      setTimeout(() => {
+        const backdrop = document.createElement('div');
+        backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+        backdrop.innerHTML = '<div style="position:relative; max-width:500px; width:100%;">' +
+          '<button id="btnFecharPopup" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:none;font-size:24px;cursor:pointer;font-weight:bold;">&times;</button>' +
+          '<img src="' + b.image_url + '" style="width:100%; border-radius:16px; display:block; cursor:pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
+        '</div>';
+        document.body.appendChild(backdrop);
+        
+        backdrop.querySelector('#btnFecharPopup').onclick = function() {
+          backdrop.remove();
+          localStorage.setItem('zkn_popup_shown', 'true');
+        };
+      }, 3000);
+    } catch(e) { console.warn('[Popup] erro:', e); }
+  })();
+</script>
 </body>
 </html>
