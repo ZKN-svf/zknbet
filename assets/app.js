@@ -420,6 +420,10 @@ window.ZKN = window.ZKN || {};
 // ============================================================
 // RESGATAR CODIGO PROMOCIONAL (Modal) - VERSAO CORRIGIDA
 // ============================================================
+
+// ============================================================
+// RESGATAR CODIGO PROMOCIONAL (Modal) - VERSAO CORRIGIDA
+// ============================================================
 window.ZKN.abrirResgatarCodigo = function() {
   const backdrop = document.createElement('div');
   backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -453,10 +457,7 @@ window.ZKN.abrirResgatarCodigo = function() {
   btnCancelar.onclick = () => backdrop.remove();
   
   btnConfirmar.onclick = async () => {
-    // PEGA O VALOR DIRETAMENTE DO INPUT NESTE EXATO MOMENTO
     const codeValue = String(input.value || '').trim().toUpperCase();
-    
-    console.log('[PROMO] Valor do input:', JSON.stringify(codeValue));
     
     if (!codeValue) {
       if (window.ZKN && window.ZKN.toast) window.ZKN.toast('Atenção', 'Digite um código antes de resgatar.', 'warning');
@@ -467,20 +468,24 @@ window.ZKN.abrirResgatarCodigo = function() {
     btnConfirmar.textContent = 'Verificando...';
     
     try {
-      // Envia o body com a propriedade 'code' garantida
-      const payload = { code: codeValue };
-      console.log('[PROMO] Enviando payload:', JSON.stringify(payload));
+      const token = window.ZKNAuth.getToken();
+      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
       
-      const res = await window.ZKNAuth.api('/promo/claim', { 
-        method: 'POST', 
-        body: JSON.stringify(payload) 
+      // Usa fetch direto, igual o auth.js faz
+      const res = await fetch(apiBase + '/promo/claim', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ code: codeValue })
       });
       
-      console.log('[PROMO] Resposta:', JSON.stringify(res));
+      const data = await res.json().catch(() => ({}));
       
       if (res.ok) {
         if (window.ZKN && window.ZKN.toast) {
-          window.ZKN.toast('Sucesso!', 'Você ganhou R$ ' + Number(res.data.value).toFixed(2).replace('.', ','), 'success');
+          window.ZKN.toast('Sucesso!', 'Você ganhou R$ ' + Number(data.value).toFixed(2).replace('.', ','), 'success');
         }
         backdrop.remove();
         if (window.ZKNSaldo && window.ZKNSaldo.atualizar) {
@@ -488,13 +493,12 @@ window.ZKN.abrirResgatarCodigo = function() {
         }
       } else {
         if (window.ZKN && window.ZKN.toast) {
-          window.ZKN.toast('Erro', res.data.message || 'Código inválido', 'error');
+          window.ZKN.toast('Erro', data.message || 'Código inválido', 'error');
         }
         btnConfirmar.disabled = false;
         btnConfirmar.textContent = 'Resgatar';
       }
     } catch (e) {
-      console.error('[PROMO] Erro:', e);
       if (window.ZKN && window.ZKN.toast) {
         window.ZKN.toast('Erro', e.message, 'error');
       }
