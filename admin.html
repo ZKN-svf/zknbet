@@ -392,7 +392,6 @@
         <button class="admin-tab" data-tab="transactions">Transações</button>
         <button class="admin-tab" data-tab="nitrogames">NitroGames</button>
         <button class="admin-tab" data-tab="withdraws">Saques pendentes</button>
-        <button class="admin-tab" data-tab="promo-old">Promo Codes</button>
         <button class="admin-tab" data-tab="promo">Promo Codes</button>
         <button class="admin-tab" data-tab="audit">Auditoria</button>
       </div>
@@ -735,11 +734,7 @@
           const pixDisplay = w.pix_key ? `${w.pix_key_type}: ${w.pix_key}` : '-';
           const titular = w.holder_name ? `${w.holder_name} (${w.holder_cpf || '?'})` : '-';
 
-          let acoes = '-';
-          if (w.status === 'pending') {
-            acoes = `<button class="admin-btn" style="padding:6px 10px;font-size:11px;background:var(--grad-green);color:#fff;" onclick="aprovarSaque('${w.id}', ${w.amount})"><span class="ico ico-check"></span> Aprovar</button>
-                     <button class="admin-btn danger" style="padding:6px 10px;font-size:11px;margin-left:4px;" onclick="rejeitarSaque('${w.id}', ${w.amount})">✗ Rejeitar</button>`;
-          }
+          let acoes = '<span style="font-size:11px;color:var(--text-muted);padding:4px 8px;border:1px solid var(--border-strong);border-radius:6px;display:inline-block;">Saque processado automaticamente</span>';
 
           return `
             <tr>
