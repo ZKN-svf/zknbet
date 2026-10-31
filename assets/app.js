@@ -656,3 +656,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch(e) { console.error('Erro ao carregar tema', e); }
 });
+
+// ============================================================
+// CARREGAR TEMA SAZONAL ULTRA
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || '';
+    const res = await fetch(apiBase + '/settings/theme');
+    const data = await res.json();
+    
+    if (data.theme && data.theme !== 'default') {
+      // Adiciona o CSS do tema
+      if (!document.getElementById('event-theme-css')) {
+        const link = document.createElement('link');
+        link.id = 'event-theme-css';
+        link.rel = 'stylesheet';
+        link.href = 'assets/events.css?v=' + Date.now(); // Cache bust
+        document.head.appendChild(link);
+      }
+      
+      // Aplica a classe no body
+      document.body.classList.add('theme-' + data.theme);
+
+      // Exemplo de injeção de HTML extra (se precisar)
+      if (data.theme === 'christmas' && !document.getElementById('xmas-lights')) {
+        const lights = document.createElement('div');
+        lights.id = 'xmas-lights';
+        // Aqui poderia injetar luzes via DOM se o CSS não fosse suficiente
+        document.body.appendChild(lights);
+      }
+    }
+  } catch(e) { console.error('Erro ao carregar tema', e); }
+});
