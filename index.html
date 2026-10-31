@@ -12,7 +12,43 @@
   <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
-<style>#carrosselBanners{max-width:800px!important;margin-left:auto!important;margin-right:auto!important;}#carrosselBanners img{max-height:260px;object-fit:cover;}@media(max-width:768px){#carrosselBanners{max-width:100%!important;padding:0 12px!important;}#carrosselBanners img{max-height:none;}}</style>
+
+<style>
+  #carrosselBanners {
+    max-width: 1000px !important;
+    margin: 0 auto !important;
+    padding: 0 24px !important;
+  }
+  #carrosselTrack {
+    aspect-ratio: 3 / 1 !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  #carrosselTrack div {
+    min-width: 100%;
+    height: 100%;
+  }
+  #carrosselTrack img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  /* Mobile: volta a ser proporção natural */
+  @media (max-width: 768px) {
+    #carrosselBanners {
+      max-width: 100% !important;
+      padding: 0 12px !important;
+    }
+    #carrosselTrack {
+      aspect-ratio: auto !important;
+    }
+    #carrosselTrack img {
+      height: auto !important;
+    }
+  }
+</style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -374,7 +410,7 @@
       
       track.innerHTML = banners.map(b => 
         '<div style="min-width: 100%; position: relative; cursor: pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
-          '<img src="' + b.image_url + '" style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 260px;">' +
+          '<img src="' + b.image_url + '">' +
         '</div>'
       ).join('');
       
