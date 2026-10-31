@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Entrar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
+  <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
+  <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/icons.css">
+</head>
+<body>
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+
+  <div class="auth-wrap">
+    <div class="card auth-card">
+      <h1>Entrar</h1>
+      <p class="subtitle">Acesse com seu celular e senha.</p>
+
+      <label for="phone">Celular</label>
+      <input type="tel" id="phone" placeholder="(11) 91234-5678" inputmode="numeric" autocomplete="tel">
+
+      <label for="email">E-mail (ou use celular acima)</label>
+      <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+
+      <label for="password">Senha</label>
+      <input type="password" id="password" placeholder="Sua senha" autocomplete="current-password">
+      <button id="btnEntrar" class="btn-primary btn-block">Entrar</button>
+
+      <p class="auth-alt">Não tem conta? <a href="cadastro.html">Cadastre-se</a></p>
+    </div>
+  </div>
+
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/bottom-nav.js"></script>
+  <script src="assets/game-frame.js"></script>
+  <script>
+    const phoneEl = document.getElementById('phone');
+    phoneEl.addEventListener('input', () => window.ZKNVal.mascaraCelular(phoneEl));
+
+    document.getElementById('btnEntrar').onclick = async () => {
+      const phoneEl = document.getElementById('phone');
+      const emailEl = document.getElementById('email');
+      const passEl = document.getElementById('password');
+
+      const phone = phoneEl ? window.ZKNVal.normalizarCelular(phoneEl.value) : '';
+      const email = emailEl ? emailEl.value.trim() : '';
+      const password = passEl ? passEl.value : '';
+
+      // Validacao
+      const phoneOk = phone && window.ZKNVal.validarCelular(phone);
+      const emailOk = email && window.ZKNVal.validarEmail(email);
+
+      if (!phoneOk && !emailOk) {
+        return ZKN.toast('Informe celular ou e-mail', 'Preencha um dos dois corretamente.', 'error');
+      }
+      if (!password || password.length < 6) {
+        return ZKN.toast('Senha muito curta', 'Minimo de 6 caracteres.', 'error');
+      }
+
+      const btn = document.getElementById('btnEntrar');
+      btn.disabled = true;
+      btn.textContent = 'Entrando...';
+
+      // Fallback: tenta telefone primeiro; se falhar, tenta e-mail
+      let payload = phoneOk ? { phone, password } : { email, password };
+
+      // Debug: mostra o body que sera enviado
+      const bodyStr = JSON.stringify(payload);
+      console.log('[LOGIN] Body enviado:', bodyStr);
+      console.log('[LOGIN] Body hex:', Array.from(bodyStr).map(c => c.charCodeAt(0).toString(16)).join(' '));
+
+      const r = await ZKNAuth.login(payload);
+
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
+
+      if (!r.sucesso) {
+        console.error('[LOGIN] Falha:', r.mensagem);
+        return ZKN.toast('Nao foi possivel entrar', r.mensagem || 'Verifique os dados.', 'error');
+      }
+
+      console.log('[LOGIN] Sucesso:', r.user);
+      ZKN.toast('Bem-vindo!', 'Login realizado com sucesso.');
+      const back = new URLSearchParams(location.search).get('back') || 'index.html';
+      setTimeout(() => location.href = back, 600);
+    };
+  </script>
+</body>
+</html>
