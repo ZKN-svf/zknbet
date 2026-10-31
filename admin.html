@@ -818,6 +818,52 @@
     document.getElementById('adminPassword').addEventListener('keypress', e => {
       if (e.key === 'Enter') document.getElementById('btnLogin').click();
     });
-  </script>
+      // ============================================================
+    // PROMO CODES: EVENTO DO BOTAO (injetado manualmente)
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+      var btnCriar = document.getElementById('btnCriarPromo');
+      if (!btnCriar) return;
+      btnCriar.onclick = async function() {
+        var code = document.getElementById('promoCode').value.trim().toUpperCase();
+        var value = parseFloat(document.getElementById('promoValue').value);
+        var maxUses = parseInt(document.getElementById('promoMaxUses').value);
+        var days = parseInt(document.getElementById('promoDays').value);
+        if (!code || !value || value <= 0) {
+          toast('Erro', 'Preencha codigo e valor valido.', 'error');
+          return;
+        }
+        btnCriar.disabled = true;
+        btnCriar.textContent = 'Criando...';
+        var expiresAt = Date.now() + (days * 24 * 60 * 60 * 1000);
+        try {
+          await api('/admin/promo/create', {
+            method: 'POST',
+            body: JSON.stringify({ code: code, value: value, maxUses: maxUses, expiresAt: expiresAt })
+          });
+          toast('Sucesso', 'Codigo criado!', 'success');
+          document.getElementById('promoCode').value = '';
+          document.getElementById('promoValue').value = '';
+          carregarPromo();
+        } catch (e) {
+          toast('Erro', e.message, 'error');
+        } finally {
+          btnCriar.disabled = false;
+          btnCriar.textContent = 'Criar Codigo';
+        }
+      };
+    });
+
+    window.desativarPromo = async function(id) {
+      if (!confirm('Desativar este codigo?')) return;
+      try {
+        await api('/admin/promo/' + id + '/disable', { method: 'POST' });
+        toast('Desativado', '', 'success');
+        carregarPromo();
+      } catch (e) {
+        toast('Erro', e.message, 'error');
+      }
+    };
+</script>
 </body>
 </html>
