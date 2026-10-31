@@ -412,21 +412,25 @@ window.forcarAnimacaoSaldo = forcarAnimacaoSaldo;
 // RESGATAR CODIGO PROMOCIONAL (Modal)
 // ============================================================
 window.ZKN = window.ZKN || {};
+
+// ============================================================
+// RESGATAR CODIGO PROMOCIONAL (Modal)
+// ============================================================
 window.ZKN.abrirResgatarCodigo = function() {
   const backdrop = document.createElement('div');
   backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
   
   backdrop.innerHTML = `
     <div style="background:linear-gradient(180deg, #1a2332 0%, #0a0f1a 100%); border:2px solid #f5be3c; border-radius:24px; padding:32px 24px; max-width:400px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(245,190,60,0.3); position:relative;">
-      <button onclick="this.parentNode.parentNode.remove()" style="position:absolute;top:12px;right:16px;background:transparent;border:none;color:#8a94a6;font-size:24px;cursor:pointer;">&times;</button>
+      <button id="btnFecharModal" style="position:absolute;top:12px;right:16px;background:transparent;border:none;color:#8a94a6;font-size:24px;cursor:pointer;">&times;</button>
       <div style="font-size:56px;margin-bottom:16px;">🎟️</div>
       <h3 style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#f5be3c;margin-bottom:8px;">Resgatar Código</h3>
       <p style="font-size:14px;color:#8a94a6;margin-bottom:20px;">Digite o código promocional para receber seu bônus.</p>
       
-      <input id="inputPromo" type="text" placeholder="Ex: ZKN10" style="width:100%;padding:16px;background:#15171C;border:1px solid #333;border-radius:10px;color:#fff;font-size:18px;text-align:center;text-transform:uppercase;margin-bottom:16px;outline:none;font-weight:700;">
+      <input id="inputPromoCode" type="text" placeholder="Ex: ZKN10" style="width:100%;padding:16px;background:#15171C;border:1px solid #333;border-radius:10px;color:#fff;font-size:18px;text-align:center;text-transform:uppercase;margin-bottom:16px;outline:none;font-weight:700;">
       
       <div style="display:flex;gap:8px;">
-        <button id="btnFecharPromo" style="flex:1;padding:14px;border-radius:10px;background:#2a2a2a;border:1px solid #444;color:#fff;font-weight:700;cursor:pointer;">Cancelar</button>
+        <button id="btnCancelarPromo" style="flex:1;padding:14px;border-radius:10px;background:#2a2a2a;border:1px solid #444;color:#fff;font-weight:700;cursor:pointer;">Cancelar</button>
         <button id="btnConfirmarPromo" style="flex:1;padding:14px;border-radius:10px;background:linear-gradient(135deg, #00d67f, #00b96d);color:#fff;font-weight:800;border:none;cursor:pointer;">Resgatar</button>
       </div>
     </div>
@@ -434,33 +438,58 @@ window.ZKN.abrirResgatarCodigo = function() {
   
   document.body.appendChild(backdrop);
   
-  backdrop.querySelector('#inputPromo').focus();
+  const input = backdrop.querySelector('#inputPromoCode');
+  const btnFechar = backdrop.querySelector('#btnFecharModal');
+  const btnCancelar = backdrop.querySelector('#btnCancelarPromo');
+  const btnConfirmar = backdrop.querySelector('#btnConfirmarPromo');
   
-  backdrop.querySelector('#btnFecharPromo').onclick = () => backdrop.remove();
-  backdrop.querySelector('#btnConfirmarPromo').onclick = async () => {
-    const code = backdrop.querySelector('#inputPromo').value.trim().toUpperCase();
-    if (!code) return;
+  input.focus();
+  
+  btnFechar.onclick = () => backdrop.remove();
+  btnCancelar.onclick = () => backdrop.remove();
+  
+  btnConfirmar.onclick = async () => {
+    const code = input.value.trim().toUpperCase();
     
-    const btn = backdrop.querySelector('#btnConfirmarPromo');
-    btn.disabled = true;
-    btn.textContent = 'Verificando...';
+    if (!code) {
+      if (window.ZKN && window.ZKN.toast) window.ZKN.toast('Atenção', 'Digite um código antes de resgatar.', 'warning');
+      return;
+    }
+    
+    btnConfirmar.disabled = true;
+    btnConfirmar.textContent = 'Verificando...';
     
     try {
-      const res = await ZKNAuth.api('/promo/claim', { method: 'POST', body: JSON.stringify({ code }) });
+      const res = await window.ZKNAuth.api('/promo/claim', { 
+        method: 'POST', 
+        body: JSON.stringify({ code: code }) 
+      });
       
       if (res.ok) {
-        if (window.ZKN && window.ZKN.toast) window.ZKN.toast('Sucesso!', 'Você ganhou R$ ' + Number(res.data.value).toFixed(2).replace('.', ','), 'success');
+        if (window.ZKN && window.ZKN.toast) {
+          window.ZKN.toast('Sucesso!', 'Você ganhou R$ ' + Number(res.data.value).toFixed(2).replace('.', ','), 'success');
+        }
         backdrop.remove();
-        if (window.ZKNSaldo && window.ZKNSaldo.atualizar) window.ZKNSaldo.atualizar();
+        if (window.ZKNSaldo && window.ZKNSaldo.atualizar) {
+          window.ZKNSaldo.atualizar();
+        }
       } else {
-        if (window.ZKN && window.ZKN.toast) window.ZKN.toast('Erro', res.data.message || 'Código inválido', 'error');
-        btn.disabled = false;
-        btn.textContent = 'Resgatar';
+        if (window.ZKN && window.ZKN.toast) {
+          window.ZKN.toast('Erro', res.data.message || 'Código inválido', 'error');
+        }
+        btnConfirmar.disabled = false;
+        btnConfirmar.textContent = 'Resgatar';
       }
-    } catch(e) {
-      if (window.ZKN && window.ZKN.toast) window.ZKN.toast('Erro', e.message, 'error');
-      btn.disabled = false;
-      btn.textContent = 'Resgatar';
+    } catch (e) {
+      if (window.ZKN && window.ZKN.toast) {
+        window.ZKN.toast('Erro', e.message, 'error');
+      }
+      btnConfirmar.disabled = false;
+      btnConfirmar.textContent = 'Resgatar';
     }
   };
+  
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') btnConfirmar.click();
+  });
 };
