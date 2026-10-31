@@ -53,7 +53,7 @@
     let todas = [];
     let filtro = 'all';
 
-    const LABELS = { deposit: 'Depósito', withdraw: 'Saque', bet: 'Aposta', win: 'Ganho' };
+    const LABELS = { deposit: 'Depósito', withdraw: 'Saque', bet: 'Aposta', win: 'Ganho', bonus: 'Bônus' };
 
     function render() {
       const lista = filtro === 'all' ? todas : todas.filter(t => t.type === filtro);
@@ -63,7 +63,7 @@
         return;
       }
       tbody.innerHTML = lista.map(t => {
-        const positivo = t.type === 'deposit' || t.type === 'win';
+        const positivo = t.type === 'deposit' || t.type === 'win' || t.type === 'bonus';
         const sinal = positivo ? '+' : '-';
         const dt = new Date(t.created_at);
         return `
@@ -79,7 +79,7 @@
 
     function montarFiltros() {
       const barra = document.getElementById('filtros');
-      const tipos = ['all', 'deposit', 'withdraw', 'bet', 'win'];
+      const tipos = ['all', 'deposit', 'withdraw', 'bet', 'win', 'bonus'];
       barra.innerHTML = '';
       tipos.forEach(t => {
         const b = document.createElement('button');
