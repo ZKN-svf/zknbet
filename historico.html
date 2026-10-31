@@ -53,7 +53,7 @@
     let todas = [];
     let filtro = 'all';
 
-    const LABELS = { deposit: 'Depósito', withdraw: 'Saque', bet: 'Aposta', win: 'Ganho', bonus: 'Bônus' };
+    const LABELS = { deposit: 'Depósito', withdraw: 'Saque', bonus: 'Bônus' };
 
     function render() {
       const lista = filtro === 'all' ? todas : todas.filter(t => t.type === filtro);
@@ -79,7 +79,7 @@
 
     function montarFiltros() {
       const barra = document.getElementById('filtros');
-      const tipos = ['all', 'deposit', 'withdraw', 'bet', 'win', 'bonus'];
+      const tipos = ['all', 'deposit', 'withdraw', 'bonus'];
       barra.innerHTML = '';
       tipos.forEach(t => {
         const b = document.createElement('button');
