@@ -579,7 +579,7 @@
             '<td><img src="' + b.image_url + '" style="max-width:120px;max-height:60px;border-radius:6px;"></td>' +
             '<td><span class="badge ' + (b.type === 'carousel' ? 'completed' : 'pending') + '">' + b.type + '</span></td>' +
             '<td style="font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;">' + (b.link || '-') + '</td>' +
-            '<td><button class="admin-btn danger" style="padding:4px 8px;font-size:11px;" onclick="deletarBanner(\'' + b.id + '\')">Excluir</button></td>' +
+            '<td><button class="admin-btn secondary" style="padding:4px 8px;font-size:11px;margin-right:4px;" onclick="editarLinkBanner(\'' + b.id + '\')">Editar Link</button><button class="admin-btn danger" style="padding:4px 8px;font-size:11px;" onclick="deletarBanner(\'' + b.id + '\')">Excluir</button></td>' +
           '</tr>';
         }).join('');
       } catch (e) {
