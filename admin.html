@@ -392,6 +392,7 @@
         <button class="admin-tab" data-tab="transactions">Transações</button>
         <button class="admin-tab" data-tab="nitrogames">NitroGames</button>
         <button class="admin-tab" data-tab="withdraws">Saques pendentes</button>
+        <button class="admin-tab" data-tab="promo-old">Promo Codes</button>
         <button class="admin-tab" data-tab="promo">Promo Codes</button>
         <button class="admin-tab" data-tab="audit">Auditoria</button>
       </div>
@@ -469,34 +470,20 @@
 
       
 
-      <!-- PROMO CODES -->
       <div id="tab-promo" class="tab-content hidden">
         <div style="margin-bottom:24px; background:var(--bg-2); padding:20px; border-radius:var(--radius); border:1px solid var(--border);">
-          <h3 style="font-family:var(--font-display); font-size:16px; margin-bottom:16px;">Criar novo cÃ³digo</h3>
+          <h3 style="font-family:var(--font-display); font-size:16px; margin-bottom:16px;">Criar novo código</h3>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
-            <div>
-              <label style="font-size:11px; color:var(--text-muted);">CÃ³digo (ex: ZKN10)</label>
-              <input id="promoCode" class="admin-input" placeholder="ZKN10">
-            </div>
-            <div>
-              <label style="font-size:11px; color:var(--text-muted);">Valor (R$)</label>
-              <input id="promoValue" type="number" step="0.01" class="admin-input" placeholder="10.00">
-            </div>
-            <div>
-              <label style="font-size:11px; color:var(--text-muted);">Limite de usos (0 = ilimitado)</label>
-              <input id="promoMaxUses" type="number" class="admin-input" value="0">
-            </div>
-            <div>
-              <label style="font-size:11px; color:var(--text-muted);">Expira em (dias)</label>
-              <input id="promoDays" type="number" class="admin-input" value="30">
-            </div>
+            <div><label style="font-size:11px; color:var(--text-muted);">Código</label><input id="promoCode" class="admin-input" placeholder="ZKN10"></div>
+            <div><label style="font-size:11px; color:var(--text-muted);">Valor (R$)</label><input id="promoValue" type="number" step="0.01" class="admin-input" placeholder="10.00"></div>
+            <div><label style="font-size:11px; color:var(--text-muted);">Limite usos (0=ilimitado)</label><input id="promoMaxUses" type="number" class="admin-input" value="0"></div>
+            <div><label style="font-size:11px; color:var(--text-muted);">Expira em (dias)</label><input id="promoDays" type="number" class="admin-input" value="30"></div>
           </div>
-          <button id="btnCriarPromo" class="admin-btn">Criar CÃ³digo</button>
+          <button id="btnCriarPromo" class="admin-btn">Criar Código</button>
         </div>
-
         <div style="overflow-x:auto;">
           <table class="admin-table">
-            <thead><tr><th>CÃ³digo</th><th>Valor</th><th>Usos</th><th>Expira</th><th>Status</th><th>AÃ§Ãµes</th></tr></thead>
+            <thead><tr><th>Código</th><th>Valor</th><th>Usos</th><th>Expira</th><th>Status</th><th>Ações</th></tr></thead>
             <tbody id="promoTable"><tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
           </table>
         </div>
@@ -587,6 +574,7 @@
         if (tab === 'nitrogames') carregarNitroBalance();
         if (tab === 'withdraws') carregarWithdraws();
         if (tab === 'audit') carregarAudit();
+        if (tab === 'promo') carregarPromo();
         if (tab === 'promo') carregarPromo();
       };
     });
@@ -845,6 +833,38 @@
         toast('Desativado', '', 'success');
         carregarPromo();
       } catch(e) { toast('Erro', e.message, 'error'); }
+    }
+    async function carregarPromo() {
+      try {
+        const d = await api('/admin/promo/list');
+        const tb = document.getElementById('promoTable');
+        const list = d.codes || [];
+        if (!list.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Nenhum código criado.</td></tr>'; return; }
+        tb.innerHTML = list.map(p => {
+          const status = p.active ? '<span class="badge completed">Ativo</span>' : '<span class="badge withdraw">Desativado</span>';
+          const expira = new Date(p.expires_at).toLocaleDateString('pt-BR');
+          return '<tr><td><strong>' + p.code + '</strong></td><td style="color:var(--gold);font-weight:700;">' + fmtBRL(p.value) + '</td><td>' + p.total_uses + ' / ' + (p.max_uses === 0 ? '∞' : p.max_uses) + '</td><td>' + expira + '</td><td>' + status + '</td><td>' + (p.active ? '<button class="admin-btn danger" style="padding:4px 8px;font-size:11px;" onclick="desativarPromo(\'' + p.id + '\')">Desativar</button>' : '-') + '</td></tr>';
+        }).join('');
+      } catch(e) { toast('Erro', e.message, 'error'); }
+    }
+
+    document.getElementById('btnCriarPromo').onclick = async () => {
+      const code = document.getElementById('promoCode').value.trim().toUpperCase();
+      const value = parseFloat(document.getElementById('promoValue').value);
+      const maxUses = parseInt(document.getElementById('promoMaxUses').value);
+      const days = parseInt(document.getElementById('promoDays').value);
+      if (!code || !value || value <= 0) return toast('Erro', 'Preencha código e valor válido.', 'error');
+      const expiresAt = Date.now() + (days * 24 * 60 * 60 * 1000);
+      try {
+        await api('/admin/promo/create', { method: 'POST', body: JSON.stringify({ code, value, maxUses, expiresAt }) });
+        toast('Sucesso', 'Código criado!', 'success');
+        carregarPromo();
+      } catch(e) { toast('Erro', e.message, 'error'); }
+    };
+
+    async function desativarPromo(id) {
+      if (!confirm('Desativar este código?')) return;
+      try { await api('/admin/promo/' + id + '/disable', { method: 'POST' }); toast('Desativado', '', 'success'); carregarPromo(); } catch(e) { toast('Erro', e.message, 'error'); }
     }
     // ---------- INIT ----------
     if (adminToken && adminUser) {

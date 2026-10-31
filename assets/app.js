@@ -148,6 +148,7 @@ function renderHeader() {
           <a class="drawer-link" href="deposito.html"><span class="ico ico-money"></span> Depositar</a>
           <a class="drawer-link" href="saque.html"><span class="ico ico-cash"></span> Sacar</a>
           <a class="drawer-link" href="historico.html"><span class="ico ico-history"></span> Histórico</a>
+          <button class="drawer-link drawer-link-btn" onclick="ZKN.abrirResgatarCodigo()">🎟️ Resgatar Código</button>
 
           <div class="drawer-section-title">Indicação</div>
           <a class="drawer-link" href="indicacao.html"><span class="ico ico-handshake"></span> Indique e ganhe</a>
