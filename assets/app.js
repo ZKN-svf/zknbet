@@ -262,6 +262,51 @@ function abrirIndicacaoDrawer() {
   `);
 }
 
+// ============================================================
+// Sincroniza o status de e-mail verificado com o servidor
+// ============================================================
+async function sincronizarEmailVerificado() {
+  if (!window.ZKNAuth?.isLoggedIn?.()) return;
+  try {
+    const res = await ZKNAuth.api('/me');
+    if (res.ok && res.data && res.data.user) {
+      const serverUser = res.data.user;
+      const localUser = ZKNAuth.getUser();
+      
+      if (localUser && !localUser.emailVerified && serverUser.emailVerified) {
+        // Atualiza o cache local
+        localUser.emailVerified = serverUser.emailVerified;
+        ZKNAuth.setUser(localUser);
+        
+        // Remove o banner amarelo se ele existir na tela
+        const banner = document.getElementById('zknEmailBanner');
+        if (banner) banner.remove();
+        
+        // Se estiver na tela de saque, atualiza a mensagem de bloqueio
+        if (location.pathname.includes('saque.html')) {
+          const box = document.getElementById('statusBox');
+          if (box && box.innerHTML.includes('Verifique seu email')) {
+            box.className = 'status-box';
+            box.innerHTML = '';
+          }
+        }
+        
+        // Toast de confirmação (opcional)
+        if (window.ZKN && ZKN.toast) {
+          ZKN.toast('E-mail verificado!', 'Seus saques estão liberados.');
+        }
+      }
+    }
+  } catch (e) {
+    // Silencioso, se der erro na rede não faz nada
+  }
+}
+
+// Chama a função quando a página carregar
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(sincronizarEmailVerificado, 1500); // Espera 1.5s pra não travar o carregamento inicial
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   renderHeader();
   if (window.ZKNAuth?.isLoggedIn?.()) { window.ZKNAuth.getSaldo().catch(() => {}); }
