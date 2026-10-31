@@ -173,7 +173,7 @@ function renderHeader() {
     const banner = document.createElement('div');
     banner.id = 'zknEmailBanner';
     banner.style.cssText = 'position:fixed;top:68px;left:0;right:0;z-index:99;background:linear-gradient(90deg,#f5be3c,#ffd76e);color:#0a0f1a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
-    banner.innerHTML = '<span>&#9888;&#65039; Verifique seu email para liberar saques.</span>' +
+    banner.innerHTML = '<span>&#9888;&#65039; Verifique seu email para liberar saques. (olhe a caixa de spam)</span>' +
       '<button onclick="ZKN.reenviarEmail(this)" style="background:#0a0f1a;color:#f5be3c;border:none;padding:8px 16px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;">Reenviar</button>';
     document.body.appendChild(banner);
   })();
@@ -194,7 +194,7 @@ function abrirDrawer() {
     const banner = document.createElement('div');
     banner.id = 'zknEmailBanner';
     banner.style.cssText = 'position:fixed;top:68px;left:0;right:0;z-index:99;background:linear-gradient(90deg,#f5be3c,#ffd76e);color:#0a0f1a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
-    banner.innerHTML = '<span>&#9888;&#65039; Verifique seu email para liberar saques.</span>' +
+    banner.innerHTML = '<span>&#9888;&#65039; Verifique seu email para liberar saques. (olhe a caixa de spam)</span>' +
       '<button onclick="ZKN.reenviarEmail(this)" style="background:#0a0f1a;color:#f5be3c;border:none;padding:8px 16px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;">Reenviar</button>';
     document.body.appendChild(banner);
   })();
