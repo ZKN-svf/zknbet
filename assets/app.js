@@ -416,6 +416,10 @@ window.ZKN = window.ZKN || {};
 // ============================================================
 // RESGATAR CODIGO PROMOCIONAL (Modal)
 // ============================================================
+
+// ============================================================
+// RESGATAR CODIGO PROMOCIONAL (Modal) - VERSAO CORRIGIDA
+// ============================================================
 window.ZKN.abrirResgatarCodigo = function() {
   const backdrop = document.createElement('div');
   backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -449,9 +453,12 @@ window.ZKN.abrirResgatarCodigo = function() {
   btnCancelar.onclick = () => backdrop.remove();
   
   btnConfirmar.onclick = async () => {
-    const code = input.value.trim().toUpperCase();
+    // PEGA O VALOR DIRETAMENTE DO INPUT NESTE EXATO MOMENTO
+    const codeValue = String(input.value || '').trim().toUpperCase();
     
-    if (!code) {
+    console.log('[PROMO] Valor do input:', JSON.stringify(codeValue));
+    
+    if (!codeValue) {
       if (window.ZKN && window.ZKN.toast) window.ZKN.toast('Atenção', 'Digite um código antes de resgatar.', 'warning');
       return;
     }
@@ -460,10 +467,16 @@ window.ZKN.abrirResgatarCodigo = function() {
     btnConfirmar.textContent = 'Verificando...';
     
     try {
+      // Envia o body com a propriedade 'code' garantida
+      const payload = { code: codeValue };
+      console.log('[PROMO] Enviando payload:', JSON.stringify(payload));
+      
       const res = await window.ZKNAuth.api('/promo/claim', { 
         method: 'POST', 
-        body: JSON.stringify({ code: code }) 
+        body: JSON.stringify(payload) 
       });
+      
+      console.log('[PROMO] Resposta:', JSON.stringify(res));
       
       if (res.ok) {
         if (window.ZKN && window.ZKN.toast) {
@@ -481,6 +494,7 @@ window.ZKN.abrirResgatarCodigo = function() {
         btnConfirmar.textContent = 'Resgatar';
       }
     } catch (e) {
+      console.error('[PROMO] Erro:', e);
       if (window.ZKN && window.ZKN.toast) {
         window.ZKN.toast('Erro', e.message, 'error');
       }
