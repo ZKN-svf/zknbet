@@ -689,3 +689,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch(e) { console.error('Erro ao carregar tema', e); }
 });
+
+// ============================================================
+// TELEGRAM LINK DINAMICO (via backend)
+// ============================================================
+(function() {
+  var tgLink = null;
+  var xhr = new XMLHttpRequest();
+  var apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || '';
+  xhr.open('GET', apiBase + '/settings/telegram');
+  xhr.onload = function() {
+    try {
+      var data = JSON.parse(xhr.responseText);
+      if (data.link) {
+        tgLink = data.link;
+        atualizar();
+      }
+    } catch(e) {}
+  };
+  xhr.send();
+
+  function atualizar() {
+    if (!tgLink) return;
+    var links = document.querySelectorAll('a');
+    for (var i = 0; i < links.length; i++) {
+      var link = links[i];
+      var isTelegram = (link.href && link.href.indexOf('Micaelasilva7') !== -1) || (link.textContent.indexOf('Suporte (Telegram)') !== -1);
+      if (isTelegram && link.href !== tgLink) {
+        link.href = tgLink;
+        link.target = '_blank';
+        link.rel = 'noopener';
+      }
+    }
+  }
+
+  // Fica observando o DOM para pegar quando o menu for criado
+  var observer = new MutationObserver(atualizar);
+  observer.observe(document.body, { childList: true, subtree: true });
+  setTimeout(atualizar, 1000);
+  setTimeout(atualizar, 3000);
+})();
