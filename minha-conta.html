@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -85,17 +85,20 @@
       try {
         const r = await ZKNAuth.getRollover();
         if (!r) return;
+        
         const d = document.getElementById('stat-total-deposited');
         const b = document.getElementById('stat-total-bet');
         const ro = document.getElementById('stat-rollover');
+        
         if (d) d.textContent = ZKN.formatBRL(r.total_deposited || 0);
         if (b) b.textContent = ZKN.formatBRL(r.total_bet || 0);
+        
         if (ro) {
-          if (r.sem_rollover || r.liberado) {
+          if (r.remaining === 0 || r.sem_rollover || r.liberado) {
             ro.textContent = 'LIBERADO';
             ro.style.color = 'var(--green)';
           } else {
-            ro.textContent = ZKN.formatBRL(r.remaining || 0);
+            ro.textContent = 'Falta ' + ZKN.formatBRL(r.remaining);
             ro.style.color = 'var(--gold)';
           }
         }

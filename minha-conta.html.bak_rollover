@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet — Minha Conta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/icons.css">
+</head>
+<body>
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+
+  <div class="auth-wrap" style="max-width:600px;">
+    <div class="card auth-card">
+      <h1><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;display:inline;vertical-align:middle;margin-right:8px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Minha Conta</h1>
+      <p class="subtitle">Gerencie seus dados e segurança.</p>
+
+      <div id="userInfo" style="margin:24px 0;"></div>
+
+      <div id="stat-section" style="margin:16px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
+        <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Total depositado</div>
+          <div id="stat-total-deposited" style="font-size:18px;font-weight:800;color:var(--gold);">R$ 0,00</div>
+        </div>
+        <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Total apostado</div>
+          <div id="stat-total-bet" style="font-size:18px;font-weight:800;color:var(--text);">R$ 0,00</div>
+        </div>
+        <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Rollover</div>
+          <div id="stat-rollover" style="font-size:18px;font-weight:800;color:var(--green);">-</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button class="btn-secondary btn-block" onclick="location.href='alterar-dados.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;display:inline;vertical-align:middle;margin-right:8px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Alterar dados</button>
+        <button class="btn-secondary btn-block" onclick="location.href='alterar-senha.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;display:inline;vertical-align:middle;margin-right:8px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Alterar senha</button>
+        <button class="btn-secondary btn-block" onclick="location.href='historico.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;display:inline;vertical-align:middle;margin-right:8px;"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>Histórico de transações</button>
+        <button class="btn-secondary btn-block" onclick="location.href='saque-primeiro-acesso.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;display:inline;vertical-align:middle;margin-right:8px;"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>Configurar dados de saque</button>
+        <button class="btn-secondary btn-block" onclick="location.href='indicacao.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;display:inline;vertical-align:middle;margin-right:8px;"><path d="M11 17l-5-5"/><path d="M14 14l5-5"/><path d="M3 3l3 3"/><path d="M21 3l-3 3"/><path d="M3 21l3-3"/><path d="M21 21l-3-3"/><path d="M14 10l-4 4"/><path d="M10 14l-4 4"/><path d="M14 14l4 4"/></svg>Programa de indicação</button>
+        <button class="btn-secondary btn-block" onclick="sair()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;display:inline;vertical-align:middle;margin-right:8px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair da conta</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/bottom-nav.js"></script>
+  <script src="assets/game-frame.js"></script>
+  <script>
+    if (!ZKNAuth.requireLogin('minha-conta.html')) throw new Error('redirecionado');
+
+    async function carregar() {
+      const saldo = await ZKNAuth.getSaldo();
+      const user = ZKNAuth.getUser();
+      document.getElementById('userInfo').innerHTML = `
+        <div style="display:flex;align-items:center;gap:16px;padding:20px;background:var(--bg-3);border-radius:var(--radius);border:1px solid var(--border);">
+          <div class="drawer-avatar" style="width:56px;height:56px;font-size:20px;">${ZKN.gerarIniciais(user.name)}</div>
+          <div style="min-width:0;">
+            <div style="font-weight:800;font-size:18px;margin-bottom:2px;">${user.name}</div>
+            <div style="color:var(--text-muted);font-size:14px;">${user.phone}</div>
+            <div style="color:var(--text-muted);font-size:12px;">${user.email || ''}</div>
+            <div style="color:var(--gold);font-size:12px;font-weight:700;margin-top:4px;">Código: ${user.refCode}</div>
+          </div>
+        </div>
+        <div class="saldo-info" style="margin-top:16px;">
+          <span class="label">Saldo atual</span>
+          <span class="val">${ZKN.formatBRL(saldo)}</span>
+        </div>
+      `;
+    }
+
+    function sair() {
+      if (confirm('Deseja sair da conta?')) ZKNAuth.logout();
+    }
+
+    async function carregarEstatisticas() {
+      try {
+        const r = await ZKNAuth.getRollover();
+        if (!r) return;
+        const d = document.getElementById('stat-total-deposited');
+        const b = document.getElementById('stat-total-bet');
+        const ro = document.getElementById('stat-rollover');
+        if (d) d.textContent = ZKN.formatBRL(r.total_deposited || 0);
+        if (b) b.textContent = ZKN.formatBRL(r.total_bet || 0);
+        if (ro) {
+          if (r.sem_rollover || r.liberado) {
+            ro.textContent = 'LIBERADO';
+            ro.style.color = 'var(--green)';
+          } else {
+            ro.textContent = ZKN.formatBRL(r.remaining || 0);
+            ro.style.color = 'var(--gold)';
+          }
+        }
+      } catch (e) {
+        console.warn('[carregarEstatisticas]', e.message);
+      }
+    }
+
+    carregar();
+    carregarEstatisticas();
+  </script>
+</body>
+</html>
