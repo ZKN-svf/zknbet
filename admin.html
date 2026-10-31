@@ -502,6 +502,32 @@
 
   <script src="assets/config.js"></script>
   <script>
+    // ============================================================
+    // PROMO CODES (Declarado no topo para evitar "is not defined")
+    // ============================================================
+    async function carregarPromo() {
+      const tb = document.getElementById('promoTable');
+      if (!tb) return;
+      try {
+        const d = await api('/admin/promo/list');
+        const list = d.codes || [];
+        if (!list.length) {
+          tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Nenhum código criado.</td></tr>';
+          return;
+        }
+        tb.innerHTML = list.map(p => {
+          const status = p.active ? '<span class="badge completed">Ativo</span>' : '<span class="badge withdraw">Desativado</span>';
+          const expira = new Date(p.expires_at).toLocaleDateString('pt-BR');
+          const max = p.max_uses === 0 ? '∞' : p.max_uses;
+          const btn = p.active ? '<button class="admin-btn danger" style="padding:4px 8px;font-size:11px;" onclick="desativarPromo(\'' + p.id + '\')">Desativar</button>' : '-';
+          return '<tr><td><strong>' + p.code + '</strong></td><td style="color:var(--gold);font-weight:700;">' + fmtBRL(p.value) + '</td><td>' + p.total_uses + ' / ' + max + '</td><td>' + expira + '</td><td>' + status + '</td><td>' + btn + '</td></tr>';
+        }).join('');
+      } catch (e) {
+        tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--red);">Erro: ' + e.message + '</td></tr>';
+      }
+    }
+
+    // Evento do botão (pode ficar no topo porque o botão pode não existir ainda, mas usamos o addEventListener depois do DOM carregar)
     const API = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
     let adminToken = localStorage.getItem('zkn_admin_token');
     let adminUser = JSON.parse(localStorage.getItem('zkn_admin_user') || 'null');
