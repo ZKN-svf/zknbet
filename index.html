@@ -26,12 +26,17 @@
     padding: 0 16px !important;
     box-sizing: border-box;
   }
+  #carrosselWrapper {
+    max-width: 1280px;
+    margin: 0 auto;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+  }
   #carrosselTrack {
     display: flex !important;
     flex-wrap: nowrap !important;
     transition: transform 0.5s ease !important;
-    border-radius: 16px;
-    overflow: hidden;
   }
   #carrosselTrack > div {
     flex: 0 0 100% !important;
@@ -41,14 +46,14 @@
   }
   #carrosselTrack img {
     width: 100% !important;
-    height: auto !important; max-height: 400px !important;
+    height: auto !important;
+    max-height: 400px !important;
     display: block !important;
     object-fit: contain !important;
   }
   @media (max-width: 768px) {
-    #carrosselBanners {
-      padding: 0 12px !important;
-    }
+    #carrosselBanners { padding: 0 12px !important; }
+    #carrosselTrack img { max-height: 220px !important; }
   }
 </style>
 </head>
@@ -404,45 +409,42 @@
 
 
 <script>
-  // Carrossel de Banners (createElement)
+  // Carrossel de Banners (reescrito)
   (async function() {
     try {
       const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
       const res = await fetch(apiBase + '/marketing/banners');
       const data = await res.json();
       const banners = (data.banners || []).filter(b => b.type === 'carousel');
-      
+
       if (!banners.length) return;
-      
+
       const container = document.getElementById('carrosselBanners');
       const track = document.getElementById('carrosselTrack');
       if (!container || !track) return;
-      
-      container.style.display = 'block'; container.style.height = 'auto';
-      track.innerHTML = ''; // Limpa qualquer conteúdo antigo
-      
+
+      container.style.display = 'block';
+      track.innerHTML = '';
+      track.style.width = (banners.length * 100) + '%';
+
       banners.forEach(function(b) {
         const div = document.createElement('div');
-        div.style.cssText = 'flex:0 0 100%; min-width:100%; width:100%; cursor:pointer;';
+        div.style.cssText = 'flex:0 0 ' + (100 / banners.length) + '%; min-width:' + (100 / banners.length) + '%; width:' + (100 / banners.length) + '%; cursor:pointer;';
         div.onclick = function() { location.href = b.link || '#'; };
-        
+
         const img = document.createElement('img');
         img.src = b.image_url;
         img.alt = 'Banner';
-        img.style.cssText = 'width:100%; height:260px; object-fit:cover; display:block;';
-        
+        img.style.cssText = 'width:100%; height:auto; max-height:400px; object-fit:contain; display:block;';
+
         div.appendChild(img);
         track.appendChild(div);
       });
-      
-            // Ajusta a largura do track para caber todas as imagens
-      track.style.width = (banners.length * 100) + '%';
-      track.style.display = 'flex';
 
       let idx = 0;
       setInterval(function() {
         idx = (idx + 1) % banners.length;
-        // Desliza 100% da tela (que equivale a 1 imagem inteira)
+        // Cada slide tem o tamanho de (100 / total). Desliza exatamente esse valor.
         track.style.transform = 'translateX(-' + (idx * (100 / banners.length)) + '%)';
       }, 4000);
     } catch(e) { console.warn('[Carrossel] erro:', e); }
