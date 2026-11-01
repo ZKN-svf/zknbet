@@ -41,9 +41,9 @@
   }
   #carrosselTrack img {
     width: 100% !important;
-    height: auto !important;
+    height: 260px !important;
     display: block !important;
-    object-fit: contain !important;
+    object-fit: cover !important;
   }
   @media (max-width: 768px) {
     #carrosselBanners {
@@ -438,7 +438,8 @@
       let idx = 0;
       setInterval(function() {
         idx = (idx + 1) % banners.length;
-        track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+        const percentPerSlide = 100 / banners.length;
+        track.style.transform = 'translateX(-' + (idx * percentPerSlide) + '%)';
       }, 4000);
     } catch(e) { console.warn('[Carrossel] erro:', e); }
   })();
