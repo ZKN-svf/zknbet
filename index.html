@@ -41,9 +41,9 @@
   }
   #carrosselTrack img {
     width: 100% !important;
-    height: 260px !important;
+    height: auto !important; max-height: 400px !important;
     display: block !important;
-    object-fit: cover !important;
+    object-fit: contain !important;
   }
   @media (max-width: 768px) {
     #carrosselBanners {
@@ -418,7 +418,7 @@
       const track = document.getElementById('carrosselTrack');
       if (!container || !track) return;
       
-      container.style.display = 'block';
+      container.style.display = 'block'; container.style.height = 'auto';
       track.innerHTML = ''; // Limpa qualquer conteúdo antigo
       
       banners.forEach(function(b) {
@@ -435,11 +435,15 @@
         track.appendChild(div);
       });
       
+            // Ajusta a largura do track para caber todas as imagens
+      track.style.width = (banners.length * 100) + '%';
+      track.style.display = 'flex';
+
       let idx = 0;
       setInterval(function() {
         idx = (idx + 1) % banners.length;
-        const percentPerSlide = 100 / banners.length;
-        track.style.transform = 'translateX(-' + (idx * percentPerSlide) + '%)';
+        // Desliza 100% da tela (que equivale a 1 imagem inteira)
+        track.style.transform = 'translateX(-' + (idx * (100 / banners.length)) + '%)';
       }, 4000);
     } catch(e) { console.warn('[Carrossel] erro:', e); }
   })();
