@@ -25,7 +25,9 @@
     display: flex !important;
     flex-wrap: nowrap !important;
     align-items: flex-start !important;
-    transition: transform 0.5s ease !important;
+    touch-action: pan-y !important;
+    user-select: none;
+    -webkit-user-select: none;
   }
   #carrosselTrack > div {
     flex: 0 0 100% !important;
@@ -405,13 +407,19 @@
       container.style.display = 'block';
       track.innerHTML = '';
 
+      let moved = false; // true quando o usuario arrastou (nao abre o link)
+
       banners.forEach(function(b) {
         const div = document.createElement('div');
-        div.onclick = function() { location.href = b.link || '#'; };
+        div.onclick = function() {
+          if (moved) return;
+          location.href = b.link || '#';
+        };
 
         const img = document.createElement('img');
         img.src = b.image_url;
         img.alt = 'Banner';
+        img.draggable = false;
 
         div.appendChild(img);
         track.appendChild(div);
@@ -420,10 +428,54 @@
       if (banners.length < 2) return;
 
       let idx = 0;
-      setInterval(function() {
-        idx = (idx + 1) % banners.length;
+      let timer = null;
+      let startX = 0;
+      let dx = 0;
+      let dragging = false;
+
+      function ir(i) {
+        idx = (i + banners.length) % banners.length;
+        track.style.transition = 'transform 0.5s ease';
         track.style.transform = 'translateX(-' + (idx * 100) + '%)';
-      }, 4000);
+      }
+      function pararAuto() { if (timer) { clearInterval(timer); timer = null; } }
+      function iniciarAuto() {
+        pararAuto();
+        timer = setInterval(function() { ir(idx + 1); }, 10000);
+      }
+
+      track.addEventListener('pointerdown', function(e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        dragging = true;
+        moved = false;
+        startX = e.clientX;
+        dx = 0;
+        pararAuto();
+        track.style.transition = 'none';
+        try { track.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+
+      track.addEventListener('pointermove', function(e) {
+        if (!dragging) return;
+        dx = e.clientX - startX;
+        if (Math.abs(dx) > 5) moved = true;
+        track.style.transform = 'translateX(calc(-' + (idx * 100) + '% + ' + dx + 'px))';
+      });
+
+      function soltar() {
+        if (!dragging) return;
+        dragging = false;
+        const limite = Math.min(60, track.offsetWidth * 0.15);
+        if (dx <= -limite) ir(idx + 1);      // arrastou para a esquerda: proximo
+        else if (dx >= limite) ir(idx - 1);  // arrastou para a direita: voltar
+        else ir(idx);                        // pouco movimento: volta pro slide atual
+        setTimeout(function() { moved = false; }, 0);
+        iniciarAuto();
+      }
+      track.addEventListener('pointerup', soltar);
+      track.addEventListener('pointercancel', soltar);
+
+      iniciarAuto();
     } catch(e) { console.warn('[Carrossel] erro:', e); }
   })();
 </script>
