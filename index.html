@@ -13,11 +13,6 @@
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
 
-
-
-
-
-
 <style>
   #carrosselBanners {
     width: 100% !important;
@@ -26,16 +21,10 @@
     padding: 0 16px !important;
     box-sizing: border-box;
   }
-  #carrosselWrapper {
-    max-width: 1280px;
-    margin: 0 auto;
-    position: relative;
-    border-radius: 16px;
-    overflow: hidden;
-  }
   #carrosselTrack {
     display: flex !important;
     flex-wrap: nowrap !important;
+    align-items: flex-start !important;
     transition: transform 0.5s ease !important;
   }
   #carrosselTrack > div {
@@ -47,26 +36,27 @@
   #carrosselTrack img {
     width: 100% !important;
     height: auto !important;
-    max-height: 400px !important;
     display: block !important;
     object-fit: contain !important;
   }
   @media (max-width: 768px) {
-    #carrosselBanners { padding: 0 12px !important; }
-    #carrosselTrack img { max-height: 220px !important; }
+    #carrosselBanners {
+      padding: 0 12px !important;
+    }
   }
 </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
 
-  <!-- TICKER -->
-    <!-- CARROSSEL DE BANNERS -->
+  <!-- CARROSSEL DE BANNERS -->
   <div id="carrosselBanners" style="display:none; margin-top: 24px; padding: 0 24px;">
     <div style="max-width: 1280px; margin: 0 auto; position: relative; border-radius: 16px; overflow: hidden;">
       <div id="carrosselTrack" style="display: flex; transition: transform 0.5s ease;"></div>
     </div>
   </div>
+
+  <!-- TICKER -->
   <div class="winners-ticker" style="margin-top: 24px;"><div class="winners-track" id="tickerTrack"></div></div>
 
   <!-- FAVORITOS (so aparece se tiver) -->
@@ -213,7 +203,9 @@
           </div>
         `;
       }).join('');
-    }    // ==========================================================
+    }
+
+    // ==========================================================
     // ORDEM DOS JOGOS FAMOSOS (aparecem primeiro)
     // ==========================================================
     const ORDEM_FAMOSOS = [
@@ -242,23 +234,19 @@
     ];
 
     function ordenarFamosos(lista) {
-      // Cria um map de prioridade: nome -> índice (menor = mais importante)
+      // Mapa de prioridade: nome -> indice (menor = mais importante)
       const prioridade = {};
       ORDEM_FAMOSOS.forEach((nome, i) => { prioridade[nome.toLowerCase()] = i; });
 
       return [...lista].sort((a, b) => {
         const aIdx = prioridade[a.name.toLowerCase()];
         const bIdx = prioridade[b.name.toLowerCase()];
-        // Se ambos estão na lista de famosos, ordena por prioridade
         if (aIdx !== undefined && bIdx !== undefined) return aIdx - bIdx;
-        // Se só um está, ele vem antes
         if (aIdx !== undefined) return -1;
         if (bIdx !== undefined) return 1;
-        // Nenhum é famoso: ordem alfabética
         return a.name.localeCompare(b.name);
       });
     }
-
 
     function renderFeatured() {
       const busca = filtro.toLowerCase().trim();
@@ -268,8 +256,7 @@
         return hay.includes(busca);
       });
 
-      // Se NAO tem busca: aplica ordem dos famosos
-      // Se TEM busca: mantem a ordem original (mais intuitivo pra busca)
+      // Sem busca: ordem dos famosos. Com busca: ordem original.
       if (!busca) {
         lista = ordenarFamosos(lista);
       }
@@ -281,7 +268,6 @@
     function renderFavoritosHome() {
       const codes = (window.ZKNGamesLib && ZKNGamesLib.getFavoritos()) || [];
       const section = document.getElementById('favoritosSection');
-      const grid = document.getElementById('favoritosGrid');
       if (!codes.length) { section.style.display = 'none'; return; }
       const jogos = codes.map(c => ALL_GAMES.find(j => j.game_code === c)).filter(Boolean).slice(0, 8);
       if (!jogos.length) { section.style.display = 'none'; return; }
@@ -292,7 +278,6 @@
     function renderRecentesHome() {
       const codes = (window.ZKNGamesLib && ZKNGamesLib.getRecentes()) || [];
       const section = document.getElementById('recentesSection');
-      const grid = document.getElementById('recentesGrid');
       if (!codes.length) { section.style.display = 'none'; return; }
       const jogos = codes.map(c => ALL_GAMES.find(j => j.game_code === c)).filter(Boolean).slice(0, 8);
       if (!jogos.length) { section.style.display = 'none'; return; }
@@ -322,7 +307,7 @@
     async function carregarHome() {
       iniciarTicker();
 
-      // OTIMIZADO: paraleliza jogos + provedoras
+      // Paraleliza jogos + provedoras
       const [jogos, provs] = await Promise.all([
         NitroGames.listarJogos(),
         NitroGames.listarProvedores(),
@@ -350,7 +335,7 @@
         `).join('');
       }
 
-      // OTIMIZADO: favoritos + recentes em paralelo
+      // Favoritos + recentes em paralelo
       if (ZKNAuth.isLoggedIn() && window.ZKNGamesLib) {
         await Promise.all([
           ZKNGamesLib.carregarFavoritos(),
@@ -371,6 +356,7 @@
 
     carregarHome();
   </script>
+
 <script id='welcomePopupCode'>
 (function() {
   if (!window.ZKNAuth || !window.ZKNAuth.isLoggedIn()) return;
@@ -401,15 +387,8 @@
 })();
 </script>
 
-
-
-
-
-
-
-
 <script>
-  // Carrossel de Banners (reescrito)
+  // Carrossel de Banners (corrigido para 2+ imagens)
   (async function() {
     try {
       const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
@@ -425,34 +404,32 @@
 
       container.style.display = 'block';
       track.innerHTML = '';
-      track.style.width = (banners.length * 100) + '%';
 
       banners.forEach(function(b) {
         const div = document.createElement('div');
-        div.style.cssText = 'flex:0 0 ' + (100 / banners.length) + '%; min-width:' + (100 / banners.length) + '%; width:' + (100 / banners.length) + '%; cursor:pointer;';
         div.onclick = function() { location.href = b.link || '#'; };
 
         const img = document.createElement('img');
         img.src = b.image_url;
         img.alt = 'Banner';
-        img.style.cssText = 'width:100%; height:auto; max-height:400px; object-fit:contain; display:block;';
 
         div.appendChild(img);
         track.appendChild(div);
       });
 
+      if (banners.length < 2) return;
+
       let idx = 0;
       setInterval(function() {
         idx = (idx + 1) % banners.length;
-        // Cada slide tem o tamanho de (100 / total). Desliza exatamente esse valor.
-        track.style.transform = 'translateX(-' + (idx * (100 / banners.length)) + '%)';
+        track.style.transform = 'translateX(-' + (idx * 100) + '%)';
       }, 4000);
     } catch(e) { console.warn('[Carrossel] erro:', e); }
   })();
 </script>
 
 <script>
-  // Pop-up de Marketing (Mostra todos, um por um)
+  // Pop-up de Marketing (mostra todos, um por um)
   (async function() {
     // Verifica se ja mostrou nas ultimas 24 horas
     const lastShown = localStorage.getItem('zkn_popup_shown');
@@ -463,21 +440,21 @@
       const res = await fetch(apiBase + '/marketing/banners');
       const data = await res.json();
       const banners = (data.banners || []).filter(b => b.type === 'popup');
-      
+
       if (!banners.length) return;
-      
+
       let index = 0;
-      
+
       function mostrarProximo() {
         if (index >= banners.length) {
-          // Terminou de mostrar todos, trava para não aparecer de novo
+          // Terminou de mostrar todos, trava para nao aparecer de novo
           localStorage.setItem('zkn_popup_shown', new Date().getTime().toString());
           return;
         }
-        
+
         const b = banners[index];
         index++;
-        
+
         const backdrop = document.createElement('div');
         backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
         backdrop.innerHTML = '<div style="position:relative; max-width:500px; width:100%;">' +
@@ -485,16 +462,16 @@
           '<img src="' + b.image_url + '" style="width:100%; border-radius:16px; display:block; cursor:pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
         '</div>';
         document.body.appendChild(backdrop);
-        
+
         backdrop.querySelector('#btnFecharPopup').onclick = function() {
           backdrop.remove();
-          setTimeout(mostrarProximo, 500); // Pequeno delay antes do próximo
+          setTimeout(mostrarProximo, 500);
         };
       }
-      
-      // Inicia a sequência após 3 segundos
+
+      // Inicia a sequencia apos 3 segundos
       setTimeout(mostrarProximo, 3000);
-      
+
     } catch(e) { console.warn('[Popup] erro:', e); }
   })();
 </script>

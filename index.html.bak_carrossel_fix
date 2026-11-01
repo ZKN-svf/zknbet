@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZKNbet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
+  <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
+  <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/icons.css">
+
+
+
+
+
+
+<style>
+  #carrosselBanners {
+    width: 100% !important;
+    max-width: 1000px !important;
+    margin: 24px auto 0 !important;
+    padding: 0 16px !important;
+    box-sizing: border-box;
+  }
+  #carrosselTrack {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    transition: transform 0.5s ease !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  #carrosselTrack > div {
+    flex: 0 0 100% !important;
+    min-width: 100% !important;
+    width: 100% !important;
+    cursor: pointer;
+  }
+  #carrosselTrack img {
+    width: 100% !important;
+    height: 260px !important;
+    display: block !important;
+    object-fit: cover !important;
+  }
+  @media (max-width: 768px) {
+    #carrosselBanners {
+      padding: 0 12px !important;
+    }
+  }
+</style>
+</head>
+<body>
+  <header class="zkn-header"><div class="zkn-header-inner"></div></header>
+
+  <!-- TICKER -->
+    <!-- CARROSSEL DE BANNERS -->
+  <div id="carrosselBanners" style="display:none; margin-top: 24px; padding: 0 24px;">
+    <div style="max-width: 1280px; margin: 0 auto; position: relative; border-radius: 16px; overflow: hidden;">
+      <div id="carrosselTrack" style="display: flex; transition: transform 0.5s ease;"></div>
+    </div>
+  </div>
+  <div class="winners-ticker" style="margin-top: 24px;"><div class="winners-track" id="tickerTrack"></div></div>
+
+  <!-- FAVORITOS (so aparece se tiver) -->
+  <section class="section" id="favoritosSection" style="display:none;padding-bottom:0;">
+    <div class="section-header">
+      <h2 class="section-title">Seus favoritos</h2>
+      <a href="favoritos.html" class="section-link">Ver todos &rarr;</a>
+    </div>
+    <div class="games-carousel" id="favoritosGrid"></div>
+  </section>
+
+  <!-- RECENTES (so aparece se tiver) -->
+  <section class="section" id="recentesSection" style="display:none;padding-bottom:0;">
+    <div class="section-header">
+      <h2 class="section-title">Jogados recentemente</h2>
+      <a href="favoritos.html" class="section-link">Ver favoritos &rarr;</a>
+    </div>
+    <div class="games-carousel" id="recentesGrid"></div>
+  </section>
+
+  <!-- TODOS OS JOGOS (destaque) -->
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">Em destaque</h2>
+      <span id="gamesCount" style="color:var(--text-muted);font-size:14px;font-weight:600;"></span>
+    </div>
+
+    <div style="position:relative;margin-bottom:20px;max-width:420px;">
+      <input type="text" id="busca" placeholder="Buscar jogo..."
+             style="width:100%;padding:12px 16px 12px 44px;background:var(--bg-2);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;">
+      <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);">&#128269;</span>
+    </div>
+
+    <div class="games-carousel" id="featuredGrid">
+      <div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Carregando jogos...</div>
+    </div>
+  </section>
+
+  <!-- PROVEDORAS -->
+  <section class="section" style="padding-top:0;">
+    <div class="section-header"><h2 class="section-title">Provedoras parceiras</h2></div>
+    <div class="providers-strip" id="providersStrip"></div>
+  </section>
+
+  <footer class="zkn-footer">
+    <div class="zkn-footer-inner">
+      <p><strong>ZKNbet</strong> (c) 2026 - Todos os direitos reservados</p>
+      <p class="disclaimer">Proibido para menores de 18 anos. Jogue com responsabilidade.</p>
+    </div>
+  </footer>
+
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/bottom-nav.js"></script>
+  <script src="assets/game-frame.js"></script>
+  <script src="assets/daily-bonus.js"></script>
+  <script src="assets/providers-map.js"></script>
+  <script src="assets/nitrogames.js"></script>
+  <script src="assets/games-lib.js"></script>
+  <script>
+    // ==========================================================
+    // TICKER
+    // ==========================================================
+    const GAMES_FOR_TICKER = [
+      'Fortune Tiger', 'Fortune Ox', 'Gates of Olympus', 'Sweet Bonanza',
+      'Big Bass Splash', 'Fortune Rabbit', 'Sugar Rush', 'Wolf Gold',
+    ];
+    function gerarIdJogador() { return Math.floor(10000 + Math.random() * 90000) + '*****'; }
+    function gerarValor() { return 50 + Math.random() * 24950; }
+    function gerarWinners(qtd) {
+      const arr = [];
+      for (let i = 0; i < qtd; i++) arr.push({
+        id: gerarIdJogador(),
+        game: GAMES_FOR_TICKER[Math.floor(Math.random() * GAMES_FOR_TICKER.length)],
+        amount: gerarValor(),
+      });
+      return arr;
+    }
+    function renderTicker() {
+      const track = document.getElementById('tickerTrack');
+      const w = gerarWinners(14);
+      const items = [...w, ...w];
+      track.innerHTML = items.map(x => `
+        <div class="winner-item">
+          <span class="winner-name">Jogador ID: ${x.id}</span>
+          <span class="winner-game">ganhou</span>
+          <span class="winner-amount">${formatBRL(x.amount)}</span>
+          <span class="winner-game">em ${x.game}!</span>
+        </div>
+      `).join('');
+    }
+    function iniciarTicker() {
+      renderTicker();
+      setInterval(() => {
+        const track = document.getElementById('tickerTrack');
+        const x = { id: gerarIdJogador(), game: GAMES_FOR_TICKER[Math.floor(Math.random() * GAMES_FOR_TICKER.length)], amount: gerarValor() };
+        const item = document.createElement('div');
+        item.className = 'winner-item';
+        item.innerHTML = `
+          <span class="winner-name">Jogador ID: ${x.id}</span>
+          <span class="winner-game">ganhou</span>
+          <span class="winner-amount">${formatBRL(x.amount)}</span>
+          <span class="winner-game">em ${x.game}!</span>
+        `;
+        track.appendChild(item);
+        if (track.children.length > 30) track.removeChild(track.firstChild);
+      }, 25000);
+    }
+
+    // ==========================================================
+    // JOGOS
+    // ==========================================================
+    let ALL_GAMES = [];
+    let filtro = '';
+
+    function renderCards(containerId, lista) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+
+      if (!lista || lista.length === 0) {
+        el.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Nenhum jogo.</div>';
+        return;
+      }
+
+      el.innerHTML = lista.map(j => {
+        const capa = j.image_url || '';
+        const inicial = (j.name || '?').charAt(0).toUpperCase();
+        const nomeEsc = (j.name || '').replace(/'/g, "\\'");
+        const favBtn = window.ZKNGamesLib && window.ZKNGamesLib.renderFavButton ? window.ZKNGamesLib.renderFavButton(j.game_code) : '';
+        return `
+          <div class="game-card" onclick="jogar('${j.game_code}', '${nomeEsc}')">
+            ${favBtn}
+            <div class="game-card-cover">
+              ${capa ? `<img src="${capa}" alt="${j.name}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentNode.insertBefore(document.createTextNode('${inicial}'),this.nextSibling)">` : inicial}
+              <div class="game-card-play"><div class="play-btn">&#9654;</div></div>
+            </div>
+            <div class="game-card-info">
+              <div class="game-card-name" title="${j.name}">${j.name}</div>
+              <div class="game-card-provider">${j.provider_name || ''}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }    // ==========================================================
+    // ORDEM DOS JOGOS FAMOSOS (aparecem primeiro)
+    // ==========================================================
+    const ORDEM_FAMOSOS = [
+      'Fortune Tiger',
+      'Fortune Ox',
+      'Fortune Rabbit',
+      'Fortune Mouse',
+      'Fortune Dragon',
+      'Gates of Olympus',
+      'Sweet Bonanza',
+      'Sweet Bonanza Xmas',
+      'Sugar Rush',
+      'Sugar Rush 1000',
+      'Big Bass Bonanza',
+      'Big Bass Splash',
+      'Big Bass Bonanza - Keeping it Reel',
+      'Starlight Princess',
+      'The Dog House',
+      'Wolf Gold',
+      'Wild West Gold',
+      'Ganesha Gold',
+      'Bikini Paradise',
+      'Dragon Tiger Luck',
+      'Double Fortune',
+      'Jungle Delight',
+    ];
+
+    function ordenarFamosos(lista) {
+      // Cria um map de prioridade: nome -> índice (menor = mais importante)
+      const prioridade = {};
+      ORDEM_FAMOSOS.forEach((nome, i) => { prioridade[nome.toLowerCase()] = i; });
+
+      return [...lista].sort((a, b) => {
+        const aIdx = prioridade[a.name.toLowerCase()];
+        const bIdx = prioridade[b.name.toLowerCase()];
+        // Se ambos estão na lista de famosos, ordena por prioridade
+        if (aIdx !== undefined && bIdx !== undefined) return aIdx - bIdx;
+        // Se só um está, ele vem antes
+        if (aIdx !== undefined) return -1;
+        if (bIdx !== undefined) return 1;
+        // Nenhum é famoso: ordem alfabética
+        return a.name.localeCompare(b.name);
+      });
+    }
+
+
+    function renderFeatured() {
+      const busca = filtro.toLowerCase().trim();
+      let lista = ALL_GAMES.filter(g => {
+        if (!busca) return true;
+        const hay = (g.name + ' ' + (g.provider_name || '')).toLowerCase();
+        return hay.includes(busca);
+      });
+
+      // Se NAO tem busca: aplica ordem dos famosos
+      // Se TEM busca: mantem a ordem original (mais intuitivo pra busca)
+      if (!busca) {
+        lista = ordenarFamosos(lista);
+      }
+
+      document.getElementById('gamesCount').textContent = lista.length + ' jogos';
+      renderCards('featuredGrid', lista);
+    }
+
+    function renderFavoritosHome() {
+      const codes = (window.ZKNGamesLib && ZKNGamesLib.getFavoritos()) || [];
+      const section = document.getElementById('favoritosSection');
+      const grid = document.getElementById('favoritosGrid');
+      if (!codes.length) { section.style.display = 'none'; return; }
+      const jogos = codes.map(c => ALL_GAMES.find(j => j.game_code === c)).filter(Boolean).slice(0, 8);
+      if (!jogos.length) { section.style.display = 'none'; return; }
+      section.style.display = 'block';
+      renderCards('favoritosGrid', jogos);
+    }
+
+    function renderRecentesHome() {
+      const codes = (window.ZKNGamesLib && ZKNGamesLib.getRecentes()) || [];
+      const section = document.getElementById('recentesSection');
+      const grid = document.getElementById('recentesGrid');
+      if (!codes.length) { section.style.display = 'none'; return; }
+      const jogos = codes.map(c => ALL_GAMES.find(j => j.game_code === c)).filter(Boolean).slice(0, 8);
+      if (!jogos.length) { section.style.display = 'none'; return; }
+      section.style.display = 'block';
+      renderCards('recentesGrid', jogos);
+    }
+
+    async function jogar(code, nome) {
+      if (!ZKNAuth.isLoggedIn()) {
+        ZKN.toast('Faca login', 'Entre para jogar.', 'warning');
+        setTimeout(() => location.href = 'login.html?back=index.html', 800);
+        return;
+      }
+      const user = ZKNAuth.getUser();
+      const email = user.email || (user.phone + '@zknbet.com');
+
+      ZKN.toast('Abrindo jogo...', nome || code);
+      const res = await NitroGames.abrirJogo(code, email);
+
+      if (res.sucesso && res.launch_url) {
+        if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) { window.ZKNGameFrame.abrir(res.launch_url, nome || code); } else { window.open(res.launch_url, '_blank', 'noopener'); }
+      } else {
+        ZKN.toast('Erro ao abrir jogo', res.mensagem || 'Tente novamente.', 'error');
+      }
+    }
+
+    async function carregarHome() {
+      iniciarTicker();
+
+      // OTIMIZADO: paraleliza jogos + provedoras
+      const [jogos, provs] = await Promise.all([
+        NitroGames.listarJogos(),
+        NitroGames.listarProvedores(),
+      ]);
+
+      if (jogos.sucesso) {
+        ALL_GAMES = window.ZKNProviders ? window.ZKNProviders.aplicarProvidersReais(jogos.jogos || []) : (jogos.jogos || []);
+        renderFeatured();
+        renderFavoritosHome();
+        renderRecentesHome();
+      } else {
+        document.getElementById('featuredGrid').innerHTML =
+          '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">' +
+          (jogos.mensagem || 'Erro ao carregar jogos.') + '</div>';
+      }
+
+      if (provs.sucesso && provs.provedores.length) {
+        document.getElementById('providersStrip').innerHTML = provs.provedores.map(p => `
+          <div class="provider-chip" onclick="location.href='jogos.html'">${p.name}</div>
+        `).join('');
+      } else {
+        const nomes = window.ZKNProviders ? window.ZKNProviders.providersUnicos(ALL_GAMES) : [...new Set(ALL_GAMES.map(j => j.provider_name).filter(Boolean))];
+        document.getElementById('providersStrip').innerHTML = nomes.map(n => `
+          <div class="provider-chip" onclick="location.href='jogos.html'">${n}</div>
+        `).join('');
+      }
+
+      // OTIMIZADO: favoritos + recentes em paralelo
+      if (ZKNAuth.isLoggedIn() && window.ZKNGamesLib) {
+        await Promise.all([
+          ZKNGamesLib.carregarFavoritos(),
+          ZKNGamesLib.carregarRecentes(),
+        ]);
+        renderFavoritosHome();
+        renderRecentesHome();
+      }
+    }
+
+    document.getElementById('busca').addEventListener('input', (e) => {
+      filtro = e.target.value;
+      renderFeatured();
+    });
+
+    window.__FAV_PAGE_RERENDER__ = () => renderFavoritosHome();
+    window.__RECENTES_UPDATED__ = () => renderRecentesHome();
+
+    carregarHome();
+  </script>
+<script id='welcomePopupCode'>
+(function() {
+  if (!window.ZKNAuth || !window.ZKNAuth.isLoggedIn()) return;
+  const lastShown = localStorage.getItem('zkn_welcome_shown');
+  const hoje = new Date().toDateString();
+  if (lastShown === hoje) return;
+  ZKNAuth.getSaldo().then(saldo => {
+    if (saldo > 0) return;
+    setTimeout(() => {
+      const backdrop = document.createElement('div');
+      backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+      backdrop.innerHTML = `<div style='background:linear-gradient(180deg, #1a2332 0%, #0a0f1a 100%); border:2px solid var(--gold); border-radius:24px; padding:32px 24px; max-width:400px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(245,190,60,0.3); position:relative;'>
+        <button onclick="this.closest('div').parentNode.remove(); localStorage.setItem('zkn_welcome_shown', new Date().toDateString());" style='position:absolute;top:12px;right:16px;background:transparent;border:none;color:#8a94a6;font-size:24px;cursor:pointer;'>&times;</button>
+        <div style='font-size:56px;margin-bottom:16px;'>🎁</div>
+        <h2 style='font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--gold);margin-bottom:8px;'>Bem-vindo à ZKNbet!</h2>
+        <p style='font-size:14px;color:#fff;margin-bottom:24px;line-height:1.5;'>Você ainda não tem saldo. Faça seu primeiro depósito e <strong>ganhe bônus exclusivos</strong> para começar a jogar!</p>
+        <div style='background:rgba(255,255,255,0.05);border-radius:12px;padding:16px;margin-bottom:24px;'>
+          <div style='font-size:12px;color:#8a94a6;text-transform:uppercase;font-weight:700;'>Deposite</div>
+          <div style='font-family:var(--font-display);font-size:28px;font-weight:900;color:#fff;'>R$ 20</div>
+          <div style='font-size:14px;color:var(--green);font-weight:700;'>Ganhe R$ 3 de bônus</div>
+        </div>
+        <button onclick="location.href='deposito.html'; localStorage.setItem('zkn_welcome_shown', new Date().toDateString());" style='width:100%;padding:16px;background:var(--grad-green);color:#fff;border:none;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 4px 16px rgba(0,214,127,0.4);'>Depositar Agora</button>
+      </div>`;
+      document.body.appendChild(backdrop);
+      localStorage.setItem('zkn_welcome_shown', hoje);
+    }, 1500);
+  });
+})();
+</script>
+
+
+
+
+
+
+
+
+<script>
+  // Carrossel de Banners (createElement)
+  (async function() {
+    try {
+      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+      const res = await fetch(apiBase + '/marketing/banners');
+      const data = await res.json();
+      const banners = (data.banners || []).filter(b => b.type === 'carousel');
+      
+      if (!banners.length) return;
+      
+      const container = document.getElementById('carrosselBanners');
+      const track = document.getElementById('carrosselTrack');
+      if (!container || !track) return;
+      
+      container.style.display = 'block';
+      track.innerHTML = ''; // Limpa qualquer conteúdo antigo
+      
+      banners.forEach(function(b) {
+        const div = document.createElement('div');
+        div.style.cssText = 'flex:0 0 100%; min-width:100%; width:100%; cursor:pointer;';
+        div.onclick = function() { location.href = b.link || '#'; };
+        
+        const img = document.createElement('img');
+        img.src = b.image_url;
+        img.alt = 'Banner';
+        img.style.cssText = 'width:100%; height:260px; object-fit:cover; display:block;';
+        
+        div.appendChild(img);
+        track.appendChild(div);
+      });
+      
+      let idx = 0;
+      setInterval(function() {
+        idx = (idx + 1) % banners.length;
+        const percentPerSlide = 100 / banners.length;
+        track.style.transform = 'translateX(-' + (idx * percentPerSlide) + '%)';
+      }, 4000);
+    } catch(e) { console.warn('[Carrossel] erro:', e); }
+  })();
+</script>
+
+<script>
+  // Pop-up de Marketing (Mostra todos, um por um)
+  (async function() {
+    // Verifica se ja mostrou nas ultimas 24 horas
+    const lastShown = localStorage.getItem('zkn_popup_shown');
+    const now = new Date().getTime();
+    if (lastShown && (now - parseInt(lastShown)) < 24 * 60 * 60 * 1000) return;
+    try {
+      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+      const res = await fetch(apiBase + '/marketing/banners');
+      const data = await res.json();
+      const banners = (data.banners || []).filter(b => b.type === 'popup');
+      
+      if (!banners.length) return;
+      
+      let index = 0;
+      
+      function mostrarProximo() {
+        if (index >= banners.length) {
+          // Terminou de mostrar todos, trava para não aparecer de novo
+          localStorage.setItem('zkn_popup_shown', new Date().getTime().toString());
+          return;
+        }
+        
+        const b = banners[index];
+        index++;
+        
+        const backdrop = document.createElement('div');
+        backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+        backdrop.innerHTML = '<div style="position:relative; max-width:500px; width:100%;">' +
+          '<button id="btnFecharPopup" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:none;font-size:24px;cursor:pointer;font-weight:bold;">&times;</button>' +
+          '<img src="' + b.image_url + '" style="width:100%; border-radius:16px; display:block; cursor:pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
+        '</div>';
+        document.body.appendChild(backdrop);
+        
+        backdrop.querySelector('#btnFecharPopup').onclick = function() {
+          backdrop.remove();
+          setTimeout(mostrarProximo, 500); // Pequeno delay antes do próximo
+        };
+      }
+      
+      // Inicia a sequência após 3 segundos
+      setTimeout(mostrarProximo, 3000);
+      
+    } catch(e) { console.warn('[Popup] erro:', e); }
+  })();
+</script>
+</body>
+</html>
