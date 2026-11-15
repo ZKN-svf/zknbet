@@ -333,15 +333,18 @@
       }
 
       el.innerHTML = lista.map(j => {
-        const capa = j.image_url || '';
+        // Pega direto da sua pasta local usando o código do jogo
+        const capaLocal = j.game_code ? `img/pgsoft/${j.game_code}.png` : '';
+        
         const inicial = (j.name || '?').charAt(0).toUpperCase();
         const nomeEsc = (j.name || '').replace(/'/g, "\\'");
         const favBtn = window.ZKNGamesLib && window.ZKNGamesLib.renderFavButton ? window.ZKNGamesLib.renderFavButton(j.game_code) : '';
+        
         return `
           <div class="game-card" onclick="jogar('${j.game_code}', '${nomeEsc}')">
             ${favBtn}
             <div class="game-card-cover">
-              ${capa ? `<img src="${capa}" alt="${j.name}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentNode.insertBefore(document.createTextNode('${inicial}'),this.nextSibling)">` : inicial}
+              <img src="${capaLocal}" alt="${j.name}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentNode.insertBefore(document.createTextNode('${inicial}'),this.nextSibling)">
               <div class="game-card-play"><div class="play-btn">&#9654;</div></div>
             </div>
             <div class="game-card-info">
