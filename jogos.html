@@ -60,9 +60,8 @@
   <script src="assets/app.js"></script>
   <script src="assets/game-frame.js"></script>
   <script src="assets/daily-bonus.js"></script>
-  <script src="assets/providers-map.js"></script>
   <script src="assets/bottom-nav.js"></script>
-  <script src="assets/nitrogames.js"></script>
+  <script src="assets/rapidverse.js"></script>
   <script src="assets/games-lib.js"></script>
   <script>
     let ALL_GAMES = [];
@@ -124,7 +123,7 @@
       const res = await NitroGames.abrirJogo(code, email);
 
       if (res.sucesso && res.launch_url) {
-        window.open(res.launch_url, '_blank');
+        if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) { window.ZKNGameFrame.abrir(res.launch_url, nome || code); } else { window.open(res.launch_url, '_blank', 'noopener'); }
       } else {
         ZKN.toast('Erro ao abrir jogo', res.mensagem || 'Tente novamente.', 'error');
       }
