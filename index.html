@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ZKNbet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,48 +13,105 @@
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
 
-<style>
-  #carrosselBanners {
-    width: 100% !important;
-    max-width: 1000px !important;
-    margin: 24px auto 0 !important;
-    padding: 0 16px !important;
-    box-sizing: border-box;
-  }
-  #carrosselTrack {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    align-items: flex-start !important;
-    touch-action: pan-y !important;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  #carrosselTrack > div {
-    flex: 0 0 100% !important;
-    min-width: 100% !important;
-    width: 100% !important;
-    cursor: pointer;
-  }
-  #carrosselTrack img {
-    width: 100% !important;
-    height: auto !important;
-    display: block !important;
-    object-fit: contain !important;
-  }
-  @media (max-width: 768px) {
-    #carrosselBanners {
-      padding: 0 12px !important;
+  <style>
+    /* Evita scroll horizontal acidental no mobile */
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
     }
-  }
-</style>
+
+    /* Carrossel Responsivo */
+    #carrosselBanners {
+      width: 100% !important;
+      max-width: 1000px !important;
+      margin: 24px auto 0 !important;
+      padding: 0 16px !important;
+      box-sizing: border-box;
+    }
+    .carrossel-wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    #carrosselTrack {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      align-items: flex-start !important;
+      touch-action: pan-y !important;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: transform 0.5s ease;
+    }
+    #carrosselTrack > div {
+      flex: 0 0 100% !important;
+      min-width: 100% !important;
+      width: 100% !important;
+      cursor: pointer;
+    }
+    #carrosselTrack img {
+      width: 100% !important;
+      height: auto !important;
+      display: block !important;
+      object-fit: contain !important;
+    }
+
+    /* Barra de busca responsiva */
+    .search-box-wrapper {
+      position: relative;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 420px;
+    }
+    .search-box-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 16px 12px 44px;
+      background: var(--bg-2);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 16px; /* 16px evita zoom automático no iOS Safari */
+      outline: none;
+    }
+
+    /* Ajustes específicos para Mobile */
+    @media (max-width: 768px) {
+      #carrosselBanners {
+        margin-top: 14px !important;
+        padding: 0 12px !important;
+      }
+      .carrossel-wrapper {
+        border-radius: 12px;
+      }
+      .winners-ticker {
+        margin-top: 14px !important;
+      }
+      .search-box-wrapper {
+        max-width: 100%;
+        margin-bottom: 16px;
+      }
+      .section-header {
+        gap: 8px;
+      }
+      .section-title {
+        font-size: 18px;
+      }
+      /* Espaço extra no rodapé caso use bottom-nav fixa */
+      .zkn-footer {
+        padding-bottom: 84px;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
 
   <!-- CARROSSEL DE BANNERS -->
-  <div id="carrosselBanners" style="display:none; margin-top: 24px; padding: 0 24px;">
-    <div style="max-width: 1280px; margin: 0 auto; position: relative; border-radius: 16px; overflow: hidden;">
-      <div id="carrosselTrack" style="display: flex; transition: transform 0.5s ease;"></div>
+  <div id="carrosselBanners" style="display:none;">
+    <div class="carrossel-wrapper">
+      <div id="carrosselTrack"></div>
     </div>
   </div>
 
@@ -86,10 +143,9 @@
       <span id="gamesCount" style="color:var(--text-muted);font-size:14px;font-weight:600;"></span>
     </div>
 
-    <div style="position:relative;margin-bottom:20px;max-width:420px;">
-      <input type="text" id="busca" placeholder="Buscar jogo..."
-             style="width:100%;padding:12px 16px 12px 44px;background:var(--bg-2);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;">
-      <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);">&#128269;</span>
+    <div class="search-box-wrapper">
+      <input type="text" id="busca" class="search-box-input" placeholder="Buscar jogo...">
+      <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;">&#128269;</span>
     </div>
 
     <div class="games-carousel" id="featuredGrid">
@@ -235,7 +291,6 @@
     ];
 
     function ordenarFamosos(lista) {
-      // Mapa de prioridade: nome -> indice (menor = mais importante)
       const prioridade = {};
       ORDEM_FAMOSOS.forEach((nome, i) => { prioridade[nome.toLowerCase()] = i; });
 
@@ -256,11 +311,6 @@
         const hay = (g.name + ' ' + (g.provider_name || '')).toLowerCase();
         return hay.includes(busca);
       });
-
-      // Sem busca: ordem dos famosos. Com busca: ordem original.
-      if (!busca) {
-        // ordem dos famosos vem do rapidverse.js
-      }
 
       document.getElementById('gamesCount').textContent = lista.length + ' jogos';
       renderCards('featuredGrid', lista);
@@ -308,7 +358,6 @@
     async function carregarHome() {
       iniciarTicker();
 
-      // Paraleliza jogos + provedoras
       const [jogos, provs] = await Promise.all([
         NitroGames.listarJogos(),
         NitroGames.listarProvedores(),
@@ -336,7 +385,6 @@
         `).join('');
       }
 
-      // Favoritos + recentes em paralelo
       if (ZKNAuth.isLoggedIn() && window.ZKNGamesLib) {
         await Promise.all([
           ZKNGamesLib.carregarFavoritos(),
@@ -358,173 +406,172 @@
     carregarHome();
   </script>
 
-<script id='welcomePopupCode'>
-(function() {
-  if (!window.ZKNAuth || !window.ZKNAuth.isLoggedIn()) return;
-  const lastShown = localStorage.getItem('zkn_welcome_shown');
-  const hoje = new Date().toDateString();
-  if (lastShown === hoje) return;
-  ZKNAuth.getSaldo().then(saldo => {
-    if (saldo > 0) return;
-    setTimeout(() => {
-      const backdrop = document.createElement('div');
-      backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
-      backdrop.innerHTML = `<div style='background:linear-gradient(180deg, #1a2332 0%, #0a0f1a 100%); border:2px solid var(--gold); border-radius:24px; padding:32px 24px; max-width:400px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(245,190,60,0.3); position:relative;'>
-        <button onclick="this.closest('div').parentNode.remove(); localStorage.setItem('zkn_welcome_shown', new Date().toDateString());" style='position:absolute;top:12px;right:16px;background:transparent;border:none;color:#8a94a6;font-size:24px;cursor:pointer;'>&times;</button>
-        <div style='font-size:56px;margin-bottom:16px;'>🎁</div>
-        <h2 style='font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--gold);margin-bottom:8px;'>Bem-vindo à ZKNbet!</h2>
-        <p style='font-size:14px;color:#fff;margin-bottom:24px;line-height:1.5;'>Você ainda não tem saldo. Faça seu primeiro depósito e <strong>ganhe bônus exclusivos</strong> para começar a jogar!</p>
-        <div style='background:rgba(255,255,255,0.05);border-radius:12px;padding:16px;margin-bottom:24px;'>
-          <div style='font-size:12px;color:#8a94a6;text-transform:uppercase;font-weight:700;'>Deposite</div>
-          <div style='font-family:var(--font-display);font-size:28px;font-weight:900;color:#fff;'>R$ 20</div>
-          <div style='font-size:14px;color:var(--green);font-weight:700;'>Ganhe R$ 3 de bônus</div>
-        </div>
-        <button onclick="location.href='deposito.html'; localStorage.setItem('zkn_welcome_shown', new Date().toDateString());" style='width:100%;padding:16px;background:var(--grad-green);color:#fff;border:none;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 4px 16px rgba(0,214,127,0.4);'>Depositar Agora</button>
-      </div>`;
-      document.body.appendChild(backdrop);
-      localStorage.setItem('zkn_welcome_shown', hoje);
-    }, 1500);
-  });
-})();
-</script>
-
-<script>
-  // Carrossel de Banners (corrigido para 2+ imagens)
-  (async function() {
-    try {
-      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
-      const res = await fetch(apiBase + '/marketing/banners');
-      const data = await res.json();
-      const banners = (data.banners || []).filter(b => b.type === 'carousel');
-
-      if (!banners.length) return;
-
-      const container = document.getElementById('carrosselBanners');
-      const track = document.getElementById('carrosselTrack');
-      if (!container || !track) return;
-
-      container.style.display = 'block';
-      track.innerHTML = '';
-
-      let moved = false; // true quando o usuario arrastou (nao abre o link)
-
-      banners.forEach(function(b) {
-        const div = document.createElement('div');
-        div.onclick = function() {
-          if (moved) return;
-          location.href = b.link || '#';
-        };
-
-        const img = document.createElement('img');
-        img.src = b.image_url;
-        img.alt = 'Banner';
-        img.draggable = false;
-
-        div.appendChild(img);
-        track.appendChild(div);
-      });
-
-      if (banners.length < 2) return;
-
-      let idx = 0;
-      let timer = null;
-      let startX = 0;
-      let dx = 0;
-      let dragging = false;
-
-      function ir(i) {
-        idx = (i + banners.length) % banners.length;
-        track.style.transition = 'transform 0.5s ease';
-        track.style.transform = 'translateX(-' + (idx * 100) + '%)';
-      }
-      function pararAuto() { if (timer) { clearInterval(timer); timer = null; } }
-      function iniciarAuto() {
-        pararAuto();
-        timer = setInterval(function() { ir(idx + 1); }, 10000);
-      }
-
-      track.addEventListener('pointerdown', function(e) {
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
-        dragging = true;
-        moved = false;
-        startX = e.clientX;
-        dx = 0;
-        pararAuto();
-        track.style.transition = 'none';
-        try { track.setPointerCapture(e.pointerId); } catch (_) {}
-      });
-
-      track.addEventListener('pointermove', function(e) {
-        if (!dragging) return;
-        dx = e.clientX - startX;
-        if (Math.abs(dx) > 5) moved = true;
-        track.style.transform = 'translateX(calc(-' + (idx * 100) + '% + ' + dx + 'px))';
-      });
-
-      function soltar() {
-        if (!dragging) return;
-        dragging = false;
-        const limite = Math.min(60, track.offsetWidth * 0.15);
-        if (dx <= -limite) ir(idx + 1);      // arrastou para a esquerda: proximo
-        else if (dx >= limite) ir(idx - 1);  // arrastou para a direita: voltar
-        else ir(idx);                        // pouco movimento: volta pro slide atual
-        setTimeout(function() { moved = false; }, 0);
-        iniciarAuto();
-      }
-      track.addEventListener('pointerup', soltar);
-      track.addEventListener('pointercancel', soltar);
-
-      iniciarAuto();
-    } catch(e) { console.warn('[Carrossel] erro:', e); }
+  <script id='welcomePopupCode'>
+  (function() {
+    if (!window.ZKNAuth || !window.ZKNAuth.isLoggedIn()) return;
+    const lastShown = localStorage.getItem('zkn_welcome_shown');
+    const hoje = new Date().toDateString();
+    if (lastShown === hoje) return;
+    ZKNAuth.getSaldo().then(saldo => {
+      if (saldo > 0) return;
+      setTimeout(() => {
+        const isMobile = window.innerWidth <= 480;
+        const backdrop = document.createElement('div');
+        backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
+        backdrop.innerHTML = `<div style='background:linear-gradient(180deg, #1a2332 0%, #0a0f1a 100%); border:2px solid var(--gold); border-radius:20px; padding:${isMobile ? '24px 18px' : '32px 24px'}; max-width:400px; width:100%; box-sizing:border-box; text-align:center; box-shadow:0 20px 60px rgba(245,190,60,0.3); position:relative; max-height:90vh; overflow-y:auto;'>
+          <button onclick="this.closest('div').parentNode.remove(); localStorage.setItem('zkn_welcome_shown', new Date().toDateString());" style='position:absolute;top:10px;right:14px;background:transparent;border:none;color:#8a94a6;font-size:26px;line-height:1;cursor:pointer;padding:4px;'>&times;</button>
+          <div style='font-size:${isMobile ? '44px' : '56px'};margin-bottom:12px;'>🎁</div>
+          <h2 style='font-family:var(--font-display);font-size:${isMobile ? '20px' : '24px'};font-weight:800;color:var(--gold);margin-bottom:8px;'>Bem-vindo à ZKNbet!</h2>
+          <p style='font-size:${isMobile ? '13px' : '14px'};color:#fff;margin-bottom:20px;line-height:1.5;'>Você ainda não tem saldo. Faça seu primeiro depósito e <strong>ganhe bônus exclusivos</strong> para começar a jogar!</p>
+          <div style='background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;margin-bottom:20px;'>
+            <div style='font-size:11px;color:#8a94a6;text-transform:uppercase;font-weight:700;'>Deposite</div>
+            <div style='font-family:var(--font-display);font-size:${isMobile ? '24px' : '28px'};font-weight:900;color:#fff;'>R$ 20</div>
+            <div style='font-size:13px;color:var(--green);font-weight:700;'>Ganhe R$ 3 de bônus</div>
+          </div>
+          <button onclick="location.href='deposito.html'; localStorage.setItem('zkn_welcome_shown', new Date().toDateString());" style='width:100%;padding:14px;background:var(--grad-green);color:#fff;border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 4px 16px rgba(0,214,127,0.4);'>Depositar Agora</button>
+        </div>`;
+        document.body.appendChild(backdrop);
+        localStorage.setItem('zkn_welcome_shown', hoje);
+      }, 1500);
+    });
   })();
-</script>
+  </script>
 
-<script>
-  // Pop-up de Marketing (mostra todos, um por um)
-  (async function() {
-    // Verifica se ja mostrou nas ultimas 24 horas
-    const lastShown = localStorage.getItem('zkn_popup_shown');
-    const now = new Date().getTime();
-    if (lastShown && (now - parseInt(lastShown)) < 24 * 60 * 60 * 1000) return;
-    try {
-      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
-      const res = await fetch(apiBase + '/marketing/banners');
-      const data = await res.json();
-      const banners = (data.banners || []).filter(b => b.type === 'popup');
+  <script>
+    // Carrossel de Banners
+    (async function() {
+      try {
+        const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+        const res = await fetch(apiBase + '/marketing/banners');
+        const data = await res.json();
+        const banners = (data.banners || []).filter(b => b.type === 'carousel');
 
-      if (!banners.length) return;
+        if (!banners.length) return;
 
-      let index = 0;
+        const container = document.getElementById('carrosselBanners');
+        const track = document.getElementById('carrosselTrack');
+        if (!container || !track) return;
 
-      function mostrarProximo() {
-        if (index >= banners.length) {
-          // Terminou de mostrar todos, trava para nao aparecer de novo
-          localStorage.setItem('zkn_popup_shown', new Date().getTime().toString());
-          return;
+        container.style.display = 'block';
+        track.innerHTML = '';
+
+        let moved = false;
+
+        banners.forEach(function(b) {
+          const div = document.createElement('div');
+          div.onclick = function() {
+            if (moved) return;
+            location.href = b.link || '#';
+          };
+
+          const img = document.createElement('img');
+          img.src = b.image_url;
+          img.alt = 'Banner';
+          img.draggable = false;
+
+          div.appendChild(img);
+          track.appendChild(div);
+        });
+
+        if (banners.length < 2) return;
+
+        let idx = 0;
+        let timer = null;
+        let startX = 0;
+        let dx = 0;
+        let dragging = false;
+
+        function ir(i) {
+          idx = (i + banners.length) % banners.length;
+          track.style.transition = 'transform 0.5s ease';
+          track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+        }
+        function pararAuto() { if (timer) { clearInterval(timer); timer = null; } }
+        function iniciarAuto() {
+          pararAuto();
+          timer = setInterval(function() { ir(idx + 1); }, 10000);
         }
 
-        const b = banners[index];
-        index++;
+        track.addEventListener('pointerdown', function(e) {
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
+          dragging = true;
+          moved = false;
+          startX = e.clientX;
+          dx = 0;
+          pararAuto();
+          track.style.transition = 'none';
+          try { track.setPointerCapture(e.pointerId); } catch (_) {}
+        });
 
-        const backdrop = document.createElement('div');
-        backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
-        backdrop.innerHTML = '<div style="position:relative; max-width:500px; width:100%;">' +
-          '<button id="btnFecharPopup" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:none;font-size:24px;cursor:pointer;font-weight:bold;">&times;</button>' +
-          '<img src="' + b.image_url + '" style="width:100%; border-radius:16px; display:block; cursor:pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
-        '</div>';
-        document.body.appendChild(backdrop);
+        track.addEventListener('pointermove', function(e) {
+          if (!dragging) return;
+          dx = e.clientX - startX;
+          if (Math.abs(dx) > 5) moved = true;
+          track.style.transform = 'translateX(calc(-' + (idx * 100) + '% + ' + dx + 'px))';
+        });
 
-        backdrop.querySelector('#btnFecharPopup').onclick = function() {
-          backdrop.remove();
-          setTimeout(mostrarProximo, 500);
-        };
-      }
+        function soltar() {
+          if (!dragging) return;
+          dragging = false;
+          const limite = Math.min(60, track.offsetWidth * 0.15);
+          if (dx <= -limite) ir(idx + 1);
+          else if (dx >= limite) ir(idx - 1);
+          else ir(idx);
+          setTimeout(function() { moved = false; }, 0);
+          iniciarAuto();
+        }
+        track.addEventListener('pointerup', soltar);
+        track.addEventListener('pointercancel', soltar);
 
-      // Inicia a sequencia apos 3 segundos
-      setTimeout(mostrarProximo, 3000);
+        iniciarAuto();
+      } catch(e) { console.warn('[Carrossel] erro:', e); }
+    })();
+  </script>
 
-    } catch(e) { console.warn('[Popup] erro:', e); }
-  })();
-</script>
+  <script>
+    // Pop-up de Marketing (ajustado para não vazar no mobile)
+    (async function() {
+      const lastShown = localStorage.getItem('zkn_popup_shown');
+      const now = new Date().getTime();
+      if (lastShown && (now - parseInt(lastShown)) < 24 * 60 * 60 * 1000) return;
+      try {
+        const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+        const res = await fetch(apiBase + '/marketing/banners');
+        const data = await res.json();
+        const banners = (data.banners || []).filter(b => b.type === 'popup');
+
+        if (!banners.length) return;
+
+        let index = 0;
+
+        function mostrarProximo() {
+          if (index >= banners.length) {
+            localStorage.setItem('zkn_popup_shown', new Date().getTime().toString());
+            return;
+          }
+
+          const b = banners[index];
+          index++;
+
+          const isMobile = window.innerWidth <= 540;
+          const backdrop = document.createElement('div');
+          backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px 16px;box-sizing:border-box;';
+          backdrop.innerHTML = '<div style="position:relative; max-width:500px; width:100%;">' +
+            '<button id="btnFecharPopup" style="position:absolute;top:' + (isMobile ? '-12px' : '-16px') + ';right:' + (isMobile ? '-8px' : '-16px') + ';width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:none;font-size:22px;line-height:1;cursor:pointer;font-weight:bold;box-shadow:0 4px 12px rgba(0,0,0,0.5);z-index:2;display:flex;align-items:center;justify-content:center;">&times;</button>' +
+            '<img src="' + b.image_url + '" style="width:100%; max-height:80vh; object-fit:contain; border-radius:16px; display:block; cursor:pointer;" onclick="location.href=\'' + (b.link || '#') + '\'">' +
+          '</div>';
+          document.body.appendChild(backdrop);
+
+          backdrop.querySelector('#btnFecharPopup').onclick = function() {
+            backdrop.remove();
+            setTimeout(mostrarProximo, 500);
+          };
+        }
+
+        setTimeout(mostrarProximo, 3000);
+
+      } catch(e) { console.warn('[Popup] erro:', e); }
+    })();
+  </script>
 </body>
 </html>
