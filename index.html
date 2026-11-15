@@ -333,8 +333,9 @@
       }
 
       el.innerHTML = lista.map(j => {
-        // Pega direto da sua pasta local usando o código do jogo
-        const capaLocal = j.game_code ? `img/pgsoft/${j.game_code}.png` : '';
+        // Usa o vendor_game_code (ex: 126.png) em vez do hash criptografado
+        const codigoImg = j.vendor_game_code || j.game_code;
+        const capaLocal = codigoImg ? `img/PGSoft/${codigoImg}.png` : '';
         
         const inicial = (j.name || '?').charAt(0).toUpperCase();
         const nomeEsc = (j.name || '').replace(/'/g, "\\'");
@@ -344,7 +345,8 @@
           <div class="game-card" onclick="jogar('${j.game_code}', '${nomeEsc}')">
             ${favBtn}
             <div class="game-card-cover">
-              <img src="${capaLocal}" alt="${j.name}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentNode.insertBefore(document.createTextNode('${inicial}'),this.nextSibling)">
+              <img src="${capaLocal}" alt="${j.name}" loading="lazy" decoding="async" 
+                   onerror="this.onerror=null; this.style.display='none'; const span=document.createElement('span'); span.className='fallback-txt'; span.innerText='${inicial}'; span.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:bold;color:var(--gold);'; this.parentNode.appendChild(span);">
               <div class="game-card-play"><div class="play-btn">&#9654;</div></div>
             </div>
             <div class="game-card-info">
