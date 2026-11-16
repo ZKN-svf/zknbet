@@ -335,7 +335,7 @@
       el.innerHTML = lista.map(j => {
         // Usa o vendor_game_code (ex: 126.png) em vez do hash criptografado
         const codigoImg = j.vendor_game_code || j.game_code;
-        const capaLocal = codigoImg ? `img/pgsoft/${codigoImg}.png` : '';
+        const capaLocal = codigoImg ? `img/PGsoft/${codigoImg}.png` : '';
         
         const inicial = (j.name || '?').charAt(0).toUpperCase();
         const nomeEsc = (j.name || '').replace(/'/g, "\\'");
