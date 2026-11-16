@@ -8,8 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
-  <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
-  <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
 
@@ -120,7 +118,7 @@
     </div>
     <div style="position:relative;margin-bottom:20px;max-width:420px;">
       <input type="text" id="busca" placeholder="Buscar jogo..."
-             style="width:100%;padding:12px 16px 12px 44px;background:var(--bg-2);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;">
+             style="width:100%;padding:12px 16px 12px 44px;background:var(--bg-2);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text);font-size:16px;outline:none;">
       <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);">&#128269;</span>
     </div>
 
@@ -129,7 +127,7 @@
     </div>
   </section>
 
-    <section class="section" id="provedorasSectionJogos" style="padding-top:0;">
+  <section class="section" id="provedorasSectionJogos" style="padding-top:0;">
     <div class="section-header">
       <h2 class="section-title">Provedoras parceiras</h2>
       <a href="provedoras.html" class="section-link">Ver todas &rarr;</a>
@@ -158,11 +156,33 @@
     let ALL_GAMES = [];
     let filtro = '';
 
+    // Pasta das capas locais. ATENCAO: o nome precisa ser IDENTICO ao do GitHub
+    // (o Windows ignora maiuscula/minuscula, o servidor nao).
+    const PASTA_CAPAS = 'img/PGsoft';
+
     // Filtro por provedora via URL (?provider=PG%20Soft)
     const _params = new URLSearchParams(location.search);
     const _providerFiltro = _params.get('provider');
     if (_providerFiltro) {
       filtro = _providerFiltro;
+    }
+
+    // Se a capa local falhar, tenta a image_url do banco; se falhar tambem, mostra a inicial.
+    function capaFalhou(img) {
+      const fb = img.dataset.fb;
+      if (fb && !img.dataset.tentou) {
+        img.dataset.tentou = '1';
+        img.src = fb;
+        return;
+      }
+      img.style.display = 'none';
+      if (!img.parentNode.querySelector('.fallback-txt')) {
+        const span = document.createElement('span');
+        span.className = 'fallback-txt';
+        span.textContent = img.dataset.inicial || '?';
+        span.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:bold;color:var(--gold);';
+        img.parentNode.appendChild(span);
+      }
     }
 
     function renderGrid() {
@@ -183,12 +203,16 @@
       }
 
       grid.innerHTML = lista.map(j => {
-        const capa = j.image_url || '';
+        const codigoImg = j.vendor_game_code || j.game_code;
+        const capaLocal = codigoImg ? `${PASTA_CAPAS}/${codigoImg}.png` : '';
+        const fallback = (j.image_url || '').replace(/"/g, '&quot;');
         const inicial = (j.name || '?').charAt(0).toUpperCase();
+        const nomeEsc = (j.name || '').replace(/'/g, "\\'");
         return `
-          <div class="game-card" onclick="jogar('${j.game_code}', '${j.name.replace(/'/g, "\\'")}')">
+          <div class="game-card" onclick="jogar('${j.game_code}', '${nomeEsc}')">
             <div class="game-card-cover">
-              ${capa ? `<img src="${capa}" alt="${j.name}" onerror="this.style.display='none';this.parentNode.textContent='${inicial}'">` : inicial}
+              <img src="${capaLocal}" alt="${j.name}" loading="lazy" decoding="async"
+                   data-fb="${fallback}" data-inicial="${inicial}" onerror="capaFalhou(this)">
               <div class="game-card-play"><div class="play-btn">&#9654;</div></div>
             </div>
             <div class="game-card-info">
@@ -220,63 +244,6 @@
       }
     }
 
-    async function iniciar() {
-      const res = await NitroGames.listarJogos();
-      if (!res.sucesso) {
-        document.getElementById('grid').innerHTML =
-          '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">' +
-          (res.mensagem || 'Erro ao carregar jogos.') + '</div>';
-        return;
-      }
-      ALL_GAMES = window.ZKNProviders ? window.ZKNProviders.aplicarProvidersReais(res.jogos || []) : (res.jogos || []);
-      renderGrid();
-    }
-
-    document.getElementById('busca').addEventListener('input', (e) => {
-      filtro = e.target.value;
-      renderGrid();
-    });
-
-    function limparFiltroProvider() {
-      const url = new URL(location.href);
-      url.searchParams.delete('provider');
-      history.replaceState(null, '', url.toString());
-      filtro = '';
-      document.getElementById('busca').value = '';
-      document.getElementById('filtroProviderChip').style.display = 'none';
-      renderGrid();
-    }
-
-    function atualizarChipFiltro() {
-      const chip = document.getElementById('filtroProviderChip');
-      const nome = document.getElementById('filtroProviderNome');
-      const urlProvider = new URLSearchParams(location.search).get('provider');
-      if (urlProvider) {
-        chip.style.display = 'flex';
-        nome.textContent = urlProvider;
-      } else {
-        chip.style.display = 'none';
-      }
-    }
-
-    // Preenche o input de busca com o provider da URL (se houver)
-    // e mostra o chip. Roda antes de iniciar() carregar os jogos.
-    if (_providerFiltro) {
-      const _buscaInput = document.getElementById('busca');
-      if (_buscaInput) _buscaInput.value = _providerFiltro;
-      atualizarChipFiltro();
-    }
-
-    function limparFiltroProvider() {
-      const url = new URL(location.href);
-      url.searchParams.delete('provider');
-      history.replaceState(null, '', url.toString());
-      filtro = '';
-      document.getElementById('busca').value = '';
-      document.getElementById('filtroProviderChip').style.display = 'none';
-      renderGrid();
-    }
-
     function atualizarChipFiltro() {
       const chip = document.getElementById('filtroProviderChip');
       const nome = document.getElementById('filtroProviderNome');
@@ -284,13 +251,19 @@
       if (urlProvider && chip && nome) {
         chip.style.display = 'flex';
         nome.textContent = urlProvider;
+      } else if (chip) {
+        chip.style.display = 'none';
       }
     }
 
-    if (_providerFiltro) {
-      const _buscaInput = document.getElementById('busca');
-      if (_buscaInput) _buscaInput.value = _providerFiltro;
-      atualizarChipFiltro();
+    function limparFiltroProvider() {
+      const url = new URL(location.href);
+      url.searchParams.delete('provider');
+      history.replaceState(null, '', url.toString());
+      filtro = '';
+      document.getElementById('busca').value = '';
+      document.getElementById('filtroProviderChip').style.display = 'none';
+      renderGrid();
     }
 
     function renderProvidersStripJogos() {
@@ -320,14 +293,32 @@
       }).join('');
     }
 
-    // Envolve iniciar() para chamar renderProvidersStripJogos depois
-    const _origIniciar = iniciar;
-    iniciar = async function() {
-      await _origIniciar();
+    async function iniciar() {
+      const res = await NitroGames.listarJogos();
+      if (!res.sucesso) {
+        document.getElementById('grid').innerHTML =
+          '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">' +
+          (res.mensagem || 'Erro ao carregar jogos.') + '</div>';
+        return;
+      }
+      ALL_GAMES = window.ZKNProviders ? window.ZKNProviders.aplicarProvidersReais(res.jogos || []) : (res.jogos || []);
+      renderGrid();
       renderProvidersStripJogos();
-    };
+    }
+
+    document.getElementById('busca').addEventListener('input', (e) => {
+      filtro = e.target.value;
+      renderGrid();
+    });
+
+    // Preenche o input de busca com o provider da URL (se houver) e mostra o chip
+    if (_providerFiltro) {
+      const _buscaInput = document.getElementById('busca');
+      if (_buscaInput) _buscaInput.value = _providerFiltro;
+      atualizarChipFiltro();
+    }
+
     iniciar();
   </script>
 </body>
 </html>
-
