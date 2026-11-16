@@ -7,8 +7,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
-  <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
-  <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
   <style>
@@ -480,7 +478,8 @@
         <button class="admin-tab active" data-tab="dashboard">Dashboard</button>
         <button class="admin-tab" data-tab="users">Usuários</button>
         <button class="admin-tab" data-tab="transactions">Transações</button>
-        <button class="admin-tab" data-tab="nitrogames">NitroGames</button>
+        <button class="admin-tab" data-tab="rapidverse">🎮 RapidVerse</button>
+        <button class="admin-tab" data-tab="catalogo">🎰 Jogos</button>
         <button class="admin-tab" data-tab="withdraws">Saques pendentes</button>
         <button class="admin-tab" data-tab="marketing">Marketing</button>
         <button class="admin-tab" data-tab="events">🎃 Eventos</button>
@@ -524,18 +523,73 @@
         </div>
       </div>
 
-      <!-- NITROGAMES -->
-      <div id="tab-nitrogames" class="tab-content hidden">
+      <!-- RAPIDVERSE -->
+      <div id="tab-rapidverse" class="tab-content hidden">
         <div class="stat-card" style="margin-bottom:16px;">
-          <div class="stat-label">Saldo de agente (NitroGames)</div>
-          <div class="stat-value gold" id="statNitroBalance">-</div>
-          <div class="stat-sub" style="margin-top:8px;">Este é o saldo da sua conta de agente na NitroGames. Se estiver zerado, os jogos não abrem (AGENT_WALLET_EMPTY).</div>
+          <div class="stat-label">Modo dos jogos (RapidVerse)</div>
+          <div class="stat-value" id="rvModoAtual">-</div>
+          <div class="stat-sub" style="margin-top:8px;">Demo: jogos de teste, sem mexer no saldo. Real: os jogos usam o saldo de verdade dos jogadores.</div>
         </div>
-        <button class="admin-btn secondary" onclick="carregarNitroBalance()">🔄 Atualizar saldo</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="btnRvDemo" class="admin-btn secondary" onclick="definirModoRapidverse('demo')">Modo Demo</button>
+          <button id="btnRvReal" class="admin-btn" onclick="definirModoRapidverse('real')">Ativar Modo Real</button>
+        </div>
       </div>
 
-      <!-- SAQUE -->
-      
+      <!-- CATALOGO: JOGOS E PROVEDORAS -->
+      <div id="tab-catalogo" class="tab-content hidden">
+
+        <!-- PROVEDORAS -->
+        <h3 style="font-family:var(--font-display);font-size:18px;font-weight:800;margin-bottom:12px;">Provedoras</h3>
+        <div style="margin-bottom:16px; background:var(--bg-2); padding:20px; border-radius:var(--radius); border:1px solid var(--border);">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div>
+              <label style="font-size:11px; color:var(--text-muted);">Código da provedora (igual ao da RapidVerse, ex: PGSoft)</label>
+              <input id="provCodigo" class="admin-input" list="vendorList" placeholder="PGSoft" maxlength="40">
+            </div>
+            <div>
+              <label style="font-size:11px; color:var(--text-muted);">Nome exibido no site (opcional)</label>
+              <input id="provNome" class="admin-input" placeholder="PG Soft" maxlength="60">
+            </div>
+          </div>
+          <button id="btnAddProv" class="admin-btn">Salvar provedora</button>
+        </div>
+        <div style="overflow-x:auto;margin-bottom:32px;">
+          <table class="admin-table">
+            <thead><tr><th>Código</th><th>Nome exibido</th><th>Jogos</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="provTable"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+        <datalist id="vendorList"></datalist>
+
+        <!-- JOGOS -->
+        <h3 style="font-family:var(--font-display);font-size:18px;font-weight:800;margin-bottom:12px;">Adicionar jogo</h3>
+        <div style="margin-bottom:24px; background:var(--bg-2); padding:20px; border-radius:var(--radius); border:1px solid var(--border);">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div><label style="font-size:11px; color:var(--text-muted);">Nome do jogo</label><input id="jogoNome" class="admin-input" placeholder="Fortune Tiger" maxlength="120"></div>
+            <div><label style="font-size:11px; color:var(--text-muted);">Código do jogo (game_code da RapidVerse)</label><input id="jogoCodigo" class="admin-input" placeholder="1189baca156e1bbbecc3b26651a63565"></div>
+            <div><label style="font-size:11px; color:var(--text-muted);">Provedora (código)</label><input id="jogoVendor" class="admin-input" list="vendorList" placeholder="PGSoft" maxlength="40"></div>
+            <div><label style="font-size:11px; color:var(--text-muted);">Código da capa local (nome do arquivo, ex: 126)</label><input id="jogoVgc" class="admin-input" placeholder="126"></div>
+            <div><label style="font-size:11px; color:var(--text-muted);">Capa: enviar imagem (PNG/JPG/WEBP, até 2 MB)</label><input id="jogoCapaArquivo" type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="admin-input"></div>
+            <div><label style="font-size:11px; color:var(--text-muted);">ou URL da capa (opcional)</label><input id="jogoCapaUrl" class="admin-input" placeholder="https://..."></div>
+          </div>
+          <button id="btnAddJogo" class="admin-btn">Salvar jogo</button>
+          <p style="font-size:11px;color:var(--text-muted);margin-top:10px;">Se o código do jogo já existir na mesma provedora, ele é atualizado em vez de duplicado.</p>
+        </div>
+
+        <h3 style="font-family:var(--font-display);font-size:18px;font-weight:800;margin-bottom:12px;">Jogos cadastrados <span id="jogosTotal" style="font-size:13px;color:var(--text-muted);font-weight:600;"></span></h3>
+        <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;">
+          <input type="text" id="jogoBusca" class="admin-input" placeholder="Buscar jogo pelo nome..." style="max-width:320px;">
+          <select id="jogoFiltroVendor" class="admin-input" style="max-width:220px;"><option value="">Todas as provedoras</option></select>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Capa</th><th>Nome</th><th>Provedora</th><th>Código</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="jogosTable"><tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- SAQUES PENDENTES -->
       <div id="tab-withdraws" class="tab-content hidden">
         <div style="margin-bottom:16px;display:flex;gap:8px;align-items:center;">
@@ -559,8 +613,6 @@
           </table>
         </div>
       </div>
-
-      
 
       <!-- MARKETING -->
       <div id="tab-marketing" class="tab-content hidden">
@@ -593,6 +645,7 @@
           </table>
         </div>
       </div>
+
       <!-- PROMO CODES -->
       <div id="tab-promo" class="tab-content hidden">
         <div style="margin-bottom:24px; background:var(--bg-2); padding:20px; border-radius:var(--radius); border:1px solid var(--border);">
@@ -623,23 +676,6 @@
             <button class="admin-btn" id="btnSalvarTelegram">Salvar Link</button>
           </div>
         </div>
-        <script>
-          document.getElementById('btnSalvarTelegram').onclick = async function() {
-            const link = document.getElementById('telegramLinkInput').value.trim();
-            if (!link) return toast('Erro', 'Cole um link válido.', 'error');
-            const btn = this;
-            btn.disabled = true; btn.textContent = 'Salvando...';
-            try {
-              const res = await fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? window.ZKN_CONFIG.api : 'https://zknbet-api.gabrielrobin63.workers.dev/api') + '/admin/settings/telegram', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('zkn_admin_token') || '') },
-                body: JSON.stringify({ link })
-              });
-              if (res.ok) { toast('Sucesso', 'Link salvo!', 'success'); } else { const e = await res.json().catch(()=>({})); toast('Erro', e.message || 'Falha', 'error'); }
-            } catch(e) { toast('Erro', e.message, 'error'); }
-            btn.disabled = false; btn.textContent = 'Salvar Link';
-          };
-        </script>
       </div>
 
       <!-- EVENTOS -->
@@ -659,6 +695,7 @@
           <button class="admin-btn" onclick="aplicarTema(event)">Aplicar Tema</button>
         </div>
       </div>
+
       <!-- AUDITORIA -->
       <div id="tab-audit" class="tab-content hidden">
         <div style="overflow-x:auto;">
@@ -668,64 +705,11 @@
           </table>
         </div>
       </div>
-</div>
+    </div>
   </div>
 
   <script src="assets/config.js"></script>
   <script>
-    // ============================================================
-    // PROMO CODES (Declarado no topo para evitar "is not defined")
-    // ============================================================
-    async function carregarPromo() {
-      const tb = document.getElementById('promoTable');
-      if (!tb) return;
-      try {
-        const d = await api('/admin/promo/list');
-        const list = d.codes || [];
-        if (!list.length) {
-          tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Nenhum código criado.</td></tr>';
-          return;
-        }
-        tb.innerHTML = list.map(p => {
-          const status = p.active ? '<span class="badge completed">Ativo</span>' : '<span class="badge withdraw">Desativado</span>';
-          const expira = new Date(p.expires_at).toLocaleDateString('pt-BR');
-          const max = p.max_uses === 0 ? '∞' : p.max_uses;
-          const btn = p.active ? '<button class="admin-btn danger" style="padding:4px 8px;font-size:11px;" onclick="desativarPromo(\'' + p.id + '\')">Desativar</button>' : '-';
-          return '<tr><td><strong>' + p.code + '</strong></td><td style="color:var(--gold);font-weight:700;">' + fmtBRL(p.value) + '</td><td>' + p.total_uses + ' / ' + max + '</td><td>' + expira + '</td><td>' + status + '</td><td>' + btn + '</td></tr>';
-        }).join('');
-      } catch (e) {
-        tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--red);">Erro: ' + e.message + '</td></tr>';
-      }
-    }
-
-    // Evento do botão (pode ficar no topo porque o botão pode não existir ainda, mas usamos o addEventListener depois do DOM carregar)
-    // ============================================================
-    // MARKETING (Declarado no topo)
-    // ============================================================
-    async function carregarMarketing() {
-      try {
-        const d = await api('/admin/marketing/list');
-        const tb = document.getElementById('marketingTable');
-        if (!tb) return;
-        
-        const list = d.banners || [];
-        if (!list.length) {
-          tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Nenhum banner criado.</td></tr>';
-          return;
-        }
-        
-        tb.innerHTML = list.map(b => {
-          return '<tr>' +
-            '<td><img src="' + b.image_url + '" style="max-width:120px;max-height:60px;border-radius:6px;"></td>' +
-            '<td><span class="badge ' + (b.type === 'carousel' ? 'completed' : 'pending') + '">' + b.type + '</span></td>' +
-            '<td style="font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;">' + (b.link || '-') + '</td>' +
-            '<td><button class="admin-btn secondary" style="padding:4px 8px;font-size:11px;margin-right:4px;" onclick="editarLinkBanner(\'' + b.id + '\')">Editar Link</button><button class="admin-btn danger" style="padding:4px 8px;font-size:11px;" onclick="deletarBanner(\'' + b.id + '\')">Excluir</button></td>' +
-          '</tr>';
-        }).join('');
-      } catch (e) {
-        if (document.getElementById('marketingTable')) document.getElementById('marketingTable').innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--red);">Erro: ' + e.message + '</td></tr>';
-      }
-    }
     const API = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
     let adminToken = localStorage.getItem('zkn_admin_token');
     let adminUser = JSON.parse(localStorage.getItem('zkn_admin_user') || 'null');
@@ -752,6 +736,59 @@
       el.innerHTML = `<div class="toast-title">${title}</div>${msg ? `<div class="toast-body">${msg}</div>` : ''}`;
       c.appendChild(el);
       setTimeout(() => el.remove(), 4000);
+    }
+
+    // ============================================================
+    // PROMO CODES
+    // ============================================================
+    async function carregarPromo() {
+      const tb = document.getElementById('promoTable');
+      if (!tb) return;
+      try {
+        const d = await api('/admin/promo/list');
+        const list = d.codes || [];
+        if (!list.length) {
+          tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Nenhum código criado.</td></tr>';
+          return;
+        }
+        tb.innerHTML = list.map(p => {
+          const status = p.active ? '<span class="badge completed">Ativo</span>' : '<span class="badge withdraw">Desativado</span>';
+          const expira = new Date(p.expires_at).toLocaleDateString('pt-BR');
+          const max = p.max_uses === 0 ? '∞' : p.max_uses;
+          const btn = p.active ? '<button class="admin-btn danger" style="padding:4px 8px;font-size:11px;" onclick="desativarPromo(\'' + p.id + '\')">Desativar</button>' : '-';
+          return '<tr><td><strong>' + p.code + '</strong></td><td style="color:var(--gold);font-weight:700;">' + fmtBRL(p.value) + '</td><td>' + p.total_uses + ' / ' + max + '</td><td>' + expira + '</td><td>' + status + '</td><td>' + btn + '</td></tr>';
+        }).join('');
+      } catch (e) {
+        tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--red);">Erro: ' + e.message + '</td></tr>';
+      }
+    }
+
+    // ============================================================
+    // MARKETING
+    // ============================================================
+    async function carregarMarketing() {
+      try {
+        const d = await api('/admin/marketing/list');
+        const tb = document.getElementById('marketingTable');
+        if (!tb) return;
+
+        const list = d.banners || [];
+        if (!list.length) {
+          tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Nenhum banner criado.</td></tr>';
+          return;
+        }
+
+        tb.innerHTML = list.map(b => {
+          return '<tr>' +
+            '<td><img src="' + b.image_url + '" style="max-width:120px;max-height:60px;border-radius:6px;"></td>' +
+            '<td><span class="badge ' + (b.type === 'carousel' ? 'completed' : 'pending') + '">' + b.type + '</span></td>' +
+            '<td style="font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;">' + (b.link || '-') + '</td>' +
+            '<td><button class="admin-btn secondary" style="padding:4px 8px;font-size:11px;margin-right:4px;" onclick="editarLinkBanner(\'' + b.id + '\')">Editar Link</button><button class="admin-btn danger" style="padding:4px 8px;font-size:11px;" onclick="deletarBanner(\'' + b.id + '\')">Excluir</button></td>' +
+          '</tr>';
+        }).join('');
+      } catch (e) {
+        if (document.getElementById('marketingTable')) document.getElementById('marketingTable').innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--red);">Erro: ' + e.message + '</td></tr>';
+      }
     }
 
     // ---------- LOGIN ----------
@@ -790,7 +827,7 @@
       const btn = ev.target;
       btn.disabled = true;
       btn.textContent = 'Aplicando...';
-      
+
       try {
         await api('/admin/settings/theme', { method: 'POST', body: JSON.stringify({ theme }) });
         toast('Sucesso', 'Tema aplicado em todo o site!', 'success');
@@ -802,6 +839,26 @@
       }
     };
 
+    // ============================================================
+    // CONFIGURAÇÕES (Telegram)
+    // ============================================================
+    document.getElementById('btnSalvarTelegram').onclick = async function() {
+      const link = document.getElementById('telegramLinkInput').value.trim();
+      if (!link) return toast('Erro', 'Cole um link válido.', 'error');
+      const btn = this;
+      btn.disabled = true; btn.textContent = 'Salvando...';
+      try {
+        await api('/admin/settings/telegram', { method: 'POST', body: JSON.stringify({ link }) });
+        toast('Sucesso', 'Link salvo!', 'success');
+      } catch(e) { toast('Erro', e.message, 'error'); }
+      btn.disabled = false; btn.textContent = 'Salvar Link';
+    };
+
+    function carregarTelegram() {
+      fetch(API + '/settings/telegram').then(r => r.json()).then(d => {
+        if (d.link) document.getElementById('telegramLinkInput').value = d.link;
+      }).catch(() => {});
+    }
 
     function entrarNoPainel() {
       document.getElementById('loginScreen').classList.add('hidden');
@@ -827,25 +884,14 @@
         if (tab === 'dashboard') carregarDashboard();
         if (tab === 'users') carregarUsers();
         if (tab === 'transactions') carregarTransactions();
-        if (tab === 'nitrogames') carregarNitroBalance();
+        if (tab === 'rapidverse') carregarRapidverseModo();
+        if (tab === 'catalogo') carregarCatalogo();
         if (tab === 'withdraws') carregarWithdraws();
         if (tab === 'audit') carregarAudit();
         if (tab === 'promo') carregarPromo();
         if (tab === 'marketing') carregarMarketing();
         if (tab === 'events') window.carregarTema();
-        if (tab === 'settings') { fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? window.ZKN_CONFIG.api : 'https://zknbet-api.gabrielrobin63.workers.dev/api') + '/settings/telegram').then(r=>r.json()).then(d=>{ if(d.link) document.getElementById('telegramLinkInput').value = d.link; }); }
-        if (tab === 'promo') carregarPromo();
-        if (tab === 'marketing') carregarMarketing();
-        if (tab === 'events') window.carregarTema();
-        if (tab === 'settings') { fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? window.ZKN_CONFIG.api : 'https://zknbet-api.gabrielrobin63.workers.dev/api') + '/settings/telegram').then(r=>r.json()).then(d=>{ if(d.link) document.getElementById('telegramLinkInput').value = d.link; }); }
-        if (tab === 'promo') carregarPromo();
-        if (tab === 'marketing') carregarMarketing();
-        if (tab === 'events') window.carregarTema();
-        if (tab === 'settings') { fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? window.ZKN_CONFIG.api : 'https://zknbet-api.gabrielrobin63.workers.dev/api') + '/settings/telegram').then(r=>r.json()).then(d=>{ if(d.link) document.getElementById('telegramLinkInput').value = d.link; }); }
-        if (tab === 'promo') carregarPromo();
-        if (tab === 'marketing') carregarMarketing();
-        if (tab === 'events') window.carregarTema();
-        if (tab === 'settings') { fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? window.ZKN_CONFIG.api : 'https://zknbet-api.gabrielrobin63.workers.dev/api') + '/settings/telegram').then(r=>r.json()).then(d=>{ if(d.link) document.getElementById('telegramLinkInput').value = d.link; }); }
+        if (tab === 'settings') carregarTelegram();
       };
     });
 
@@ -890,6 +936,8 @@
         </tr>
       `).join('');
     }
+    document.getElementById('userSearch').addEventListener('input', renderUsers);
+
     async function ajustarSaldo(uid, nome, saldoAtual) {
       const backdrop = document.createElement('div');
       backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -924,10 +972,10 @@
         const reason = backdrop.querySelector('#inpMotivo').value.trim();
         if (!amount || amount <= 0) { toast('Valor invalido', 'Digite um valor maior que zero', 'error'); return; }
         if (action === 'remove' && amount > saldoAtual) { toast('Saldo insuficiente', 'O usuario so tem ' + fmtBRL(saldoAtual), 'error'); return; }
-        
+
         btnConfirm.disabled = true;
         btnConfirm.textContent = 'Processando...';
-        
+
         try {
           await api('/admin/users/' + uid + '/balance', { method: 'PUT', body: JSON.stringify({ amount, action, reason }) });
           toast(action === 'add' ? 'Saldo adicionado' : 'Saldo removido', fmtBRL(amount) + ' ' + (action === 'add' ? 'creditado' : 'debitado'), 'success');
@@ -960,13 +1008,194 @@
       } catch (e) { toast('Erro', e.message, 'error'); }
     }
 
-    // ---------- NITROGAMES ----------
-    async function carregarNitroBalance() {
+    // ---------- RAPIDVERSE ----------
+    function pintarModoRapidverse(mode) {
+      const real = mode === 'real';
+      const el = document.getElementById('rvModoAtual');
+      el.textContent = real ? 'REAL' : 'DEMO';
+      el.style.color = real ? 'var(--green)' : 'var(--gold)';
+      document.getElementById('btnRvReal').style.opacity = real ? '0.5' : '1';
+      document.getElementById('btnRvDemo').style.opacity = real ? '1' : '0.5';
+    }
+
+    async function carregarRapidverseModo() {
       try {
-        const d = await api('/admin/nitrogames/balance');
-        document.getElementById('statNitroBalance').textContent = JSON.stringify(d.balance || {});
+        const d = await api('/admin/settings/rapidverse-mode');
+        pintarModoRapidverse(d.mode);
       } catch (e) { toast('Erro', e.message, 'error'); }
     }
+
+    async function definirModoRapidverse(mode) {
+      if (mode === 'real' && !confirm('Colocar em modo REAL? Os jogos vão usar o saldo de verdade dos jogadores.')) return;
+      try {
+        const d = await api('/admin/settings/rapidverse-mode', { method: 'PUT', body: JSON.stringify({ mode }) });
+        pintarModoRapidverse(d.mode);
+        toast('Modo alterado', 'Agora está em ' + d.mode.toUpperCase(), 'success');
+      } catch (e) { toast('Erro', e.message, 'error'); }
+    }
+
+    // ---------- CATALOGO (jogos e provedoras) ----------
+    function esc(v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, function(c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function enc(v) { return encodeURIComponent(v); }
+
+    async function carregarCatalogo() {
+      await carregarProvedoras();
+      await carregarJogosAdmin();
+    }
+
+    async function carregarProvedoras() {
+      const tb = document.getElementById('provTable');
+      try {
+        const d = await api('/admin/rapidverse/providers');
+        const list = d.providers || [];
+
+        document.getElementById('vendorList').innerHTML = list.map(p => '<option value="' + esc(p.vendor_code) + '">').join('');
+        const sel = document.getElementById('jogoFiltroVendor');
+        const atual = sel.value;
+        sel.innerHTML = '<option value="">Todas as provedoras</option>' +
+          list.map(p => '<option value="' + esc(p.vendor_code) + '">' + esc(p.name) + ' (' + p.jogos + ')</option>').join('');
+        sel.value = atual;
+
+        if (!list.length) {
+          tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Nenhuma provedora ainda.</td></tr>';
+          return;
+        }
+        tb.innerHTML = list.map(p => {
+          const ativo = Number(p.active) === 1;
+          return '<tr>' +
+            '<td data-label="Código"><strong>' + esc(p.vendor_code) + '</strong></td>' +
+            '<td data-label="Nome exibido">' + esc(p.name) + '</td>' +
+            '<td data-label="Jogos">' + p.jogos + '</td>' +
+            '<td data-label="Status">' + (ativo ? '<span class="badge completed">Visível</span>' : '<span class="badge withdraw">Oculta</span>') + '</td>' +
+            '<td>' +
+              '<button class="admin-btn secondary" style="padding:6px 10px;font-size:11px;margin-right:4px;" data-act="prov-toggle" data-vendor="' + esc(p.vendor_code) + '" data-name="' + esc(p.name) + '" data-active="' + (ativo ? 0 : 1) + '">' + (ativo ? 'Ocultar' : 'Mostrar') + '</button>' +
+              '<button class="admin-btn danger" style="padding:6px 10px;font-size:11px;" data-act="prov-del" data-vendor="' + esc(p.vendor_code) + '" data-jogos="' + p.jogos + '">Excluir</button>' +
+            '</td></tr>';
+        }).join('');
+      } catch (e) {
+        tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--red);">Erro: ' + esc(e.message) + '</td></tr>';
+      }
+    }
+
+    async function carregarJogosAdmin() {
+      const tb = document.getElementById('jogosTable');
+      const q = document.getElementById('jogoBusca').value.trim();
+      const vendor = document.getElementById('jogoFiltroVendor').value;
+      const params = new URLSearchParams({ limit: '300' });
+      if (q) params.set('q', q);
+      if (vendor) params.set('vendor', vendor);
+      try {
+        const d = await api('/admin/rapidverse/games?' + params.toString());
+        const list = d.games || [];
+        document.getElementById('jogosTotal').textContent = '(' + (d.total || 0) + (d.total > list.length ? ', mostrando ' + list.length + ' — use a busca ou o filtro' : '') + ')';
+        if (!list.length) {
+          tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Nenhum jogo encontrado.</td></tr>';
+          return;
+        }
+        tb.innerHTML = list.map(j => {
+          const ativo = Number(j.active) === 1;
+          const capa = j.image_url ? '<img src="' + esc(j.image_url) + '" style="width:44px;height:44px;object-fit:cover;border-radius:6px;" onerror="this.style.display=\'none\'">' : '<span style="color:var(--text-muted);">-</span>';
+          return '<tr>' +
+            '<td data-label="Capa">' + capa + '</td>' +
+            '<td data-label="Nome"><strong>' + esc(j.game_name) + '</strong></td>' +
+            '<td data-label="Provedora">' + esc(j.vendor_code) + '</td>' +
+            '<td data-label="Código" style="font-size:11px;word-break:break-all;">' + esc(j.game_code) + '</td>' +
+            '<td data-label="Status">' + (ativo ? '<span class="badge completed">Visível</span>' : '<span class="badge withdraw">Oculto</span>') + '</td>' +
+            '<td>' +
+              '<button class="admin-btn secondary" style="padding:6px 10px;font-size:11px;margin-right:4px;" data-act="game-toggle" data-vendor="' + esc(j.vendor_code) + '" data-code="' + esc(j.game_code) + '" data-active="' + (ativo ? 0 : 1) + '">' + (ativo ? 'Ocultar' : 'Mostrar') + '</button>' +
+              '<button class="admin-btn danger" style="padding:6px 10px;font-size:11px;" data-act="game-del" data-vendor="' + esc(j.vendor_code) + '" data-code="' + esc(j.game_code) + '" data-nome="' + esc(j.game_name) + '">Remover</button>' +
+            '</td></tr>';
+        }).join('');
+      } catch (e) {
+        tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--red);">Erro: ' + esc(e.message) + '</td></tr>';
+      }
+    }
+
+    // Cliques nos botoes das tabelas (delegacao)
+    document.getElementById('tab-catalogo').addEventListener('click', async function(ev) {
+      const btn = ev.target.closest('[data-act]');
+      if (!btn) return;
+      const act = btn.dataset.act;
+      try {
+        if (act === 'prov-toggle') {
+          await api('/admin/rapidverse/providers/' + enc(btn.dataset.vendor), { method: 'PUT', body: JSON.stringify({ active: btn.dataset.active === '1', name: btn.dataset.name }) });
+          toast('Provedora atualizada', '', 'success');
+          await carregarProvedoras();
+        } else if (act === 'prov-del') {
+          const n = btn.dataset.jogos;
+          if (!confirm('Excluir a provedora ' + btn.dataset.vendor + ' e os ' + n + ' jogos dela? Não dá pra desfazer.')) return;
+          const d = await api('/admin/rapidverse/providers/' + enc(btn.dataset.vendor), { method: 'DELETE' });
+          toast('Provedora excluída', d.jogos_removidos + ' jogos removidos', 'success');
+          await carregarCatalogo();
+        } else if (act === 'game-toggle') {
+          await api('/admin/rapidverse/games/' + enc(btn.dataset.vendor) + '/' + enc(btn.dataset.code), { method: 'PUT', body: JSON.stringify({ active: btn.dataset.active === '1' }) });
+          toast('Jogo atualizado', '', 'success');
+          await carregarJogosAdmin();
+        } else if (act === 'game-del') {
+          if (!confirm('Remover o jogo "' + btn.dataset.nome + '"? Não dá pra desfazer.')) return;
+          await api('/admin/rapidverse/games/' + enc(btn.dataset.vendor) + '/' + enc(btn.dataset.code), { method: 'DELETE' });
+          toast('Jogo removido', '', 'success');
+          await carregarCatalogo();
+        }
+      } catch (e) { toast('Erro', e.message, 'error'); }
+    });
+
+    document.getElementById('btnAddProv').onclick = async function() {
+      const vendor = document.getElementById('provCodigo').value.trim();
+      const name = document.getElementById('provNome').value.trim();
+      if (!vendor) return toast('Erro', 'Informe o código da provedora.', 'error');
+      const btn = this; btn.disabled = true;
+      try {
+        await api('/admin/rapidverse/providers', { method: 'POST', body: JSON.stringify({ vendor_code: vendor, name: name || vendor }) });
+        toast('Provedora salva', '', 'success');
+        document.getElementById('provCodigo').value = '';
+        document.getElementById('provNome').value = '';
+        await carregarProvedoras();
+      } catch (e) { toast('Erro', e.message, 'error'); }
+      btn.disabled = false;
+    };
+
+    document.getElementById('btnAddJogo').onclick = async function() {
+      const nome = document.getElementById('jogoNome').value.trim();
+      const codigo = document.getElementById('jogoCodigo').value.trim();
+      const vendor = document.getElementById('jogoVendor').value.trim();
+      const vgc = document.getElementById('jogoVgc').value.trim();
+      const arquivo = document.getElementById('jogoCapaArquivo').files[0];
+      let capaUrl = document.getElementById('jogoCapaUrl').value.trim();
+      if (!nome || !codigo || !vendor) return toast('Erro', 'Preencha nome, código do jogo e provedora.', 'error');
+
+      const btn = this; btn.disabled = true; btn.textContent = 'Salvando...';
+      try {
+        if (arquivo) {
+          const fd = new FormData();
+          fd.append('image', arquivo);
+          const r = await fetch(API + '/admin/rapidverse/upload-cover', { method: 'POST', headers: { 'Authorization': 'Bearer ' + adminToken }, body: fd });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error(j.message || 'Falha ao enviar a capa');
+          capaUrl = j.image_url;
+        }
+        await api('/admin/rapidverse/games', { method: 'POST', body: JSON.stringify({
+          game_name: nome, game_code: codigo, vendor_code: vendor,
+          vendor_game_code: vgc || null, image_url: capaUrl || null,
+        }) });
+        toast('Jogo salvo', nome, 'success');
+        ['jogoNome', 'jogoCodigo', 'jogoVgc', 'jogoCapaUrl'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('jogoCapaArquivo').value = '';
+        await carregarCatalogo();
+      } catch (e) { toast('Erro', e.message, 'error'); }
+      btn.disabled = false; btn.textContent = 'Salvar jogo';
+    };
+
+    let _buscaJogoTimer = null;
+    document.getElementById('jogoBusca').addEventListener('input', function() {
+      clearTimeout(_buscaJogoTimer);
+      _buscaJogoTimer = setTimeout(carregarJogosAdmin, 300);
+    });
+    document.getElementById('jogoFiltroVendor').addEventListener('change', carregarJogosAdmin);
 
     // ---------- AUDIT ----------
     async function carregarAudit() {
@@ -985,6 +1214,7 @@
         `).join('');
       } catch (e) { toast('Erro', e.message, 'error'); }
     }
+
     // ---------- SAQUES PENDENTES ----------
     async function carregarWithdraws() {
       try {
@@ -1047,11 +1277,9 @@
       }
     }
 
-    
     // ---------- Renderiza celula de rollover ----------
     function renderRollover(u) {const saldo=Number(u.balance||0);const dep=Number(u.deposited||0);const betSince=Number(u.bet_since_deposit||0);if(saldo<=0)return '<span style="color:var(--text-muted);font-size:11px;">sem saldo</span>';if(dep===0)return '<span style="color:var(--text-muted);font-size:11px;">sem deposito</span>';const req=dep*0.60;const falta=Math.max(0,req-betSince);const pct=Math.min(100,Math.round((betSince/req)*100));if(falta===0)return '<span class="badge completed">OK '+pct+'%</span>';return '<span class="badge pending">'+pct+'% falta '+fmtBRL(falta)+'</span>';}
 
-    
     if (adminToken && adminUser) {
       entrarNoPainel();
     }
@@ -1060,8 +1288,9 @@
     document.getElementById('adminPassword').addEventListener('keypress', e => {
       if (e.key === 'Enter') document.getElementById('btnLogin').click();
     });
-      // ============================================================
-    // PROMO CODES: EVENTO DO BOTAO (injetado manualmente)
+
+    // ============================================================
+    // PROMO CODES: evento do botao
     // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
       var btnCriar = document.getElementById('btnCriarPromo');
@@ -1106,8 +1335,9 @@
         toast('Erro', e.message, 'error');
       }
     };
+
     // ============================================================
-    // MARKETING: Evento do botão de enviar banner
+    // MARKETING: evento do botão de enviar banner
     // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
       var btnEnviar = document.getElementById('btnEnviarBanner');
@@ -1116,29 +1346,29 @@
           var fileInput = document.getElementById('marketingImage');
           var link = document.getElementById('marketingLink').value.trim();
           var type = document.getElementById('marketingType').value;
-          
+
           if (!fileInput.files.length) {
             toast('Erro', 'Selecione ao menos uma imagem.', 'error');
             return;
           }
-          
+
           btnEnviar.disabled = true;
           btnEnviar.textContent = 'Enviando ' + fileInput.files.length + '...';
-          
+
           try {
             for (var i = 0; i < fileInput.files.length; i++) {
               var formData = new FormData();
               formData.append('image', fileInput.files[i]);
               formData.append('link', link);
               formData.append('type', type);
-              
+
               await fetch(API + '/admin/marketing/upload', {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + adminToken },
                 body: formData
               });
             }
-            
+
             toast('Sucesso', 'Banners enviados!', 'success');
             document.getElementById('marketingImage').value = '';
             document.getElementById('marketingLink').value = '';
@@ -1153,15 +1383,16 @@
       }
     });
 
-window.editarLinkBanner = async function(id) {
-  const linkAtual = prompt('Digite o novo link (deixe vazio para remover):');
-  if (linkAtual === null) return;
-  try {
-    await api('/admin/marketing/link/' + id, { method: 'PUT', body: JSON.stringify({ link: linkAtual.trim() }) });
-    toast('Link atualizado', '', 'success');
-    carregarMarketing();
-  } catch (e) { toast('Erro', e.message, 'error'); }
-};
+    window.editarLinkBanner = async function(id) {
+      const linkAtual = prompt('Digite o novo link (deixe vazio para remover):');
+      if (linkAtual === null) return;
+      try {
+        await api('/admin/marketing/link/' + id, { method: 'PUT', body: JSON.stringify({ link: linkAtual.trim() }) });
+        toast('Link atualizado', '', 'success');
+        carregarMarketing();
+      } catch (e) { toast('Erro', e.message, 'error'); }
+    };
+
     window.deletarBanner = async function(id) {
       if (!confirm('Excluir este banner?')) return;
       try {
@@ -1170,7 +1401,6 @@ window.editarLinkBanner = async function(id) {
         carregarMarketing();
       } catch (e) { toast('Erro', e.message, 'error'); }
     };
-</script>
+  </script>
 </body>
 </html>
-
