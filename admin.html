@@ -697,13 +697,52 @@
 
       <!-- CONFIGURAÇÕES -->
       <div id="tab-settings" class="tab-content hidden">
-        <div style="background:var(--bg-2); padding:24px; border-radius:12px; border:1px solid var(--border); max-width:600px;">
+        <div style="background:var(--bg-2); padding:24px; border-radius:12px; border:1px solid var(--border); max-width:680px;">
           <h3 style="font-family:var(--font-display); font-size:18px; margin-bottom:8px;">Link do Suporte (Telegram)</h3>
           <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Cole o link do seu grupo ou canal do Telegram.</p>
           <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
             <input type="text" id="telegramLinkInput" class="admin-input" placeholder="https://t.me/seu_grupo" style="flex:1;min-width:220px;">
             <button class="admin-btn" id="btnSalvarTelegram">Salvar Link</button>
           </div>
+        </div>
+
+        <div style="background:var(--bg-2); padding:24px; border-radius:12px; border:1px solid var(--border); max-width:680px; margin-top:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+            <h3 style="font-family:var(--font-display); font-size:18px;">Gateway PIX (SigiloPay)</h3>
+            <span id="sigiloSourceBadge" class="badge">Carregando...</span>
+          </div>
+          <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Teste a conexão com a SigiloPay ou atualize as chaves da API pelo painel sem mexer no servidor.</p>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:6px;">URL do Webhook (cadastre no painel da SigiloPay)</label>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <input type="text" id="sigiloWebhookUrl" class="admin-input" readonly style="flex:1; min-width:220px; font-family:monospace; font-size:12px;">
+              <button type="button" class="admin-btn secondary" id="btnCopiarWebhookSigilo">Copiar URL</button>
+            </div>
+          </div>
+
+          <div style="display:grid; gap:12px; margin-bottom:16px;">
+            <div>
+              <label for="sigiloPublicInput" style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:6px;">Public Key (x-public-key)</label>
+              <input type="text" id="sigiloPublicInput" class="admin-input" placeholder="Cole a Public Key da SigiloPay">
+            </div>
+            <div>
+              <label for="sigiloSecretInput" style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:6px;">Secret Key (x-secret-key)</label>
+              <input type="password" id="sigiloSecretInput" class="admin-input" placeholder="Em branco mantém a chave atual configurada">
+            </div>
+            <div>
+              <label for="sigiloWebhookTokenInput" style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:6px;">Webhook Token (opcional)</label>
+              <input type="password" id="sigiloWebhookTokenInput" class="admin-input" placeholder="Token do webhook na SigiloPay (em branco mantém o atual)">
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="admin-btn secondary" id="btnTestarSigilo">Testar Gateway PIX</button>
+            <button type="button" class="admin-btn" id="btnSalvarSigilo">Salvar Credenciais</button>
+            <button type="button" class="admin-btn danger" id="btnResetSigilo">Usar Padrão do Servidor</button>
+          </div>
+
+          <div id="sigiloDiagBox" style="display:none; margin-top:16px; padding:14px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.25); font-size:13px; line-height:1.6;"></div>
         </div>
       </div>
 
@@ -1058,6 +1097,131 @@
       }).catch(() => {});
     }
 
+    // ============================================================
+    // CONFIGURAÇÕES (Gateway PIX / SigiloPay)
+    // ============================================================
+    async function carregarSigiloSettings() {
+      const badge = document.getElementById('sigiloSourceBadge');
+      const diagBox = document.getElementById('sigiloDiagBox');
+      if (diagBox) diagBox.style.display = 'none';
+      try {
+        const d = await api('/admin/settings/sigilopay');
+        document.getElementById('sigiloPublicInput').value = d.public_key || '';
+        document.getElementById('sigiloSecretInput').value = '';
+        document.getElementById('sigiloWebhookTokenInput').value = '';
+        document.getElementById('sigiloSecretInput').placeholder = d.has_secret
+          ? `Atual: ${d.secret_preview} (em branco mantém)`
+          : 'Cole a Secret Key';
+        document.getElementById('sigiloWebhookTokenInput').placeholder = d.has_webhook_token
+          ? 'Webhook Token já configurado (em branco mantém)'
+          : 'Cole o Webhook Token (opcional)';
+        document.getElementById('sigiloWebhookUrl').value = d.webhook_url || (API + '/webhook/sigilopay');
+        if (badge) {
+          badge.className = 'badge ' + (d.custom_keys ? 'completed' : 'deposit');
+          badge.textContent = d.custom_keys ? 'Customizado no Painel' : 'Padrão do Servidor';
+        }
+      } catch (e) {
+        if (badge) {
+          badge.className = 'badge withdraw';
+          badge.textContent = 'Erro ao carregar';
+        }
+        toast('Erro', e.message, 'error');
+      }
+    }
+
+    document.getElementById('btnCopiarWebhookSigilo').onclick = async function() {
+      const val = document.getElementById('sigiloWebhookUrl').value;
+      if (!val) return;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(val);
+        } else {
+          const inp = document.getElementById('sigiloWebhookUrl');
+          inp.select();
+          document.execCommand('copy');
+        }
+        toast('Copiado!', 'URL do webhook SigiloPay copiada.', 'success');
+      } catch {
+        toast('Atenção', 'Copie manualmente a URL exibida no campo.', 'warning');
+      }
+    };
+
+    document.getElementById('btnTestarSigilo').onclick = async function() {
+      const btn = this;
+      const box = document.getElementById('sigiloDiagBox');
+      btn.disabled = true;
+      btn.textContent = 'Testando...';
+      box.style.display = 'block';
+      box.innerHTML = 'Consultando API da SigiloPay...';
+      try {
+        const d = await api('/admin/settings/sigilopay/test', { method: 'POST' });
+        const authLine = d.auth_ok
+          ? `<div style="color:var(--green);">✅ <strong>Autenticação OK</strong> (HTTP ${esc(d.auth_status)}) — Saldo na SigiloPay: <strong>${fmtBRL(d.balance?.available)}</strong> (Pendente: ${fmtBRL(d.balance?.pending)})</div>`
+          : `<div style="color:var(--red);">❌ <strong>Falha na autenticação</strong> (HTTP ${esc(d.auth_status)}) — verifique Public Key e Secret Key.</div>`;
+
+        let pixLine = '';
+        if (d.pix_ok) {
+          pixLine = `<div style="color:var(--green);margin-top:6px;">✅ <strong>Geração PIX OK</strong> — A adquirente gerou o QR Code de teste normalmente.</div>`;
+        } else {
+          const isSmartRouting = d.error_code === 'GATEWAY_ACQUIRER_ERROR' || /AISmartRouting|Nenhuma integra/i.test(d.upstream_message || '');
+          pixLine = `
+            <div style="color:var(--red);margin-top:6px;">❌ <strong>Falha ao gerar QR Code PIX</strong> (HTTP ${esc(d.pix_status)}${d.error_code ? ' · ' + esc(d.error_code) : ''})</div>
+            <div style="margin-top:4px;color:var(--text-muted);word-break:break-word;">Resposta SigiloPay: <code>${esc(d.upstream_message || 'Erro desconhecido')}</code></div>
+            ${isSmartRouting ? '<div style="margin-top:8px;padding:10px;border-radius:6px;background:rgba(245,190,60,0.12);border:1px solid rgba(245,190,60,0.35);color:var(--gold);">⚠️ Suas chaves autenticaram, mas nenhuma adquirente PIX está ativa no bloco <strong>AI Smart Routing</strong> dentro do painel da SigiloPay. Acesse <strong>app.sigilopay.com.br → Adquirentes / Smart Routing</strong> e ative uma integração PIX, ou salve chaves de outra conta acima.</div>' : ''}
+          `;
+        }
+        box.innerHTML = authLine + pixLine;
+      } catch (e) {
+        box.innerHTML = `<div style="color:var(--red);">❌ Erro ao executar diagnóstico: ${esc(e.message)}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Testar Gateway PIX';
+      }
+    };
+
+    document.getElementById('btnSalvarSigilo').onclick = async function() {
+      const public_key = document.getElementById('sigiloPublicInput').value.trim();
+      const secret_key = document.getElementById('sigiloSecretInput').value.trim();
+      const webhook_token = document.getElementById('sigiloWebhookTokenInput').value.trim();
+      if (!public_key) return toast('Erro', 'Informe a Public Key.', 'error');
+      const btn = this;
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+      try {
+        await api('/admin/settings/sigilopay', {
+          method: 'POST',
+          body: JSON.stringify({ public_key, secret_key, webhook_token }),
+        });
+        toast('Credenciais salvas!', 'Testando o gateway recomendado.', 'success');
+        await carregarSigiloSettings();
+      } catch (e) {
+        toast('Erro', e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Salvar Credenciais';
+      }
+    };
+
+    document.getElementById('btnResetSigilo').onclick = async function() {
+      if (!confirm('Remover as chaves customizadas do painel e voltar a usar o padrão configurado no Cloudflare Worker?')) return;
+      const btn = this;
+      btn.disabled = true;
+      btn.textContent = 'Restaurando...';
+      try {
+        await api('/admin/settings/sigilopay', {
+          method: 'POST',
+          body: JSON.stringify({ reset: true }),
+        });
+        toast('Restaurado!', 'Usando as chaves padrão do servidor.', 'success');
+        await carregarSigiloSettings();
+      } catch (e) {
+        toast('Erro', e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Usar Padrão do Servidor';
+      }
+    };
+
     function entrarNoPainel() {
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('adminPanel').classList.remove('hidden');
@@ -1088,7 +1252,7 @@
         if (tab === 'promo') carregarPromo();
         if (tab === 'marketing') carregarMarketing();
         if (tab === 'events') window.carregarTema();
-        if (tab === 'settings') carregarTelegram();
+        if (tab === 'settings') { carregarTelegram(); carregarSigiloSettings(); }
       };
     });
 

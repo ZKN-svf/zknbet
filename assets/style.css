@@ -2038,12 +2038,11 @@ html, body {
   color: var(--green);
   font-size: 13px;
   font-weight: 700;
+  line-height: 1.5;
   display: none;
-  align-items: center;
-  gap: 8px;
 }
 .deposito-bonus-preview.visible {
-  display: flex;
+  display: block;
 }
 
 /* Paginas legais / institucionais */
