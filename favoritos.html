@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Favoritos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,97 +11,6 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
-
-  <style>
-    /* Evita scroll horizontal acidental no mobile */
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    /* Carrossel Responsivo */
-    #carrosselBanners {
-      width: 100% !important;
-      max-width: 1000px !important;
-      margin: 24px auto 0 !important;
-      padding: 0 16px !important;
-      box-sizing: border-box;
-    }
-    .carrossel-wrapper {
-      max-width: 1280px;
-      margin: 0 auto;
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    #carrosselTrack {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      align-items: flex-start !important;
-      touch-action: pan-y !important;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: transform 0.5s ease;
-    }
-    #carrosselTrack > div {
-      flex: 0 0 100% !important;
-      min-width: 100% !important;
-      width: 100% !important;
-      cursor: pointer;
-    }
-    #carrosselTrack img {
-      width: 100% !important;
-      height: auto !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
-
-    /* Barra de busca responsiva */
-    .search-box-wrapper {
-      position: relative;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 420px;
-    }
-    .search-box-input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px 12px 44px;
-      background: var(--bg-2);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 16px;
-      outline: none;
-    }
-
-    /* Ajustes específicos para Mobile */
-    @media (max-width: 768px) {
-      #carrosselBanners {
-        margin-top: 14px !important;
-        padding: 0 12px !important;
-      }
-      .carrossel-wrapper {
-        border-radius: 12px;
-      }
-      .winners-ticker {
-        margin-top: 14px !important;
-      }
-      .search-box-wrapper {
-        max-width: 100%;
-        margin-bottom: 16px;
-      }
-      .section-header {
-        gap: 8px;
-      }
-      .section-title {
-        font-size: 18px;
-      }
-      .zkn-footer {
-        padding-bottom: 84px;
-      }
-    }
-  </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -109,11 +18,9 @@
   <section class="section">
     <div class="section-header">
       <h2 class="section-title"><span class="ico ico-star"></span> Meus favoritos</h2>
-      <a href="jogos.html" class="section-link">Adicionar mais →</a>
+      <a href="jogos.html" class="section-link">Adicionar mais &rarr;</a>
     </div>
-    <div class="games-carousel" id="favGrid">
-      <div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Carregando...</div>
-    </div>
+    <div class="games-carousel" id="favGrid"></div>
   </section>
 
   <section class="section" id="recentesSection" style="display:none;padding-top:0;">
@@ -125,7 +32,7 @@
 
   <footer class="zkn-footer">
     <div class="zkn-footer-inner">
-      <p><strong>ZKNbet</strong> © 2026 · Todos os direitos reservados</p>
+      <p><strong>ZKNbet</strong> &copy; 2026 &middot; Todos os direitos reservados</p>
       <p class="disclaimer">Proibido para menores de 18 anos. Jogue com responsabilidade.</p>
     </div>
   </footer>
@@ -145,7 +52,6 @@
 
     let ALL_GAMES = [];
 
-    // ---------- RENDER: FAVORITOS ----------
     function renderFavoritos() {
       const codes = (window.ZKNGamesLib && ZKNGamesLib.getFavoritos()) || [];
       const grid = document.getElementById('favGrid');
@@ -161,16 +67,14 @@
       }
 
       const jogos = codes.map(c => ALL_GAMES.find(j => j.game_code === c)).filter(Boolean);
-
       if (!jogos.length) {
-        grid.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Carregando jogos...</div>';
+        grid.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Nenhum favorito ativo encontrado.</div>';
         return;
       }
 
       ZKNGamesLib.renderGameSection(grid, jogos);
     }
 
-    // ---------- RENDER: RECENTES ----------
     function renderRecentes() {
       const codes = (window.ZKNGamesLib && ZKNGamesLib.getRecentes()) || [];
       const section = document.getElementById('recentesSection');
@@ -182,7 +86,6 @@
       }
 
       const jogos = codes.map(c => ALL_GAMES.find(j => j.game_code === c)).filter(Boolean);
-
       if (!jogos.length) {
         if (section) section.style.display = 'none';
         return;
@@ -192,13 +95,13 @@
       ZKNGamesLib.renderGameSection(grid, jogos);
     }
 
-    // ---------- CARREGAR ----------
     async function carregar() {
-      // Carrega jogos da API
+      if (window.ZKNGamesLib?.renderSkeletons) {
+        ZKNGamesLib.renderSkeletons(document.getElementById('favGrid'), 8);
+      }
       const res = await Rapidverse.listarJogos();
 
       if (res.sucesso) {
-        // Aplica providers reais
         ALL_GAMES = window.ZKNProviders ? window.ZKNProviders.aplicarProvidersReais(res.jogos) : res.jogos;
       } else {
         document.getElementById('favGrid').innerHTML =
@@ -207,15 +110,12 @@
         return;
       }
 
-      // Carrega favoritos e recentes do backend
       await Promise.all([ZKNGamesLib.carregarFavoritos(), ZKNGamesLib.carregarRecentes()]);
-
       renderFavoritos();
       renderRecentes();
     }
 
-    // ---------- HOOKS DE RE-RENDER ----------
-    window.__FAV_RERENDER__ = () => renderFavoritos();
+    window.__FAV_PAGE_RERENDER__ = () => renderFavoritos();
     window.__RECENTES_UPDATED__ = () => renderRecentes();
 
     carregar();

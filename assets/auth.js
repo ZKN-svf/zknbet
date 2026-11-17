@@ -21,9 +21,15 @@ function getUser() {
 }
 function setUser(u) { localStorage.setItem(AUTH_CONFIG.userKey, JSON.stringify(u)); }
 function isLoggedIn() { return !!getToken() && !!getUser(); }
+function sanitizeRedirect(back) {
+  const s = String(back || '').trim();
+  if (!s) return 'index.html';
+  if (/^[a-zA-Z0-9_-]+\.html(\?[a-zA-Z0-9_=&%.-]*)?$/.test(s)) return s;
+  return 'index.html';
+}
 function requireLogin(redirectTo = null) {
   if (!isLoggedIn()) {
-    const back = redirectTo || location.pathname.split('/').pop() || 'index.html';
+    const back = sanitizeRedirect(redirectTo || location.pathname.split('/').pop() || 'index.html');
     location.href = 'login.html?back=' + encodeURIComponent(back);
     return false;
   }
@@ -33,7 +39,8 @@ function requireLogin(redirectTo = null) {
 // ---------- HTTP ----------
 async function api(path, { method = 'GET', body, auth = true } = {}) {
   const headers = { 'Content-Type': 'application/json' };
-  if (auth) headers.Authorization = 'Bearer ' + (getToken() || '');
+  const token = auth ? getToken() : null;
+  if (auth) headers.Authorization = 'Bearer ' + (token || '');
   const res = await fetch(AUTH_CONFIG.apiBase + path, {
     method,
     headers,
@@ -41,6 +48,9 @@ async function api(path, { method = 'GET', body, auth = true } = {}) {
   });
   let data = {};
   try { data = await res.json(); } catch {}
+  if (auth && res.status === 401 && token) {
+    limparSessao();
+  }
   return { ok: res.ok, status: res.status, data };
 }
 
@@ -119,10 +129,12 @@ async function addRecente(code) {
 }
 
 // ---------- PIN de saque ----------
-async function salvarPinSaque({ pin, pixKey, pixKeyType, holderName, holderCpf }) {
-  const { ok, data } = await api('/saque-pin/setup', { method: 'POST', body: { pin, pixKey, pixKeyType, holderName, holderCpf } });
+async function salvarPinSaque({ pin, currentPin, pixKey, pixKeyType, holderName, holderCpf }) {
+  const body = { pin, pixKey, pixKeyType, holderName, holderCpf };
+  if (currentPin) body.currentPin = currentPin;
+  const { ok, data } = await api('/saque-pin/setup', { method: 'POST', body });
   if (!ok) return { sucesso: false, mensagem: data.message || 'Erro ao salvar.' };
-  const u = getUser(); u.hasWithdrawPin = true; setUser(u);
+  const u = getUser(); if (u) { u.hasWithdrawPin = true; setUser(u); }
   return { sucesso: true };
 }
 async function verificarPinSaque(pin) {
@@ -134,10 +146,20 @@ function temPinSaque() {
   return !!(u && u.hasWithdrawPin);
 }
 
-// ---------- Transações ----------
+// ---------- Transações / Apostas / Resumo ----------
 async function getTransacoes() {
   const { ok, data } = await api('/transactions');
   return ok ? (data.transactions || []) : [];
+}
+
+async function getApostas() {
+  const { ok, data } = await api('/me/bets');
+  return ok ? (data.bets || []) : [];
+}
+
+async function getResumo() {
+  const { ok, data } = await api('/me/summary');
+  return ok ? data : null;
 }
 
 // ---------- Indicação ----------
@@ -202,12 +224,12 @@ async function definirSenha(newPassword) {
 window.ZKNAuth = {
   CONFIG: AUTH_CONFIG,
   api,
-  register, login, logout,
+  register, login, logout, limparSessao, sanitizeRedirect,
   getUser, isLoggedIn, requireLogin, getToken, setUser,
   atualizarDados, alterarSenha, getSaldo,
   getFavoritos, addFavorito, removerFavorito, getRollover,
   getRecentes, addRecente,
   salvarPinSaque, verificarPinSaque, temPinSaque, getDadosSaque,
-  getTransacoes, getIndicacoes,
+  getTransacoes, getApostas, getResumo, getIndicacoes,
   loginGoogle, reenviarVerificacao, definirSenha,
 };

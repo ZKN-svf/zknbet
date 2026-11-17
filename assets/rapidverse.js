@@ -8,6 +8,11 @@
 
   var API = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || window.ZKN_API;
 
+  // Pastas de capas locais respeitando o casing exato do repositorio (Linux/Pages e case-sensitive)
+  var LOCAL_COVER_DIRS = {
+    pgsoft: 'img/PGsoft'
+  };
+
   var _lista = null;      // jogos normalizados
   var _porCode = {};      // game_code -> jogo
   var _pendente = null;   // promise em andamento (evita 2 fetch ao mesmo tempo)
@@ -20,7 +25,7 @@
       }
     } catch (e) {}
     try {
-      return localStorage.getItem('zkn_token') || localStorage.getItem('token') || '';
+      return localStorage.getItem('zkn_jwt') || localStorage.getItem('zkn_token') || localStorage.getItem('token') || '';
     } catch (e) {
       return '';
     }
@@ -35,16 +40,25 @@
       .trim() || 'Outra';
   }
 
+  function capaLocalDe(vendor, vgc) {
+    if (!vendor || !vgc) return '';
+    var dir = LOCAL_COVER_DIRS[String(vendor).toLowerCase()];
+    return dir ? dir + '/' + vgc + '.png' : '';
+  }
+
   function normalizar(j) {
     var vendor = j.vendor_code || '';
+    var localCover = capaLocalDe(vendor, j.vendor_game_code);
+    var customCover = j.image_url || '';
     return {
       game_code: j.game_code,
       name: j.name || '',
       vendor_code: vendor,
       vendor_game_code: j.vendor_game_code,
-      provider_name: nomeProvider(vendor),
-      // capa: usa image_url se existir, senao img/{vendor_game_code}.png
-      image_url: j.image_url || (j.vendor_game_code ? 'img/' + vendor + '/' + j.vendor_game_code + '.png' : ''),
+      provider_name: j.provider_name || nomeProvider(vendor),
+      // Prioriza image_url cadastrada no admin/R2; usa capa local como principal ou fallback
+      image_url: customCover || localCover,
+      fallback_image_url: customCover && localCover && customCover !== localCover ? localCover : '',
       game_type: j.game_type || '',
       rtp: j.rtp
     };
@@ -73,8 +87,17 @@
       return 0; // sort estavel: mantem a ordem alfabetica que veio do servidor
     });
   }
+
   function msgErro(d, padrao) {
     return (d && (d.mensagem || d.message || d.error)) || padrao;
+  }
+
+  function detectarPhonetype() {
+    try {
+      if (window.innerWidth <= 768) return '1';
+      if (/mobile|android|iphone|ipad|ipod/i.test(navigator.userAgent || '')) return '1';
+    } catch (e) {}
+    return '2';
   }
 
   function listarJogos(forcar) {
@@ -104,7 +127,7 @@
     return _pendente;
   }
 
-  // Provedoras derivadas da lista de jogos (a Rapidverse nao tem endpoint proprio)
+  // Provedoras derivadas da lista de jogos
   function listarProvedores() {
     return listarJogos().then(function (res) {
       if (!res.sucesso) return { sucesso: false, mensagem: res.mensagem, provedores: [] };
@@ -136,14 +159,18 @@
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token
         },
-        body: JSON.stringify({ game_code: j.game_code, vendor_code: j.vendor_code })
+        body: JSON.stringify({
+          game_code: j.game_code,
+          vendor_code: j.vendor_code,
+          phonetype: detectarPhonetype()
+        })
       })
         .then(function (r) {
           return r.json().catch(function () { return {}; }).then(function (d) {
             if (!r.ok || !d.launch_url) {
               return { sucesso: false, mensagem: msgErro(d, 'Erro ao abrir jogo.') };
             }
-            return { sucesso: true, launch_url: d.launch_url };
+            return { sucesso: true, launch_url: d.launch_url, mode: d.mode };
           });
         })
         .catch(function () {
@@ -159,8 +186,7 @@
   };
   window.Rapidverse = api;
 
-  // Mapeamento de provedoras: o provider ja vem certo (vendor_code),
-  // entao so devolve a lista recebida.
+  // Mapeamento de provedoras: o provider ja vem normalizado da API/rapidverse.js
   window.ZKNProviders = {
     aplicarProvidersReais: function (lista) { return lista || []; },
     providersUnicos: function (lista) {

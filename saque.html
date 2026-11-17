@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Saque PIX</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,97 +11,6 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
-
-  <style>
-    /* Evita scroll horizontal acidental no mobile */
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    /* Carrossel Responsivo */
-    #carrosselBanners {
-      width: 100% !important;
-      max-width: 1000px !important;
-      margin: 24px auto 0 !important;
-      padding: 0 16px !important;
-      box-sizing: border-box;
-    }
-    .carrossel-wrapper {
-      max-width: 1280px;
-      margin: 0 auto;
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    #carrosselTrack {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      align-items: flex-start !important;
-      touch-action: pan-y !important;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: transform 0.5s ease;
-    }
-    #carrosselTrack > div {
-      flex: 0 0 100% !important;
-      min-width: 100% !important;
-      width: 100% !important;
-      cursor: pointer;
-    }
-    #carrosselTrack img {
-      width: 100% !important;
-      height: auto !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
-
-    /* Barra de busca responsiva */
-    .search-box-wrapper {
-      position: relative;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 420px;
-    }
-    .search-box-input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px 12px 44px;
-      background: var(--bg-2);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 16px;
-      outline: none;
-    }
-
-    /* Ajustes específicos para Mobile */
-    @media (max-width: 768px) {
-      #carrosselBanners {
-        margin-top: 14px !important;
-        padding: 0 12px !important;
-      }
-      .carrossel-wrapper {
-        border-radius: 12px;
-      }
-      .winners-ticker {
-        margin-top: 14px !important;
-      }
-      .search-box-wrapper {
-        max-width: 100%;
-        margin-bottom: 16px;
-      }
-      .section-header {
-        gap: 8px;
-      }
-      .section-title {
-        font-size: 18px;
-      }
-      .zkn-footer {
-        padding-bottom: 84px;
-      }
-    }
-  </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -112,14 +21,13 @@
       <span class="val" data-balance>R$ 0,00</span>
     </div>
 
-    
     <!-- ROLLOVER (progresso de apostas obrigatorias) -->
     <div id="rolloverBox" style="display:none; background:var(--bg-2); border:1px solid var(--border-gold); border-radius:var(--radius); padding:16px 20px; margin-bottom:16px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
         <div>
           <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; font-weight:700;">Rollover exigido</div>
           <div style="font-size:13px; color:var(--text); margin-top:2px;">
-            Você precisa apostar <strong style="color:var(--gold);">100%</strong> dos seus depósitos para liberar o saque
+            Meta atual de apostas para liberar o saque: <strong id="rolloverRequired" style="color:var(--gold);">R$ 0,00</strong>
           </div>
         </div>
         <div style="font-size:24px; font-weight:900; color:var(--gold);" id="rolloverPct">0%</div>
@@ -137,9 +45,21 @@
       <div id="rolloverStatus" style="margin-top:12px; padding:10px; border-radius:8px; font-size:12px; text-align:center; display:none;">
       </div>
     </div>
-<div class="card" style="max-width:none;width:100%;">
+
+    <div class="card" style="max-width:none;width:100%;">
       <h1><span class="ico ico-cash"></span> Saque via PIX</h1>
       <p class="subtitle">Digite o valor e sua senha de 6 dígitos para confirmar.</p>
+
+      <div id="pixSummaryBox" style="display:none;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin:14px 0 6px;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div>
+            <span style="color:var(--text-muted);font-size:11px;text-transform:uppercase;font-weight:700;">Destino PIX cadastrado</span><br>
+            <strong id="pixSummaryVal" style="color:var(--text);"></strong>
+            <span id="pixSummaryType" style="color:var(--gold);font-size:11px;font-weight:700;margin-left:6px;text-transform:uppercase;"></span>
+          </div>
+          <a href="saque-primeiro-acesso.html" style="color:var(--gold);font-size:12px;font-weight:700;">Alterar PIX / PIN &rarr;</a>
+        </div>
+      </div>
 
       <label for="valorSaque">Valor do saque (R$)</label>
       <input type="number" id="valorSaque" placeholder="20,00" step="0.01" min="20" style="font-size:18px;font-weight:700;">
@@ -164,16 +84,22 @@
   <script>
     if (!ZKNAuth.requireLogin('saque.html')) throw new Error('redirecionado');
 
-    // Se ainda não tem PIN de saque, redireciona para configurar
     if (!ZKNAuth.temPinSaque()) {
       location.href = 'saque-primeiro-acesso.html';
       throw new Error('sem pin');
     }
 
-    // ---------- Saldo real ----------
     ZKNAuth.getSaldo();
+    let _pixCache = null;
+    ZKNAuth.getDadosSaque().then(dados => {
+      _pixCache = dados;
+      if (dados && dados.pixKey) {
+        document.getElementById('pixSummaryBox').style.display = 'block';
+        document.getElementById('pixSummaryVal').textContent = dados.pixKey;
+        document.getElementById('pixSummaryType').textContent = dados.pixKeyType || '';
+      }
+    }).catch(() => {});
 
-    // ---------- Helpers ----------
     function setStatus(tipo, msg) {
       const box = document.getElementById('statusBox');
       box.className = 'status-box active ' + tipo;
@@ -187,28 +113,25 @@
 
     const valorEl = document.getElementById('valorSaque');
     valorEl.addEventListener('input', () => {
-      // só limpa status anterior ao digitar de novo
       document.getElementById('statusBox').className = 'status-box';
     });
 
-    // ---------- Solicitar saque ----------
-    
-    // ---------- ROLLOVER ----------
     async function carregarRollover() {
       const r = await ZKNAuth.getRollover();
       const box = document.getElementById('rolloverBox');
       if (!r || !box) return;
 
-      // Se o usuario nunca depositou, esconde a caixa
-      if (!r.total_deposited || r.total_deposited === 0) {
+      if ((!r.required || r.required <= 0) && (!r.total_deposited || r.total_deposited === 0)) {
         box.style.display = 'none';
         return;
       }
 
       box.style.display = 'block';
+      const reqEl = document.getElementById('rolloverRequired');
+      if (reqEl) reqEl.textContent = ZKN.formatBRL(r.required || 0);
       document.getElementById('rolloverPct').textContent = r.percent + '%';
       document.getElementById('rolloverFill').style.width = r.percent + '%';
-      document.getElementById('rolloverBet').textContent = ZKN.formatBRL(r.total_bet);
+      document.getElementById('rolloverBet').textContent = ZKN.formatBRL(r.bet_since_deposit || 0);
       document.getElementById('rolloverRemaining').textContent = ZKN.formatBRL(r.remaining);
 
       const status = document.getElementById('rolloverStatus');
@@ -226,9 +149,9 @@
       }
     }
 
-    // Chama ao carregar
     carregarRollover();
-document.getElementById('btnSaque').onclick = async () => {
+
+    document.getElementById('btnSaque').onclick = async () => {
       const _u = ZKNAuth.getUser();
       if (_u && !_u.emailVerified) {
         return setStatus('error', '&#9888;&#65039; Verifique seu email antes de sacar. (olhe a caixa de spam) <a href="#" onclick="ZKN.reenviarEmail(this);return false;" style="color:var(--gold);">Reenviar link</a>');
@@ -237,9 +160,8 @@ document.getElementById('btnSaque').onclick = async () => {
       const valor = parseFloat(document.getElementById('valorSaque').value);
       const pin = pinEl.value;
 
-      // Validacoes ANTES de tocar no botao
       if (!valor || valor < 20) {
-        return setStatus('error', 'Valor minimo de saque: R$ 20,00.');
+        return setStatus('error', 'Valor mínimo de saque: R$ 20,00.');
       }
       if (valor > ZKN.ZKN_USER.balance) {
         return setStatus('error', `Saldo insuficiente. Você tem ${ZKN.formatBRL(ZKN.ZKN_USER.balance)}.`);
@@ -253,7 +175,6 @@ document.getElementById('btnSaque').onclick = async () => {
       setStatus('pending', 'Verificando PIN...');
 
       try {
-        // 1) Verifica PIN (timeout 15s)
         const pinOk = await Promise.race([
           ZKNAuth.verificarPinSaque(pin),
           new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout ao verificar PIN.')), 15000))
@@ -263,21 +184,19 @@ document.getElementById('btnSaque').onclick = async () => {
           return setStatus('error', ZKN.escapeHtml((pinOk && pinOk.mensagem) || 'PIN incorreto.'));
         }
 
-        // 2) Pega dados de saque
-        const dados = await ZKNAuth.getDadosSaque();
+        const dados = _pixCache && _pixCache.pixKey ? _pixCache : await ZKNAuth.getDadosSaque();
         if (!dados || !dados.pixKey) {
           return setStatus('error', 'Chave PIX não encontrada. Refaça o cadastro de saque.');
         }
 
-        btn.textContent = 'Enviando para SigiloPay...';
+        btn.textContent = 'Processando saque...';
         setStatus('pending', 'Processando saque...');
 
-        // 3) Cria transferencia (timeout 30s)
         const res = await Promise.race([
           SigiloPay.criarTransferencia(valor, dados.pixKey, {
             nome: dados.holderName,
             cpf: dados.holderCpf,
-          }),
+          }, dados.pixKeyType, pin),
           new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout ao processar saque.')), 30000))
         ]);
 
@@ -287,20 +206,21 @@ document.getElementById('btnSaque').onclick = async () => {
           ZKN.toast('Saque solicitado!', `${ZKN.formatBRL(valor)} em processamento.`);
           document.getElementById('valorSaque').value = '';
           pinEl.value = '';
+          carregarRollover();
+          ZKNAuth.getSaldo();
         } else {
-          // MOSTRA A MENSAGEM REAL (nao mais "Invalid request data" hardcoded)
           const msg = (res && res.mensagem) ? res.mensagem : 'Erro ao processar saque.';
           setStatus('error', ZKN.escapeHtml(msg));
           ZKN.toast('Erro no saque', msg, 'error');
-          console.log('[SAQUE] resposta completa:', JSON.stringify(res, null, 2));
         }
       } catch (e) {
-        setStatus('error', 'Erro: ' + ZKN.escapeHtml(e.message || 'Falha na conexao'));
-        ZKN.toast('Erro no saque', e.message || 'Verifique a conexao.', 'error');
+        setStatus('error', 'Erro: ' + ZKN.escapeHtml(e.message || 'Falha na conexão'));
+        ZKN.toast('Erro no saque', e.message || 'Verifique a conexão.', 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = 'Solicitar Saque';
       }
-    };</script>
+    };
+  </script>
 </body>
 </html>

@@ -134,25 +134,50 @@ function renderFavButton(gameCode) {
     (fav ? '★' : '☆') + '</button>';
 }
 
+function _onCoverError(img) {
+  var fb = img.getAttribute('data-fb');
+  if (fb && !img.dataset.tentou) {
+    img.dataset.tentou = '1';
+    img.src = fb;
+    return;
+  }
+  img.style.display = 'none';
+  if (img.parentNode && !img.parentNode.querySelector('.fallback-txt')) {
+    var span = document.createElement('span');
+    span.className = 'fallback-txt';
+    span.textContent = img.getAttribute('data-inicial') || '?';
+    span.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:bold;color:var(--gold);';
+    img.parentNode.appendChild(span);
+  }
+}
+
 // ---------- Render: card individual ----------
 function renderGameCard(j) {
   var capa = j.image_url || '';
+  var fallback = j.fallback_image_url || '';
   var inicial = (j.name || '?').charAt(0).toUpperCase();
   var nomeSafe = _esc(j.name);
   var providerSafe = _esc(j.provider_name || '');
 
   var coverHtml;
   if (capa) {
-    coverHtml = '<img src="' + _esc(capa) + '" alt="' + nomeSafe + '" loading="lazy" ' +
-      'onerror="this.style.display=\'none\';this.parentNode.insertBefore(document.createTextNode(\'' + _escAttr(inicial) + '\'),this.nextSibling)">';
+    coverHtml = '<img src="' + _esc(capa) + '" alt="' + nomeSafe + '" loading="lazy" decoding="async" ' +
+      'data-fb="' + _esc(fallback) + '" data-inicial="' + _esc(inicial) + '" ' +
+      'onerror="ZKNGamesLib._onCoverError(this)">';
   } else {
-    coverHtml = _esc(inicial);
+    coverHtml = '<span class="fallback-txt" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:bold;color:var(--gold);">' + _esc(inicial) + '</span>';
   }
+
+  var rtpVal = Number(j.rtp || 0);
+  var rtpBadge = (Number.isFinite(rtpVal) && rtpVal > 0)
+    ? '<span class="game-card-rtp">' + rtpVal.toFixed(1) + '% RTP</span>'
+    : '';
 
   return '<div class="game-card" onclick="ZKNGamesLib.abrirJogo(\'' + _escAttr(j.game_code) + '\', \'' + _escAttr(j.name) + '\')">' +
     renderFavButton(j.game_code) +
     '<div class="game-card-cover">' +
       coverHtml +
+      rtpBadge +
       '<div class="game-card-play"><div class="play-btn">&#9654;</div></div>' +
     '</div>' +
     '<div class="game-card-info">' +
@@ -160,6 +185,33 @@ function renderGameCard(j) {
       '<div class="game-card-provider">' + providerSafe + '</div>' +
     '</div>' +
   '</div>';
+}
+
+// ---------- Skeletons e Classificacao de categorias ----------
+function renderSkeletons(containerEl, count) {
+  if (!containerEl) return;
+  var n = Math.max(4, Math.min(24, Number(count || 12)));
+  var html = '';
+  for (var i = 0; i < n; i++) {
+    html += '<div class="skeleton-card" aria-hidden="true">' +
+      '<div class="skeleton-thumb"></div>' +
+      '<div class="skeleton-line"></div>' +
+      '<div class="skeleton-line short"></div>' +
+    '</div>';
+  }
+  containerEl.innerHTML = html;
+}
+
+function classificarCategoria(j) {
+  var tipo = String(j.game_type || '').toLowerCase();
+  var nome = String(j.name || '').toLowerCase();
+  if (/crash|instant|arcade|mine|plinko/.test(tipo) || /\b(aviator|spaceman|mines|plinko|crash|jetx|penalty|dice|goal|hi-?lo|limbo|keno)\b/.test(nome)) {
+    return 'crash';
+  }
+  if (/table|live|card|roulette|blackjack/.test(tipo) || /\b(roulette|roleta|blackjack|baccarat|poker|dragon tiger|sic bo|andar bahar|teen patti)\b/.test(nome)) {
+    return 'mesa';
+  }
+  return 'slots';
 }
 
 // ---------- Render: seção inteira ----------
@@ -173,36 +225,41 @@ function renderGameSection(containerEl, jogos) {
 }
 
 // ---------- Abrir jogo ----------
+let _abrindoJogo = false;
 async function abrirJogo(code, nome) {
   if (!window.ZKNAuth || !window.ZKNAuth.isLoggedIn()) {
     if (typeof ZKN !== 'undefined') ZKN.toast('Faça login', 'Entre para jogar.', 'warning');
     setTimeout(function() {
-      location.href = 'login.html?back=' + encodeURIComponent(location.pathname.split('/').pop());
+      location.href = 'login.html?back=' + encodeURIComponent(location.pathname.split('/').pop() || 'index.html');
     }, 800);
     return;
   }
+  if (_abrindoJogo) return;
+  _abrindoJogo = true;
 
-  await registrarRecente(code);
+  try {
+    // Registra recente sem bloquear a abertura do jogo se houver lentidao
+    registrarRecente(code).catch(function() {});
 
-  var user = window.ZKNAuth.getUser();
-  var email = '';
-  if (user && user.email) email = user.email;
-  else if (user && user.phone) email = user.phone + '@zknbet.com';
+    if (typeof ZKN !== 'undefined') ZKN.toast('Abrindo jogo...', nome || code);
 
-  if (typeof ZKN !== 'undefined') ZKN.toast('Abrindo jogo...', nome || code);
+    if (!window.Rapidverse || !window.Rapidverse.abrirJogo) {
+      if (typeof ZKN !== 'undefined') ZKN.toast('Erro', 'Rapidverse não carregou.', 'error');
+      return;
+    }
 
-  if (!window.Rapidverse || !window.Rapidverse.abrirJogo) {
-    if (typeof ZKN !== 'undefined') ZKN.toast('Erro', 'Rapidverse não carregou.', 'error');
-    return;
-  }
-
-  var res = await window.Rapidverse.abrirJogo(code, email);
-  if (res.sucesso && res.launch_url) {
-    // SOLUÇÃO FINAL: abrir em nova aba (fora do iframe)
-    // Isso resolve o problema de cookies de terceiros
-    if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) { window.ZKNGameFrame.abrir(res.launch_url, nome || code); } else { if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) { window.ZKNGameFrame.abrir(res.launch_url, nome || code); } else { window.open(res.launch_url, '_blank', 'noopener'); } }
-  } else if (typeof ZKN !== 'undefined') {
-    ZKN.toast("Erro ao abrir jogo", _traduzirMensagem(res.mensagem) || "Tente novamente.", "error");
+    var res = await window.Rapidverse.abrirJogo(code);
+    if (res.sucesso && res.launch_url) {
+      if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) {
+        window.ZKNGameFrame.abrir(res.launch_url, nome || code);
+      } else {
+        window.open(res.launch_url, '_blank', 'noopener');
+      }
+    } else if (typeof ZKN !== 'undefined') {
+      ZKN.toast('Erro ao abrir jogo', _traduzirMensagem(res.mensagem) || 'Tente novamente.', 'error');
+    }
+  } finally {
+    _abrindoJogo = false;
   }
 }
 
@@ -219,5 +276,8 @@ window.ZKNGamesLib = {
   renderFavButton: renderFavButton,
   renderGameCard: renderGameCard,
   renderGameSection: renderGameSection,
+  renderSkeletons: renderSkeletons,
+  classificarCategoria: classificarCategoria,
   abrirJogo: abrirJogo,
+  _onCoverError: _onCoverError,
 };

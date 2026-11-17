@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Ofertas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -86,11 +86,6 @@
       letter-spacing: -0.5px;
       margin-bottom: 16px;
     }
-    .offer-amount small {
-      font-size: 15px;
-      color: var(--text-muted);
-      font-weight: 700;
-    }
     .offer-bonus {
       display: flex;
       align-items: center;
@@ -125,11 +120,7 @@
       color: var(--text-muted);
       margin-top: 2px;
     }
-    .offers-loading {
-      text-align: center;
-      color: var(--text-muted);
-      padding: 40px;
-    }
+    .offers-loading,
     .offers-empty {
       text-align: center;
       color: var(--text-muted);
@@ -157,97 +148,6 @@
     @media (max-width: 480px) {
       .offers-grid { grid-template-columns: 1fr; }
       .offers-title { font-size: 26px; }
-    }
-  </style>
-
-  <style>
-    /* Evita scroll horizontal acidental no mobile */
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    /* Carrossel Responsivo */
-    #carrosselBanners {
-      width: 100% !important;
-      max-width: 1000px !important;
-      margin: 24px auto 0 !important;
-      padding: 0 16px !important;
-      box-sizing: border-box;
-    }
-    .carrossel-wrapper {
-      max-width: 1280px;
-      margin: 0 auto;
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    #carrosselTrack {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      align-items: flex-start !important;
-      touch-action: pan-y !important;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: transform 0.5s ease;
-    }
-    #carrosselTrack > div {
-      flex: 0 0 100% !important;
-      min-width: 100% !important;
-      width: 100% !important;
-      cursor: pointer;
-    }
-    #carrosselTrack img {
-      width: 100% !important;
-      height: auto !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
-
-    /* Barra de busca responsiva */
-    .search-box-wrapper {
-      position: relative;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 420px;
-    }
-    .search-box-input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px 12px 44px;
-      background: var(--bg-2);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 16px;
-      outline: none;
-    }
-
-    /* Ajustes específicos para Mobile */
-    @media (max-width: 768px) {
-      #carrosselBanners {
-        margin-top: 14px !important;
-        padding: 0 12px !important;
-      }
-      .carrossel-wrapper {
-        border-radius: 12px;
-      }
-      .winners-ticker {
-        margin-top: 14px !important;
-      }
-      .search-box-wrapper {
-        max-width: 100%;
-        margin-bottom: 16px;
-      }
-      .section-header {
-        gap: 8px;
-      }
-      .section-title {
-        font-size: 18px;
-      }
-      .zkn-footer {
-        padding-bottom: 84px;
-      }
     }
   </style>
 </head>
@@ -283,6 +183,13 @@
     </div>
   </div>
 
+  <footer class="zkn-footer">
+    <div class="zkn-footer-inner">
+      <p><strong>ZKNbet</strong> &copy; 2026 &middot; Todos os direitos reservados</p>
+      <p class="disclaimer">Proibido para menores de 18 anos. Jogue com responsabilidade.</p>
+    </div>
+  </footer>
+
   <script src="assets/loading.js"></script>
   <script src="assets/config.js"></script>
   <script src="assets/validators.js"></script>
@@ -290,18 +197,16 @@
   <script src="assets/app.js"></script>
   <script src="assets/bottom-nav.js"></script>
   <script>
-    if (!ZKNAuth.requireLogin('ofertas.html')) throw new Error('redirecionado');
-
     async function carregarOfertas() {
       try {
-        const r = await ZKNAuth.api('/deposit-bonus/list');
+        const r = await ZKNAuth.api('/deposit-bonus/list', { auth: false });
         if (!r.ok || !r.data.tiers) {
           document.getElementById('offersGrid').innerHTML = '<div class="offers-empty">Erro ao carregar ofertas.</div>';
           return;
         }
 
         const tiers = r.data.tiers;
-        const cfg = r.data.config;
+        const cfg = r.data.config || {};
 
         if (tiers.length === 0) {
           document.getElementById('offersGrid').innerHTML = '<div class="offers-empty">Nenhuma oferta disponível no momento.</div>';
@@ -310,15 +215,15 @@
 
         document.getElementById('offersGrid').innerHTML = tiers.map(t => {
           const pct = ((t.bonus_amount / t.deposit_amount) * 100).toFixed(1);
-          return '<a href="deposito.html?valor=' + t.deposit_amount + '" class="offer-card">' +
+          return '<a href="deposito.html?valor=' + encodeURIComponent(t.deposit_amount) + '" class="offer-card">' +
             '<div class="offer-deposit">Deposite</div>' +
-            '<div class="offer-amount">R$ ' + t.deposit_amount.toFixed(2).replace('.', ',') + '</div>' +
+            '<div class="offer-amount">R$ ' + Number(t.deposit_amount).toFixed(2).replace('.', ',') + '</div>' +
             '<div class="offer-bonus">' +
               '<div class="offer-bonus-icon">' +
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
               '</div>' +
               '<div>' +
-                '<div class="offer-bonus-text">Ganhe R$ ' + t.bonus_amount.toFixed(2).replace('.', ',') + '</div>' +
+                '<div class="offer-bonus-text">Ganhe R$ ' + Number(t.bonus_amount).toFixed(2).replace('.', ',') + '</div>' +
                 '<div class="offer-bonus-pct">' + pct + '% de bônus</div>' +
               '</div>' +
             '</div>' +
@@ -328,7 +233,7 @@
         const infoBox = document.getElementById('offersInfo');
         const infoText = document.getElementById('offersInfoText');
         infoBox.style.display = 'flex';
-        infoText.textContent = 'Rollover de ' + cfg.rollover_multiplier + 'x sobre o bônus' +
+        infoText.textContent = 'Rollover de ' + (cfg.rollover_multiplier || 5) + 'x sobre o bônus' +
           (cfg.first_deposit_only ? ' · Apenas no primeiro depósito' : ' · Válido em todos os depósitos');
       } catch (e) {
         console.error(e);
@@ -340,4 +245,3 @@
   </script>
 </body>
 </html>
-

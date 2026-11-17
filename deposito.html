@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Depósito PIX</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,97 +12,6 @@
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-  <style>
-    /* Evita scroll horizontal acidental no mobile */
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    /* Carrossel Responsivo */
-    #carrosselBanners {
-      width: 100% !important;
-      max-width: 1000px !important;
-      margin: 24px auto 0 !important;
-      padding: 0 16px !important;
-      box-sizing: border-box;
-    }
-    .carrossel-wrapper {
-      max-width: 1280px;
-      margin: 0 auto;
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    #carrosselTrack {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      align-items: flex-start !important;
-      touch-action: pan-y !important;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: transform 0.5s ease;
-    }
-    #carrosselTrack > div {
-      flex: 0 0 100% !important;
-      min-width: 100% !important;
-      width: 100% !important;
-      cursor: pointer;
-    }
-    #carrosselTrack img {
-      width: 100% !important;
-      height: auto !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
-
-    /* Barra de busca responsiva */
-    .search-box-wrapper {
-      position: relative;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 420px;
-    }
-    .search-box-input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px 12px 44px;
-      background: var(--bg-2);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 16px;
-      outline: none;
-    }
-
-    /* Ajustes específicos para Mobile */
-    @media (max-width: 768px) {
-      #carrosselBanners {
-        margin-top: 14px !important;
-        padding: 0 12px !important;
-      }
-      .carrossel-wrapper {
-        border-radius: 12px;
-      }
-      .winners-ticker {
-        margin-top: 14px !important;
-      }
-      .search-box-wrapper {
-        max-width: 100%;
-        margin-bottom: 16px;
-      }
-      .section-header {
-        gap: 8px;
-      }
-      .section-title {
-        font-size: 18px;
-      }
-      .zkn-footer {
-        padding-bottom: 84px;
-      }
-    }
-  </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -129,6 +38,8 @@
       <label for="valor">Ou digite outro valor</label>
       <input type="number" id="valor" placeholder="0,00" step="0.01" min="10" style="font-size:18px;font-weight:700;">
 
+      <div id="bonusPreview" class="deposito-bonus-preview"></div>
+
       <button id="btnGerar" class="btn-primary btn-block">Gerar QR Code PIX</button>
 
       <div class="qr-block" id="qrBlock">
@@ -136,7 +47,7 @@
           <div class="qr-frame" id="qrcode"></div>
           <div class="timer">
             <span>⏱</span>
-            <span id="timerText">30:00</span>
+            <span id="timerText">03:00</span>
           </div>
         </div>
         <div class="copia-cola">
@@ -148,6 +59,7 @@
           Aguardando pagamento...
         </div>
         <div class="progress-bar"><div class="progress-bar-fill" id="progressFill"></div></div>
+        <button id="btnVerificarPago" type="button" class="btn-secondary btn-block" style="margin-top:12px;">Já paguei — verificar agora</button>
       </div>
     </div>
   </div>
@@ -170,29 +82,72 @@
     let expiresAt = null;
     let saldoInicial = 0;
     let pixPago = false;
+    let bonusTiers = [];
+    let bonusConfig = null;
 
-    // Carrega saldo inicial
     ZKNAuth.getSaldo().then(s => { saldoInicial = s; });
 
-    // ---------- Quick valores ----------
+    function atualizarPreviewBonus() {
+      const box = document.getElementById('bonusPreview');
+      if (!box) return;
+      const v = parseFloat(document.getElementById('valor').value);
+      if (!v || !bonusTiers.length) {
+        box.classList.remove('visible');
+        return;
+      }
+      const match = [...bonusTiers]
+        .filter(t => Number(t.deposit_amount) <= v)
+        .sort((a, b) => Number(b.deposit_amount) - Number(a.deposit_amount))[0];
+      if (!match) {
+        const menor = [...bonusTiers].sort((a, b) => Number(a.deposit_amount) - Number(b.deposit_amount))[0];
+        if (menor) {
+          box.innerHTML = '🎁 Deposite a partir de <strong>' + ZKN.formatBRL(menor.deposit_amount) + '</strong> para ganhar <strong>+' + ZKN.formatBRL(menor.bonus_amount) + '</strong> de bônus!';
+          box.classList.add('visible');
+        } else {
+          box.classList.remove('visible');
+        }
+        return;
+      }
+      const rule = bonusConfig && Number(bonusConfig.first_deposit_only) === 1 ? ' (1º depósito)' : '';
+      box.innerHTML = '🎁 Este valor libera <strong>+' + ZKN.formatBRL(match.bonus_amount) + '</strong> de bônus' + rule + ' em <a href="recompensas.html" style="color:var(--gold);text-decoration:underline;">Recompensas</a>!';
+      box.classList.add('visible');
+    }
+
+    ZKNAuth.api('/deposit-bonus/list', { auth: false }).then(r => {
+      if (r.ok && r.data && Array.isArray(r.data.tiers)) {
+        bonusTiers = r.data.tiers;
+        bonusConfig = r.data.config || null;
+        atualizarPreviewBonus();
+      }
+    }).catch(() => {});
+
     document.querySelectorAll('#quickValores button').forEach(b => {
       b.onclick = () => {
         document.querySelectorAll('#quickValores button').forEach(x => x.classList.remove('active'));
         b.classList.add('active');
         document.getElementById('valor').value = b.dataset.valor;
+        atualizarPreviewBonus();
       };
     });
 
     document.getElementById('valor').addEventListener('input', () => {
       document.querySelectorAll('#quickValores button').forEach(x => x.classList.remove('active'));
+      atualizarPreviewBonus();
     });
 
-    // ---------- Helpers ----------
+    (function () {
+      const vParam = parseFloat(new URLSearchParams(location.search).get('valor'));
+      if (vParam && vParam >= 10) {
+        document.getElementById('valor').value = vParam;
+        document.querySelectorAll('#quickValores button').forEach(b => {
+          if (parseFloat(b.dataset.valor) === vParam) b.classList.add('active');
+        });
+      }
+    })();
+
     function copiarPix() {
       const input = document.getElementById('copiaCola');
-      input.select();
-      document.execCommand('copy');
-      ZKN.toast('Código copiado!', 'Cole no seu app do banco para pagar.');
+      ZKN.copiarTexto(input.value, 'Código PIX copiado!', 'Cole no app do seu banco para pagar.');
     }
 
     function setStatus(tipo, msg) {
@@ -214,10 +169,7 @@
         if (restante <= 0) {
           clearInterval(timerInterval);
           document.getElementById('timerText').textContent = '00:00';
-          if (!pixPago) {
-            // Expirou sem pagamento: cancela
-            cancelarPix();
-          }
+          if (!pixPago) cancelarPix();
           return;
         }
         const min = Math.floor(restante / 60000);
@@ -238,6 +190,45 @@
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     }
 
+    function confirmarPagamentoUI(saldoAgora) {
+      pixPago = true;
+      pararTudo();
+      setStatus('success', '✅ Pagamento confirmado! Saldo atualizado.');
+      document.getElementById('progressFill').style.width = '100%';
+      const diff = saldoAgora > saldoInicial ? saldoAgora - saldoInicial : parseFloat(document.getElementById('valor').value || '0');
+      ZKN.toast('Depósito confirmado!', `${ZKN.formatBRL(diff)} adicionados ao seu saldo.`);
+      if (window.ZKN?.invalidarResumo) window.ZKN.invalidarResumo();
+      if (window.ZKNBottomNav?.atualizarBadges) window.ZKNBottomNav.atualizarBadges();
+    }
+
+    async function verificarAgora(manual = false) {
+      if (pixPago || !identifierAtual) return false;
+      const btn = document.getElementById('btnVerificarPago');
+      if (manual && btn) {
+        btn.disabled = true;
+        btn.textContent = 'Consultando PIX...';
+      }
+      try {
+        const st = await SigiloPay.consultarPagamento(identifierAtual);
+        const saldoAgora = await ZKNAuth.getSaldo();
+        if ((st && st.pago) || saldoAgora > saldoInicial) {
+          confirmarPagamentoUI(saldoAgora);
+          return true;
+        }
+        if (manual) {
+          ZKN.toast('Ainda pendente', 'O banco ainda está processando o PIX. Tentaremos novamente em instantes.', 'warning');
+        }
+      } catch {} finally {
+        if (manual && btn && !pixPago) {
+          btn.disabled = false;
+          btn.textContent = 'Já paguei — verificar agora';
+        }
+      }
+      return false;
+    }
+
+    document.getElementById('btnVerificarPago').onclick = () => verificarAgora(true);
+
     async function cancelarPix() {
       if (!identifierAtual || pixPago) return;
 
@@ -245,40 +236,25 @@
       setStatus('error', '⏱ PIX expirado após 3 minutos. Gere um novo QR Code.');
       document.getElementById('progressFill').style.width = '100%';
 
-      // Esconde o QR Code (mas mantem o copia e cola visivel caso o usuario queira tentar)
-      const qrBlock = document.getElementById('qrBlock');
       const qrFrame = document.getElementById('qrcode');
       if (qrFrame) {
         qrFrame.innerHTML = '<div style="color:#94a3b8;padding:40px;text-align:center;font-family:Inter,sans-serif;">⏱<br><br>PIX expirado<br><small>Gere um novo QR Code</small></div>';
       }
 
-      // Avisa o backend para marcar como expirado
       try {
-        await fetch((window.ZKN_CONFIG && window.ZKN_CONFIG.api ? ZKN_CONFIG.api : window.ZKN_API) + '/pix/cancel/' + encodeURIComponent(identifierAtual), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + (ZKNAuth.getToken() || '')
-          }
-        });
+        await ZKNAuth.api('/pix/cancel/' + encodeURIComponent(identifierAtual), { method: 'POST' });
       } catch (e) {
-        console.warn('[cancelarPix] erro ao cancelar no backend:', e.message);
+        console.warn('[cancelarPix]', e.message);
       }
 
-      // Habilita o botao pra gerar novo
       const btn = document.getElementById('btnGerar');
       btn.disabled = false;
       btn.textContent = 'Gerar novo QR Code PIX';
-
-      // Remove destaque do campo valor pra usuario editar
       document.getElementById('valor').focus();
-
       ZKN.toast('PIX expirado', 'O QR Code expirou. Gere um novo.', 'warning');
-
       identifierAtual = null;
     }
 
-    // ---------- Gerar PIX ----------
     document.getElementById('btnGerar').onclick = async () => {
       const valor = parseFloat(document.getElementById('valor').value);
       if (!valor || valor < 10) {
@@ -293,7 +269,6 @@
       btn.textContent = 'Gerando...';
       document.getElementById('qrBlock').classList.remove('active');
 
-      // Guarda saldo atual para comparar
       saldoInicial = await ZKNAuth.getSaldo();
 
       const res = await SigiloPay.criarCobrancaPIX(valor);
@@ -309,25 +284,15 @@
       SigiloPay.gerarQRCode(document.getElementById('qrcode'), res.qr_code_copia_cola);
       document.getElementById('copiaCola').value = res.qr_code_copia_cola;
       document.getElementById('qrBlock').classList.add('active');
+      const btnVerif = document.getElementById('btnVerificarPago');
+      if (btnVerif) { btnVerif.disabled = false; btnVerif.textContent = 'Já paguei — verificar agora'; }
       setStatus('pending', 'Aguardando pagamento... O PIX expira em 3 minutos.');
       document.getElementById('progressFill').style.width = '0%';
 
-      // Timer de 3 MINUTOS (ignora o expires_at da SigiloPay)
       const expiraEm = new Date(Date.now() + MINUTOS_EXPIRACAO * 60 * 1000).toISOString();
       iniciarTimer(expiraEm);
 
-      // ---------- Polling de SALDO (a cada 5s) ----------
-      saldoPollInterval = setInterval(async () => {
-        if (pixPago) return;
-        const saldoAgora = await ZKNAuth.getSaldo();
-        if (saldoAgora > saldoInicial) {
-          pixPago = true;
-          pararTudo();
-          setStatus('success', '✅ Pagamento confirmado! Saldo atualizado.');
-          document.getElementById('progressFill').style.width = '100%';
-          ZKN.toast('Depósito confirmado!', `${ZKN.formatBRL(saldoAgora - saldoInicial)} adicionados ao seu saldo.`);
-        }
-      }, 5000);
+      saldoPollInterval = setInterval(() => { verificarAgora(false); }, 6000);
     };
   </script>
 </body>

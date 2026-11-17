@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Configurar saque</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,107 +11,21 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
-
-  <style>
-    /* Evita scroll horizontal acidental no mobile */
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    /* Carrossel Responsivo */
-    #carrosselBanners {
-      width: 100% !important;
-      max-width: 1000px !important;
-      margin: 24px auto 0 !important;
-      padding: 0 16px !important;
-      box-sizing: border-box;
-    }
-    .carrossel-wrapper {
-      max-width: 1280px;
-      margin: 0 auto;
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    #carrosselTrack {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      align-items: flex-start !important;
-      touch-action: pan-y !important;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: transform 0.5s ease;
-    }
-    #carrosselTrack > div {
-      flex: 0 0 100% !important;
-      min-width: 100% !important;
-      width: 100% !important;
-      cursor: pointer;
-    }
-    #carrosselTrack img {
-      width: 100% !important;
-      height: auto !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
-
-    /* Barra de busca responsiva */
-    .search-box-wrapper {
-      position: relative;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 420px;
-    }
-    .search-box-input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px 12px 44px;
-      background: var(--bg-2);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 16px;
-      outline: none;
-    }
-
-    /* Ajustes específicos para Mobile */
-    @media (max-width: 768px) {
-      #carrosselBanners {
-        margin-top: 14px !important;
-        padding: 0 12px !important;
-      }
-      .carrossel-wrapper {
-        border-radius: 12px;
-      }
-      .winners-ticker {
-        margin-top: 14px !important;
-      }
-      .search-box-wrapper {
-        max-width: 100%;
-        margin-bottom: 16px;
-      }
-      .section-header {
-        gap: 8px;
-      }
-      .section-title {
-        font-size: 18px;
-      }
-      .zkn-footer {
-        padding-bottom: 84px;
-      }
-    }
-  </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
 
   <div class="auth-wrap">
     <div class="card auth-card">
-      <h1>Configurar saque</h1>
-      <p class="subtitle">Antes do primeiro saque, defina sua senha de 6 dígitos e cadastre sua chave PIX.</p>
+      <h1 id="saqueCfgTitle">Configurar saque</h1>
+      <p class="subtitle" id="saqueCfgSubtitle">Antes do primeiro saque, defina sua senha de 6 dígitos e cadastre sua chave PIX.</p>
 
-      <label for="pin">Senha de saque (6 dígitos)</label>
+      <div id="currentPinWrap" style="display:none;">
+        <label for="currentPin">PIN de saque atual (6 dígitos)</label>
+        <input type="password" id="currentPin" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off">
+      </div>
+
+      <label for="pin" id="pinLabel">Senha de saque (6 dígitos)</label>
       <input type="password" id="pin" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off">
 
       <label for="pin2">Confirmar senha de 6 dígitos</label>
@@ -120,7 +34,7 @@
       <hr style="border:none;border-top:1px solid var(--border);margin:24px 0;">
 
       <label for="pixKey">Chave PIX</label>
-      <input type="text" id="pixKey" placeholder="CPF, celular ou e-mail">
+      <input type="text" id="pixKey" placeholder="CPF, celular, e-mail ou chave aleatória">
       <p class="field-hint" id="pixTypeHint">Digite para detectar automaticamente o tipo.</p>
 
       <label for="holderName">Nome completo do titular</label>
@@ -130,6 +44,7 @@
       <input type="text" id="holderCpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14">
 
       <button id="btnSalvar" class="btn-primary btn-block">Salvar e continuar</button>
+      <p class="auth-alt"><a href="saque.html">← Voltar para saque</a></p>
     </div>
   </div>
 
@@ -143,54 +58,83 @@
   <script>
     if (!ZKNAuth.requireLogin('saque-primeiro-acesso.html')) throw new Error('redirecionado');
 
-    // máscaras
     const pixEl = document.getElementById('pixKey');
     const hintEl = document.getElementById('pixTypeHint');
     const cpfEl = document.getElementById('holderCpf');
+    const currentPinEl = document.getElementById('currentPin');
+    const pinEl = document.getElementById('pin');
+    const pin2El = document.getElementById('pin2');
+    const jaTemPin = ZKNAuth.temPinSaque();
+
+    [currentPinEl, pinEl, pin2El].forEach(el => {
+      if (!el) return;
+      el.addEventListener('input', () => { el.value = el.value.replace(/\D/g, '').slice(0, 6); });
+    });
 
     pixEl.addEventListener('input', () => {
-      // se já tem @ ou UUID, não mascara
       if (pixEl.value.includes('@')) {
         const t = window.ZKNVal.identificarTipo(pixEl.value);
-        hintEl.textContent = t.tipo === 'email' ? '<span class="ico ico-check"></span> E-mail válido' : '⚠ E-mail inválido';
+        hintEl.innerHTML = t.tipo === 'email' ? '<span class="ico ico-check"></span> E-mail válido' : '⚠ E-mail inválido';
         hintEl.style.color = t.tipo === 'email' ? 'var(--green)' : 'var(--red)';
         return;
       }
       if (/[a-f0-9]{8}-[a-f0-9]{4}/i.test(pixEl.value)) {
-        hintEl.textContent = '<span class="ico ico-check"></span> Chave aleatória';
-        hintEl.style.color = 'var(--green)';
+        const valido = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pixEl.value.trim());
+        hintEl.innerHTML = valido ? '<span class="ico ico-check"></span> Chave aleatória válida' : 'Continue digitando a chave aleatória (UUID)';
+        hintEl.style.color = valido ? 'var(--green)' : 'var(--text-muted)';
         return;
       }
       window.ZKNVal.mascaraPixDinamica(pixEl);
       const raw = pixEl.value.replace(/\D/g, '');
       if (raw.length === 11) {
         const t = window.ZKNVal.identificarTipo(pixEl.value);
-        hintEl.textContent = t.tipo === 'cpf' ? '<span class="ico ico-check"></span> CPF válido' : '<span class="ico ico-check"></span> Celular';
-        hintEl.style.color = 'var(--green)';
+        hintEl.innerHTML = t.tipo === 'cpf'
+          ? '<span class="ico ico-check"></span> CPF válido'
+          : (t.tipo === 'phone' ? '<span class="ico ico-check"></span> Celular válido' : '⚠ Número inválido');
+        hintEl.style.color = t.tipo === 'unknown' ? 'var(--red)' : 'var(--green)';
       } else {
-        hintEl.textContent = 'Digite 11 dígitos (CPF ou celular).';
+        hintEl.textContent = 'Digite 11 dígitos (CPF ou celular), e-mail ou chave aleatória.';
         hintEl.style.color = 'var(--text-muted)';
       }
     });
 
     cpfEl.addEventListener('input', () => window.ZKNVal.mascaraCPF(cpfEl));
 
+    if (jaTemPin) {
+      document.getElementById('saqueCfgTitle').textContent = 'Alterar dados de saque PIX';
+      document.getElementById('saqueCfgSubtitle').textContent = 'Confirme seu PIN atual para atualizar sua chave PIX ou definir um novo PIN.';
+      document.getElementById('pinLabel').textContent = 'Novo PIN de saque (6 dígitos)';
+      document.getElementById('currentPinWrap').style.display = 'block';
+      ZKNAuth.getDadosSaque().then(dados => {
+        if (!dados) return;
+        if (dados.pixKey) pixEl.value = dados.pixKey;
+        if (dados.holderName) document.getElementById('holderName').value = dados.holderName;
+        if (dados.holderCpf) {
+          cpfEl.value = dados.holderCpf;
+          window.ZKNVal.mascaraCPF(cpfEl);
+        }
+        pixEl.dispatchEvent(new Event('input'));
+      }).catch(() => {});
+    }
+
     document.getElementById('btnSalvar').onclick = async () => {
-      const pin = document.getElementById('pin').value;
-      const pin2 = document.getElementById('pin2').value;
+      const currentPin = jaTemPin ? currentPinEl.value : undefined;
+      const pin = pinEl.value;
+      const pin2 = pin2El.value;
       const pixKeyRaw = pixEl.value.trim();
-      const holderName = document.getElementById('holderName').value.trim();
+      const holderNameRaw = document.getElementById('holderName').value.trim();
+      const holderName = window.ZKNVal.removerAcentos(holderNameRaw).replace(/[^A-Za-z\s]/g, '').trim();
       const holderCpf = cpfEl.value.replace(/\D/g, '');
 
+      if (jaTemPin && !/^\d{6}$/.test(currentPin || '')) {
+        return ZKN.toast('PIN atual obrigatório', 'Informe o seu PIN atual de 6 dígitos.', 'error');
+      }
       if (!/^\d{6}$/.test(pin)) return ZKN.toast('PIN inválido', 'Use 6 dígitos numéricos.', 'error');
       if (pin !== pin2) return ZKN.toast('PINs não coincidem', 'Confirme o mesmo PIN.', 'error');
 
       const id = window.ZKNVal.identificarTipo(pixKeyRaw);
-      if (id.tipo === 'unknown') return ZKN.toast('Chave PIX inválida', 'Informe CPF, celular ou e-mail válido.', 'error');
-      if (!holderName || holderName.length < 5) return ZKN.toast('Nome inválido', 'Nome completo do titular.', 'error');
-      if (!/^[A-Za-z\s]+$/.test(holderName)) {
-        return ZKN.toast('Nome com acento ou caractere inválido', 'Use apenas letras sem acento (ex: Anderson Guimaraes).', 'error');
-      }
+      if (id.tipo === 'unknown') return ZKN.toast('Chave PIX inválida', 'Informe CPF, celular, e-mail ou chave aleatória válida.', 'error');
+      if (!holderName || holderName.length < 5) return ZKN.toast('Nome inválido', 'Nome completo do titular (somente letras).', 'error');
       if (!window.ZKNVal.validarCPF(holderCpf)) return ZKN.toast('CPF inválido', 'CPF do titular inválido.', 'error');
 
       const btn = document.getElementById('btnSalvar');
@@ -199,6 +143,7 @@
 
       const r = await ZKNAuth.salvarPinSaque({
         pin,
+        currentPin,
         pixKey: id.valor,
         pixKeyType: id.tipo,
         holderName,

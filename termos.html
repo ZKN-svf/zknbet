@@ -1,9 +1,8 @@
-﻿<!-- termos.html -->
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Termos e Condições</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,105 +11,58 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
-  <script src="assets/loading.js"></script>
-
-  <style>
-    /* Evita scroll horizontal acidental no mobile */
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    /* Carrossel Responsivo */
-    #carrosselBanners {
-      width: 100% !important;
-      max-width: 1000px !important;
-      margin: 24px auto 0 !important;
-      padding: 0 16px !important;
-      box-sizing: border-box;
-    }
-    .carrossel-wrapper {
-      max-width: 1280px;
-      margin: 0 auto;
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    #carrosselTrack {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      align-items: flex-start !important;
-      touch-action: pan-y !important;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: transform 0.5s ease;
-    }
-    #carrosselTrack > div {
-      flex: 0 0 100% !important;
-      min-width: 100% !important;
-      width: 100% !important;
-      cursor: pointer;
-    }
-    #carrosselTrack img {
-      width: 100% !important;
-      height: auto !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
-
-    /* Barra de busca responsiva */
-    .search-box-wrapper {
-      position: relative;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 420px;
-    }
-    .search-box-input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px 12px 44px;
-      background: var(--bg-2);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 16px;
-      outline: none;
-    }
-
-    /* Ajustes específicos para Mobile */
-    @media (max-width: 768px) {
-      #carrosselBanners {
-        margin-top: 14px !important;
-        padding: 0 12px !important;
-      }
-      .carrossel-wrapper {
-        border-radius: 12px;
-      }
-      .winners-ticker {
-        margin-top: 14px !important;
-      }
-      .search-box-wrapper {
-        max-width: 100%;
-        margin-bottom: 16px;
-      }
-      .section-header {
-        gap: 8px;
-      }
-      .section-title {
-        font-size: 18px;
-      }
-      .zkn-footer {
-        padding-bottom: 84px;
-      }
-    }
-  </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
-  <div class="section" style="max-width:800px;">
-    <h1 style="font-family:var(--font-display);font-size:28px;margin-bottom:20px;">📄 Termos e Condições</h1>
-    <p style="color:var(--text-muted);line-height:1.8;">Conteúdo em elaboração. Em breve os termos completos estarão disponíveis aqui.</p>
-    <p style="margin-top:20px;"><a href="index.html" style="color:var(--gold);font-weight:700;">← Voltar ao início</a></p>
-  </div>
+
+  <main class="legal-wrap">
+    <div class="legal-card">
+      <h1>Termos e Condições de Uso</h1>
+      <div class="legal-updated">Última atualização: 2026 &middot; Plataforma ZKNbet</div>
+
+      <p>Ao criar uma conta, acessar ou utilizar os serviços da ZKNbet, você concorda integralmente com estes Termos e Condições de Uso.</p>
+
+      <h2>1. Elegibilidade e Maioridade (+18)</h2>
+      <ul>
+        <li>O uso da plataforma é estritamente proibido para menores de 18 anos.</li>
+        <li>Cada usuário pode manter apenas uma única conta pessoal e intransferível vinculada ao seu CPF e e-mail válidos.</li>
+      </ul>
+
+      <h2>2. Cadastro, Segurança e Verificação</h2>
+      <ul>
+        <li>Você é responsável pela confidencialidade de sua senha de acesso e da senha (PIN) de 6 dígitos para saques.</li>
+        <li>Para solicitar saques via PIX, é obrigatório validar seu endereço de e-mail e utilizar uma chave PIX pertencente ao mesmo CPF do titular cadastrado.</li>
+      </ul>
+
+      <h2>3. Depósitos, Saques e Regras de Rollover</h2>
+      <ul>
+        <li>Os pagamentos e retiradas são processados exclusivamente via PIX. Valores mínimos são exibidos diretamente nas páginas de Depósito e Saque.</li>
+        <li>Todo depósito em dinheiro real possui requisito mínimo de movimentação em apostas de <strong>1x (uma vez)</strong> o valor depositado antes da liberação do saque, em conformidade com políticas de prevenção à lavagem de dinheiro.</li>
+        <li>Créditos provenientes de bônus de depósito, cashback ou promoções possuem regras próprias de rollover indicadas claramente antes do resgate (por padrão, 5x sobre bônus de depósito e 2x sobre cashback).</li>
+      </ul>
+
+      <h2>4. Uso Justo e Antifraude</h2>
+      <p>É proibido explorar falhas técnicas, utilizar múltiplas contas para abusar de bônus ou realizar manobras fraudulentas de depósito/indicação. Contas em violação poderão ter bônus anulados e o acesso suspenso.</p>
+
+      <h2>5. Atendimento ao Usuário</h2>
+      <p>Em caso de dúvidas sobre transações, saldo ou verificação, utilize o canal oficial de <strong>Suporte (Telegram)</strong> disponível no menu e no rodapé da plataforma.</p>
+
+      <p style="margin-top:28px;"><a href="index.html" style="color:var(--gold);font-weight:700;">&larr; Voltar ao início</a></p>
+    </div>
+  </main>
+
+  <footer class="zkn-footer">
+    <div class="zkn-footer-inner">
+      <p><strong>ZKNbet</strong> &copy; 2026 &middot; Todos os direitos reservados</p>
+      <p class="disclaimer">Proibido para menores de 18 anos. Jogue com responsabilidade.</p>
+    </div>
+  </footer>
+
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/bottom-nav.js"></script>
 </body>
 </html>

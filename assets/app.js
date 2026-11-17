@@ -87,6 +87,47 @@ function toast(title, body = '', type = 'success') {
   }, 4000);
 }
 
+// ---------- Helpers globais ----------
+function sanitizeBannerLink(link) {
+  const s = String(link || '').trim();
+  if (!s || s === '#') return '';
+  if (/[\x00-\x1f\s]/.test(s)) return '';
+  if (/^https?:\/\/[^\s"'<>]+$/i.test(s)) return s;
+  if (/^\/?[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*(\.html)?(\?[a-zA-Z0-9_=&%.-]*)?(#[a-zA-Z0-9_-]*)?$/.test(s) && !s.includes('..')) {
+    return s;
+  }
+  return '';
+}
+
+async function copiarTexto(texto, titulo = 'Copiado!', corpo = '') {
+  const val = String(texto || '');
+  if (!val) return false;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(val);
+    } else {
+      throw new Error('clipboard unavailable');
+    }
+    toast(titulo, corpo);
+    return true;
+  } catch {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = val;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      if (ok) toast(titulo, corpo);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+}
+
 // ---------- Header ----------
 function renderHeader() {
   const path = location.pathname.split('/').pop() || 'index.html';
@@ -96,6 +137,9 @@ function renderHeader() {
   const navItems = [
     { href: 'index.html', label: 'Início' },
     { href: 'jogos.html', label: 'Jogos' },
+    { href: 'recompensas.html', label: 'Recompensas', badgeId: 'desktop-badge-rewards' },
+    { href: 'ofertas.html', label: 'Ofertas' },
+    { href: 'favoritos.html', label: 'Favoritos' },
     { href: 'deposito.html', label: 'Depositar' },
     { href: 'saque.html', label: 'Sacar' },
     { href: 'indicacao.html', label: 'Indicar' },
@@ -135,7 +179,7 @@ function renderHeader() {
     </a>
     
     <nav class="zkn-nav">
-      ${navItems.map(i => `<a href="${i.href}" class="${path === i.href ? 'active' : ''}">${i.label}</a>`).join('')}
+      ${navItems.map(i => `<a href="${i.href}" class="${path === i.href ? 'active' : ''}">${i.label}${i.badgeId ? `<span class="nav-badge hidden" id="${i.badgeId}"></span>` : ''}</a>`).join('')}
     </nav>
     <div class="zkn-header-right">${rightSide}</div>
   `;
@@ -179,7 +223,8 @@ function renderHeader() {
           <button class="drawer-link drawer-link-btn" onclick="ZKN.abrirIndicacaoDrawer()">🔗 Seu código de indicação</button>
 
           <div class="drawer-section-title">Ajuda</div>
-          <a class="drawer-link" href="https://t.me/Micaelasilva7" target="_blank" rel="noopener"><span class="ico ico-telegram"></span> Suporte (Telegram)</a>
+          <a class="drawer-link" data-support-link href="https://t.me/Micaelasilva7" target="_blank" rel="noopener"><span class="ico ico-telegram"></span> Suporte (Telegram)</a>
+          <a class="drawer-link" href="jogo-responsavel.html">🛡️ Jogo Responsável</a>
         </nav>
 
         <div class="drawer-footer" id="drawerFooter"></div>
@@ -189,6 +234,30 @@ function renderHeader() {
 
   atualizarDrawerUser();
   mostrarBannerEmail();
+  observarSaldos();
+  if (_bootstrapCache && _bootstrapCache.telegram_link) {
+    aplicarTelegramLinks(_bootstrapCache.telegram_link);
+  }
+}
+
+function renderFooter() {
+  const inner = document.querySelector('.zkn-footer .zkn-footer-inner');
+  if (!inner || inner.querySelector('.zkn-footer-links')) return;
+  const tg = (_bootstrapCache && _bootstrapCache.telegram_link) || 'https://t.me/Micaelasilva7';
+  const linksHtml = `
+    <div class="zkn-footer-links">
+      <a href="termos.html">Termos de Uso</a>
+      <a href="privacidade.html">Política de Privacidade</a>
+      <a href="jogo-responsavel.html">Jogo Responsável</a>
+      <a href="ofertas.html">Ofertas &amp; Bônus</a>
+      <a href="${escapeHtml(tg)}" data-support-link target="_blank" rel="noopener">Suporte (Telegram)</a>
+    </div>
+  `;
+  inner.insertAdjacentHTML('afterbegin', linksHtml);
+  const disc = inner.querySelector('.disclaimer');
+  if (disc && !disc.querySelector('.zkn-footer-badge-18')) {
+    disc.insertAdjacentHTML('afterbegin', '<span class="zkn-footer-badge-18">+18</span>');
+  }
 }
 
 // Banner de verificação de email (idempotente: só cria uma vez)
@@ -278,53 +347,174 @@ function abrirIndicacaoDrawer() {
 }
 
 // ============================================================
-// Sincroniza o status de e-mail verificado com o servidor
+// Sincronizacao unificada (/me/summary) + Bootstrap (/settings/bootstrap)
 // ============================================================
-async function sincronizarEmailVerificado() {
-  if (!window.ZKNAuth?.isLoggedIn?.()) return;
-  try {
-    const res = await ZKNAuth.api('/me');
-    if (res.ok && res.data && res.data.user) {
-      const serverUser = res.data.user;
-      const localUser = ZKNAuth.getUser();
-      
-      if (localUser && !localUser.emailVerified && serverUser.emailVerified) {
-        // Atualiza o cache local
-        localUser.emailVerified = serverUser.emailVerified;
-        ZKNAuth.setUser(localUser);
-        
-        // Remove o banner amarelo se ele existir na tela
-        const banner = document.getElementById('zknEmailBanner');
-        if (banner) banner.remove();
-        
-        // Se estiver na tela de saque, atualiza a mensagem de bloqueio
-        if (location.pathname.includes('saque.html')) {
-          const box = document.getElementById('statusBox');
-          if (box && box.innerHTML.includes('Verifique seu email')) {
-            box.className = 'status-box';
-            box.innerHTML = '';
-          }
-        }
-        
-        // Toast de confirmação (opcional)
-        if (window.ZKN && ZKN.toast) {
-          ZKN.toast('E-mail verificado!', 'Seus saques estão liberados.');
-        }
-      }
+let _bootstrapCache = null;
+let _bootstrapPromise = null;
+let _summaryPromise = null;
+
+function aplicarTema(temaRaw) {
+  const tema = String(temaRaw || '').trim();
+  if (tema && tema !== 'default' && /^[a-z0-9_-]+$/i.test(tema)) {
+    if (!document.getElementById('event-theme-css')) {
+      const link = document.createElement('link');
+      link.id = 'event-theme-css';
+      link.rel = 'stylesheet';
+      link.href = 'assets/events.css?v=' + encodeURIComponent(tema);
+      document.head.appendChild(link);
     }
-  } catch (e) {
-    // Silencioso, se der erro na rede não faz nada
+    document.body.classList.add('theme-' + tema);
   }
 }
 
-// Chama a função quando a página carregar
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(sincronizarEmailVerificado, 1500); // Espera 1.5s pra não travar o carregamento inicial
-});
+function aplicarTelegramLinks(tgLink) {
+  if (!tgLink || !/^https?:\/\//i.test(tgLink)) return;
+  document.querySelectorAll('a[data-support-link], a[href*="Micaelasilva7"]').forEach(link => {
+    link.href = tgLink;
+    link.target = '_blank';
+    link.rel = 'noopener';
+  });
+}
+
+async function getBootstrap(force = false) {
+  if (!force && _bootstrapCache) return _bootstrapCache;
+  if (!force) {
+    try {
+      const raw = sessionStorage.getItem('zkn_bootstrap_v1');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.ts && Date.now() - parsed.ts < 60000 && parsed.data) {
+          _bootstrapCache = parsed.data;
+          return _bootstrapCache;
+        }
+      }
+    } catch {}
+  }
+  if (_bootstrapPromise) return _bootstrapPromise;
+
+  const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || window.ZKN_API || '';
+  _bootstrapPromise = (async () => {
+    try {
+      const res = await fetch(apiBase + '/settings/bootstrap');
+      if (res.ok) {
+        const data = await res.json();
+        _bootstrapCache = data;
+        try { sessionStorage.setItem('zkn_bootstrap_v1', JSON.stringify({ ts: Date.now(), data })); } catch {}
+        return data;
+      }
+    } catch {}
+
+    // Fallback caso rota agregada nao esteja disponivel
+    const [rTheme, rTg, rBanners] = await Promise.all([
+      fetch(apiBase + '/settings/theme').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+      fetch(apiBase + '/settings/telegram').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+      fetch(apiBase + '/marketing/banners').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+    ]);
+    const data = {
+      theme: rTheme.theme || 'default',
+      telegram_link: rTg.link || '',
+      banners: rBanners.banners || [],
+    };
+    _bootstrapCache = data;
+    return data;
+  })().finally(() => { _bootstrapPromise = null; });
+
+  return _bootstrapPromise;
+}
+
+function invalidarResumo() {
+  try { sessionStorage.removeItem('zkn_summary_v1'); } catch {}
+}
+
+function aplicarBadgesUI(totalBadges) {
+  const n = Number(totalBadges || 0);
+  ['desktop-badge-rewards', 'badge-rewards'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (n > 0) {
+      el.textContent = n;
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
+}
+
+async function getSummaryCached(force = false) {
+  if (!window.ZKNAuth?.isLoggedIn?.()) return null;
+  if (!force) {
+    try {
+      const raw = sessionStorage.getItem('zkn_summary_v1');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.ts && Date.now() - parsed.ts < 20000 && parsed.data) {
+          aplicarBadgesUI(parsed.data?.rewards?.total_badges || 0);
+          return parsed.data;
+        }
+      }
+    } catch {}
+  }
+  if (_summaryPromise) return _summaryPromise;
+
+  _summaryPromise = (async () => {
+    try {
+      const data = await window.ZKNAuth.getResumo();
+      if (!data || !data.user) return null;
+
+      try { sessionStorage.setItem('zkn_summary_v1', JSON.stringify({ ts: Date.now(), data })); } catch {}
+
+      const localUser = window.ZKNAuth.getUser();
+      const serverUser = data.user;
+      if (localUser) {
+        const verificouAgora = !localUser.emailVerified && serverUser.emailVerified;
+        Object.assign(localUser, {
+          name: serverUser.name,
+          phone: serverUser.phone,
+          email: serverUser.email,
+          balance: serverUser.balance,
+          emailVerified: serverUser.emailVerified,
+          hasPassword: serverUser.hasPassword,
+          hasWithdrawPin: serverUser.hasWithdrawPin,
+        });
+        window.ZKNAuth.setUser(localUser);
+
+        if (verificouAgora) {
+          const banner = document.getElementById('zknEmailBanner');
+          if (banner) banner.remove();
+          if (location.pathname.includes('saque.html')) {
+            const box = document.getElementById('statusBox');
+            if (box && box.innerHTML.includes('Verifique seu email')) {
+              box.className = 'status-box';
+              box.innerHTML = '';
+            }
+          }
+          toast('E-mail verificado!', 'Seus saques estão liberados.');
+        }
+      }
+
+      if (data.rewards) aplicarBadgesUI(data.rewards.total_badges);
+      return data;
+    } catch {
+      return null;
+    }
+  })().finally(() => { _summaryPromise = null; });
+
+  return _summaryPromise;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   renderHeader();
-  if (window.ZKNAuth?.isLoggedIn?.()) { window.ZKNAuth.getSaldo().catch(() => {}); }
+  renderFooter();
+  getBootstrap().then(b => {
+    if (!b) return;
+    aplicarTema(b.theme);
+    aplicarTelegramLinks(b.telegram_link);
+  }).catch(() => {});
+
+  if (window.ZKNAuth?.isLoggedIn?.()) {
+    window.ZKNAuth.getSaldo().catch(() => {});
+    setTimeout(() => { getSummaryCached().catch(() => {}); }, 350);
+  }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharDrawer(); });
   window.addEventListener('pageshow', () => { if (window.ZKNAuth?.isLoggedIn?.()) iniciarPollingSaldo(); });
 });
@@ -424,84 +614,56 @@ window.ZKN = {
 
   ZKN_USER, formatBRL, toast, gerarIniciais,
   escapeHtml, escapeJsString, escapeJsAttr,
-  renderHeader, abrirDrawer, fecharDrawer, abrirIndicacaoDrawer, atualizarSaldoBtn,
+  sanitizeBannerLink, copiarTexto,
+  getBootstrap, getSummaryCached, invalidarResumo, aplicarBadgesUI,
+  renderHeader, renderFooter, abrirDrawer, fecharDrawer, abrirIndicacaoDrawer, atualizarSaldoBtn,
 };
 
 
 // ============================================================
-// ANIMACAO AUTOMATICA NO SALDO
-// Observa todos os [data-balance] e dispara animacao quando
-// o texto mudar (deposito, saque, aposta, bonus, polling, etc).
+// ANIMACAO AUTOMATICA NO SALDO (sem MutationObserver global)
 // ============================================================
-(function() {
-  function animar(el) {
+function animarElementoSaldo(el) {
+  el.classList.remove('saldo-atualizado');
+  void el.offsetWidth;
+  el.classList.add('saldo-atualizado');
+  const chip = el.closest('.balance-chip');
+  if (chip) {
+    chip.classList.remove('saldo-atualizado');
+    void chip.offsetWidth;
+    chip.classList.add('saldo-atualizado');
+  }
+  setTimeout(() => {
     el.classList.remove('saldo-atualizado');
-    void el.offsetWidth; // force reflow
-    el.classList.add('saldo-atualizado');
-    const chip = el.closest('.balance-chip');
-    if (chip) {
-      chip.classList.remove('saldo-atualizado');
-      void chip.offsetWidth;
-      chip.classList.add('saldo-atualizado');
-    }
-    setTimeout(() => {
-      el.classList.remove('saldo-atualizado');
-      if (chip) chip.classList.remove('saldo-atualizado');
-    }, 1000);
-  }
+    if (chip) chip.classList.remove('saldo-atualizado');
+  }, 1000);
+}
 
-  function observar() {
-    const els = document.querySelectorAll('[data-balance]');
-    els.forEach(el => {
-      if (el.__animObs) return;
-      el.__animObs = true;
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach(m => {
-          if (m.type === 'characterData' || m.type === 'childList') {
-            const atual = el.textContent.trim();
-            if (el.__animLast !== undefined && el.__animLast !== atual) {
-              animar(el);
-            }
-            el.__animLast = atual;
-          }
-        });
-      });
-      observer.observe(el, { characterData: true, childList: true, subtree: true });
-      el.__animLast = el.textContent.trim();
+function observarSaldos() {
+  document.querySelectorAll('[data-balance]').forEach(el => {
+    if (el.__animObs) return;
+    el.__animObs = true;
+    const observer = new MutationObserver(() => {
+      const atual = el.textContent.trim();
+      if (el.__animLast !== undefined && el.__animLast !== atual) {
+        animarElementoSaldo(el);
+      }
+      el.__animLast = atual;
     });
-  }
+    observer.observe(el, { characterData: true, childList: true, subtree: true });
+    el.__animLast = el.textContent.trim();
+  });
+}
 
-  // Observa elementos existentes
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', observar);
-  } else {
-    observar();
-  }
-  // Re-observa se novos [data-balance] forem adicionados (ex: apos drawer)
-  new MutationObserver(() => {
-    document.querySelectorAll('[data-balance]').forEach(el => {
-      if (!el.__animObs) observar();
-    });
-  }).observe(document.body, { childList: true, subtree: true });
-})();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', observarSaldos);
+} else {
+  observarSaldos();
+}
 
 // Forca a animacao mesmo se o saldo nao mudou (uso no botao de recarregar)
 function forcarAnimacaoSaldo() {
-  document.querySelectorAll('[data-balance]').forEach(el => {
-    el.classList.remove('saldo-atualizado');
-    void el.offsetWidth;
-    el.classList.add('saldo-atualizado');
-    const chip = el.closest('.balance-chip');
-    if (chip) {
-      chip.classList.remove('saldo-atualizado');
-      void chip.offsetWidth;
-      chip.classList.add('saldo-atualizado');
-    }
-    setTimeout(() => {
-      el.classList.remove('saldo-atualizado');
-      if (chip) chip.classList.remove('saldo-atualizado');
-    }, 1000);
-  });
+  document.querySelectorAll('[data-balance]').forEach(animarElementoSaldo);
 }
 window.forcarAnimacaoSaldo = forcarAnimacaoSaldo;
 
@@ -509,18 +671,6 @@ window.forcarAnimacaoSaldo = forcarAnimacaoSaldo;
 // RESGATAR CODIGO PROMOCIONAL (Modal)
 // ============================================================
 window.ZKN = window.ZKN || {};
-
-// ============================================================
-// RESGATAR CODIGO PROMOCIONAL (Modal)
-// ============================================================
-
-// ============================================================
-// RESGATAR CODIGO PROMOCIONAL (Modal) - VERSAO CORRIGIDA
-// ============================================================
-
-// ============================================================
-// RESGATAR CODIGO PROMOCIONAL (Modal) - VERSAO CORRIGIDA
-// ============================================================
 window.ZKN.abrirResgatarCodigo = function() {
   const backdrop = document.createElement('div');
   backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -644,67 +794,3 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   });
 });
-
-// ============================================================
-// CARREGAR TEMA SAZONAL (uma única chamada por página)
-// ============================================================
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || '';
-    const res = await fetch(apiBase + '/settings/theme');
-    const data = await res.json();
-    const tema = String(data.theme || '').trim();
-
-    if (tema && tema !== 'default' && /^[a-z0-9_-]+$/i.test(tema)) {
-      if (!document.getElementById('event-theme-css')) {
-        const link = document.createElement('link');
-        link.id = 'event-theme-css';
-        link.rel = 'stylesheet';
-        // Cache-bust estável: muda quando o tema muda, mas permite cache entre visitas
-        link.href = 'assets/events.css?v=' + encodeURIComponent(tema);
-        document.head.appendChild(link);
-      }
-      document.body.classList.add('theme-' + tema);
-    }
-  } catch(e) { console.error('Erro ao carregar tema', e); }
-});
-
-// ============================================================
-// TELEGRAM LINK DINAMICO (via backend)
-// ============================================================
-(function() {
-  var tgLink = null;
-  var xhr = new XMLHttpRequest();
-  var apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || '';
-  xhr.open('GET', apiBase + '/settings/telegram');
-  xhr.onload = function() {
-    try {
-      var data = JSON.parse(xhr.responseText);
-      if (data.link) {
-        tgLink = data.link;
-        atualizar();
-      }
-    } catch(e) {}
-  };
-  xhr.send();
-
-  function atualizar() {
-    if (!tgLink) return;
-    var links = document.querySelectorAll('a');
-    for (var i = 0; i < links.length; i++) {
-      var link = links[i];
-      var isTelegram = (link.href && link.href.indexOf('Micaelasilva7') !== -1) || (link.textContent.indexOf('Suporte (Telegram)') !== -1);
-      if (isTelegram && link.href !== tgLink) {
-        link.href = tgLink;
-        link.target = '_blank';
-        link.rel = 'noopener';
-      }
-    }
-  }
-
-  // Fica observando o DOM para pegar quando o menu for criado
-  var observer = new MutationObserver(atualizar);
-  observer.observe(document.body, { childList: true, subtree: true });
-  setTimeout(atualizar, 1000);
-  setTimeout(atualizar, 3000);
-})();

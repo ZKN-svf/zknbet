@@ -68,14 +68,24 @@ function validarEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || ''));
 }
 
-// ---------- Detecta CPF, celular ou e-mail ----------
+// ---------- Detecta CPF, celular, e-mail ou chave aleatoria ----------
 function identificarTipo(valor) {
   const v = String(valor || '').trim();
-  if (v.includes('@')) return { tipo: 'email', valor: v.toLowerCase() };
+  if (validarEmail(v)) return { tipo: 'email', valor: v.toLowerCase() };
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)) {
+    return { tipo: 'random', valor: v.toLowerCase() };
+  }
   const digits = v.replace(/\D/g, '');
-  if (digits.length === 11 && validarCPF(digits)) return { tipo: 'cpf', valor: digits };
+  if (digits.length === 11 && !v.startsWith('+55') && validarCPF(digits)) {
+    return { tipo: 'cpf', valor: digits };
+  }
   if (validarCelular(digits)) return { tipo: 'phone', valor: normalizarCelular(digits) };
+  if (digits.length === 14) return { tipo: 'cnpj', valor: digits };
   return { tipo: 'unknown', valor: v };
+}
+
+function removerAcentos(str) {
+  return String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
 // ---------- Máscaras ----------
@@ -133,6 +143,7 @@ window.ZKNVal = {
   normalizarCelular,
   validarEmail,
   identificarTipo,
+  removerAcentos,
   mascaraCPF,
   mascaraCelular,
   mascaraPixDinamica,

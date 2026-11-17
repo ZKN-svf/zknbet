@@ -1,9 +1,8 @@
-﻿<!-- jogo-responsavel.html -->
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Jogo Responsável</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,105 +11,50 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
-  <script src="assets/loading.js"></script>
-
-  <style>
-    /* Evita scroll horizontal acidental no mobile */
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    /* Carrossel Responsivo */
-    #carrosselBanners {
-      width: 100% !important;
-      max-width: 1000px !important;
-      margin: 24px auto 0 !important;
-      padding: 0 16px !important;
-      box-sizing: border-box;
-    }
-    .carrossel-wrapper {
-      max-width: 1280px;
-      margin: 0 auto;
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    #carrosselTrack {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      align-items: flex-start !important;
-      touch-action: pan-y !important;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: transform 0.5s ease;
-    }
-    #carrosselTrack > div {
-      flex: 0 0 100% !important;
-      min-width: 100% !important;
-      width: 100% !important;
-      cursor: pointer;
-    }
-    #carrosselTrack img {
-      width: 100% !important;
-      height: auto !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
-
-    /* Barra de busca responsiva */
-    .search-box-wrapper {
-      position: relative;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 420px;
-    }
-    .search-box-input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px 12px 44px;
-      background: var(--bg-2);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 16px;
-      outline: none;
-    }
-
-    /* Ajustes específicos para Mobile */
-    @media (max-width: 768px) {
-      #carrosselBanners {
-        margin-top: 14px !important;
-        padding: 0 12px !important;
-      }
-      .carrossel-wrapper {
-        border-radius: 12px;
-      }
-      .winners-ticker {
-        margin-top: 14px !important;
-      }
-      .search-box-wrapper {
-        max-width: 100%;
-        margin-bottom: 16px;
-      }
-      .section-header {
-        gap: 8px;
-      }
-      .section-title {
-        font-size: 18px;
-      }
-      .zkn-footer {
-        padding-bottom: 84px;
-      }
-    }
-  </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
-  <div class="section" style="max-width:800px;">
-    <h1 style="font-family:var(--font-display);font-size:28px;margin-bottom:20px;">🎯 Jogo Responsável</h1>
-    <p style="color:var(--text-muted);line-height:1.8;">Conteúdo em elaboração. Em breve as diretrizes de jogo responsável estarão disponíveis aqui.</p>
-    <p style="margin-top:20px;"><a href="index.html" style="color:var(--gold);font-weight:700;">← Voltar ao início</a></p>
-  </div>
+
+  <main class="legal-wrap">
+    <div class="legal-card">
+      <h1>Jogo Responsável (+18)</h1>
+      <div class="legal-updated">Entretenimento consciente &middot; Política de proteção ao jogador</div>
+
+      <p>Na ZKNbet, acreditamos que apostar deve ser sempre uma forma saudável de entretenimento adulto — nunca uma fonte de renda, solução para dívidas ou obrigação financeira.</p>
+
+      <h2>1. Boas Práticas para Jogar com Controle</h2>
+      <ul>
+        <li>Defina um orçamento máximo de lazer antes de depositar e jamais ultrapasse esse limite.</li>
+        <li>Nunca tente recuperar perdas imediatamente aumentando o valor das apostas.</li>
+        <li>Estabeleça um limite de tempo por sessão e faça pausas regulares.</li>
+        <li>Evite jogar sob estresse, cansaço extremo ou consumo de álcool.</li>
+      </ul>
+
+      <h2>2. Sinais de Alerta</h2>
+      <p>Se você perceber que está ocultando gastos de familiares, comprometendo contas essenciais do mês, ou sentindo ansiedade quando não está jogando, pare imediatamente e procure orientação.</p>
+
+      <h2>3. Pausa e Apoio Gratuito</h2>
+      <ul>
+        <li>Para solicitar bloqueio temporário ou encerramento da conta, fale com nossa equipe pelo <strong>Suporte (Telegram)</strong>.</li>
+        <li>Apoio confidencial e gratuito no Brasil: <strong>Jogadores Anônimos Brasil</strong> (jogadoresanonimos.com.br) e <strong>CVV — Centro de Valorização da Vida</strong> (disque <strong>188</strong>, 24 horas).</li>
+      </ul>
+
+      <p style="margin-top:28px;"><a href="index.html" style="color:var(--gold);font-weight:700;">&larr; Voltar ao início</a></p>
+    </div>
+  </main>
+
+  <footer class="zkn-footer">
+    <div class="zkn-footer-inner">
+      <p><strong>ZKNbet</strong> &copy; 2026 &middot; Todos os direitos reservados</p>
+      <p class="disclaimer">Proibido para menores de 18 anos. Jogue com responsabilidade.</p>
+    </div>
+  </footer>
+
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/bottom-nav.js"></script>
 </body>
 </html>

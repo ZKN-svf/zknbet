@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Criar conta</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,97 +13,6 @@
   <link rel="stylesheet" href="assets/icons.css">
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-  <style>
-    /* Evita scroll horizontal acidental no mobile */
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    /* Carrossel Responsivo */
-    #carrosselBanners {
-      width: 100% !important;
-      max-width: 1000px !important;
-      margin: 24px auto 0 !important;
-      padding: 0 16px !important;
-      box-sizing: border-box;
-    }
-    .carrossel-wrapper {
-      max-width: 1280px;
-      margin: 0 auto;
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    #carrosselTrack {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      align-items: flex-start !important;
-      touch-action: pan-y !important;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: transform 0.5s ease;
-    }
-    #carrosselTrack > div {
-      flex: 0 0 100% !important;
-      min-width: 100% !important;
-      width: 100% !important;
-      cursor: pointer;
-    }
-    #carrosselTrack img {
-      width: 100% !important;
-      height: auto !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
-
-    /* Barra de busca responsiva */
-    .search-box-wrapper {
-      position: relative;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 420px;
-    }
-    .search-box-input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px 12px 44px;
-      background: var(--bg-2);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 16px;
-      outline: none;
-    }
-
-    /* Ajustes específicos para Mobile */
-    @media (max-width: 768px) {
-      #carrosselBanners {
-        margin-top: 14px !important;
-        padding: 0 12px !important;
-      }
-      .carrossel-wrapper {
-        border-radius: 12px;
-      }
-      .winners-ticker {
-        margin-top: 14px !important;
-      }
-      .search-box-wrapper {
-        max-width: 100%;
-        margin-bottom: 16px;
-      }
-      .section-header {
-        gap: 8px;
-      }
-      .section-title {
-        font-size: 18px;
-      }
-      .zkn-footer {
-        padding-bottom: 84px;
-      }
-    }
-  </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -158,24 +67,30 @@
   <script src="assets/bottom-nav.js"></script>
   <script src="assets/game-frame.js"></script>
   <script>
+    const urlRef = new URLSearchParams(location.search).get('ref');
+    if (urlRef) document.getElementById('refCode').value = urlRef.toUpperCase();
+
+    function obterRefFinal() {
+      const val = document.getElementById('refCode')?.value || urlRef || '';
+      const clean = String(val).trim().toUpperCase();
+      return clean || undefined;
+    }
+
+    const getBackTarget = () => ZKNAuth.sanitizeRedirect(new URLSearchParams(location.search).get('back'));
 
     window.handleGoogleRegister = async function(response) {
       if (!response || !response.credential) {
         return ZKN.toast('Erro', 'Falha no Google.', 'error');
       }
-      const urlRef = new URLSearchParams(location.search).get('ref');
       ZKN.toast('Criando conta...', 'Validando Google');
-      const r = await ZKNAuth.loginGoogle({ credential: response.credential, ref: urlRef || undefined });
+      const r = await ZKNAuth.loginGoogle({ credential: response.credential, ref: obterRefFinal() });
       if (!r.sucesso) return ZKN.toast('Erro', r.mensagem, 'error');
       ZKN.toast('Conta criada!', 'Bem-vindo à ZKNbet.');
-      setTimeout(() => location.href = 'index.html', 600);
+      setTimeout(() => location.href = getBackTarget(), 600);
     };
+
     const phoneEl = document.getElementById('phone');
     phoneEl.addEventListener('input', () => window.ZKNVal.mascaraCelular(phoneEl));
-
-    // preenche refCode da URL se vier ?ref=XXXX
-    const urlRef = new URLSearchParams(location.search).get('ref');
-    if (urlRef) document.getElementById('refCode').value = urlRef.toUpperCase();
 
     document.getElementById('btnCadastrar').onclick = async () => {
       const name = document.getElementById('name').value.trim();
@@ -183,12 +98,13 @@
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const password2 = document.getElementById('password2').value;
+      const refFinal = obterRefFinal();
 
-      if (!name || name.length < 3) return ZKN.toast('Nome invalido', 'Digite seu nome completo.', 'error');
-      if (!window.ZKNVal.validarCelular(phone)) return ZKN.toast('Celular invalido', 'Digite DDD + 9 + 8 digitos.', 'error');
-      if (!email || !window.ZKNVal.validarEmail(email)) return ZKN.toast('E-mail invalido', 'Digite um e-mail valido (ex: seu@gmail.com).', 'error');
-      if (!password || password.length < 6) return ZKN.toast('Senha muito curta', 'Minimo de 6 caracteres.', 'error');
-      if (password !== password2) return ZKN.toast('Senhas nao coincidem', 'Confirme a mesma senha.', 'error');
+      if (!name || name.length < 3) return ZKN.toast('Nome inválido', 'Digite seu nome completo.', 'error');
+      if (!window.ZKNVal.validarCelular(phone)) return ZKN.toast('Celular inválido', 'Digite DDD + 9 + 8 dígitos.', 'error');
+      if (!email || !window.ZKNVal.validarEmail(email)) return ZKN.toast('E-mail inválido', 'Digite um e-mail válido (ex: seu@gmail.com).', 'error');
+      if (!password || password.length < 6) return ZKN.toast('Senha muito curta', 'Mínimo de 6 caracteres.', 'error');
+      if (password !== password2) return ZKN.toast('Senhas não coincidem', 'Confirme a mesma senha.', 'error');
 
       const btn = document.getElementById('btnCadastrar');
       btn.disabled = true;
@@ -196,15 +112,15 @@
 
       const turnstileToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]')?.value || '';
 
-      const r = await ZKNAuth.register({ name, phone, email, password, ref: urlRef || undefined, turnstileToken });
+      const r = await ZKNAuth.register({ name, phone, email, password, ref: refFinal, turnstileToken });
 
       btn.disabled = false;
       btn.textContent = 'Criar conta';
 
-      if (!r.sucesso) return ZKN.toast('Nao foi possivel cadastrar', r.mensagem, 'error');
+      if (!r.sucesso) return ZKN.toast('Não foi possível cadastrar', r.mensagem, 'error');
 
-      ZKN.toast('Conta criada!', 'Bem-vindo a ZKNbet.');
-      setTimeout(() => location.href = 'index.html', 600);
+      ZKN.toast('Conta criada!', 'Bem-vindo à ZKNbet.');
+      setTimeout(() => location.href = getBackTarget(), 600);
     };
   </script>
 </body>

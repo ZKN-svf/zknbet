@@ -11,12 +11,25 @@ function _authHeaders() {
   };
 }
 
-function detectarTipoPix(chave) {
-  const limpa = String(chave || '').replace(/\D/g, '');
-  if (limpa.length === 11 && /^\d+$/.test(limpa)) return 'cpf';
-  if (limpa.length === 14 && /^\d+$/.test(limpa)) return 'cnpj';
-  if (String(chave).includes('@')) return 'email';
-  if (limpa.length === 11 || limpa.length === 13) return 'phone';
+function detectarTipoPix(chave, hintType) {
+  if (window.ZKNVal && window.ZKNVal.identificarTipo) {
+    const res = window.ZKNVal.identificarTipo(chave);
+    if (hintType === 'phone' && res.tipo === 'cpf' && window.ZKNVal.validarCelular(chave)) {
+      return 'phone';
+    }
+    if (res.tipo !== 'unknown') return res.tipo;
+  }
+  const s = String(chave || '').trim();
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return 'email';
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)) return 'random';
+  const limpa = s.replace(/\D/g, '');
+  if (hintType === 'phone' && (limpa.length === 10 || limpa.length === 11)) return 'phone';
+  if (limpa.length === 14) return 'cnpj';
+  if (limpa.length === 11) {
+    if (window.ZKNVal && window.ZKNVal.validarCPF && !window.ZKNVal.validarCPF(limpa)) return 'phone';
+    return 'cpf';
+  }
+  if (limpa.length === 10 || limpa.length === 12 || limpa.length === 13) return 'phone';
   return 'random';
 }
 
@@ -54,18 +67,18 @@ async function consultarPagamento(identifier) {
   }
 }
 
-async function criarTransferencia(valor, chavePix, dadosProprietario) {
+async function criarTransferencia(valor, chavePix, dadosProprietario, tipoPix, pin) {
   try {
+    const tipoDetectado = tipoPix || detectarTipoPix(chavePix);
     const bodyEnviado = {
       amount: parseFloat(Number(valor).toFixed(2)),
-      pix: { key: chavePix, type: detectarTipoPix(chavePix) },
+      pix: { key: chavePix, type: tipoDetectado },
       owner: {
         name: dadosProprietario.nome,
         document: String(dadosProprietario.cpf).replace(/\D/g, ''),
       },
+      pin: pin || undefined,
     };
-
-    console.log('[SIGILO FRONTEND] Body enviado:', JSON.stringify(bodyEnviado, null, 2));
 
     const res = await fetch(_apiBase() + '/pix/transfer', {
       method: 'POST',

@@ -5,8 +5,8 @@
 // ============================================================
 
 (function() {
-  // Não mostra na tela de login/cadastro
-  const PAGINAS_SEM_NAV = ['login.html', 'cadastro.html'];
+  // Não mostra nas telas de auth e admin
+  const PAGINAS_SEM_NAV = ['login.html', 'cadastro.html', 'esqueci-senha.html', 'redefinir-senha.html', 'admin.html'];
   const paginaAtual = location.pathname.split('/').pop() || 'index.html';
   if (PAGINAS_SEM_NAV.includes(paginaAtual)) return;
 
@@ -140,16 +140,13 @@
       padding-bottom: 80px !important;
     }
 
-    /* Desktop: esconde (ou mostra menor) */
-    @media (min-width: 768px) {
+    /* Desktop (>900px): navega pelo header superior, esconde barra inferior */
+    @media (min-width: 901px) {
       .bottom-nav {
-        max-width: 480px;
-        border-radius: 20px;
-        bottom: 16px;
-        border: 1px solid rgba(245, 190, 60, 0.3);
+        display: none !important;
       }
       body {
-        padding-bottom: 100px !important;
+        padding-bottom: 0 !important;
       }
     }
   `;
@@ -192,35 +189,36 @@
   // ============================================================
   // BADGES — calcula quantas coisas disponiveis
   // ============================================================
-  async function calcularBadges() {
+  async function calcularBadges(force = false) {
     if (!window.ZKNAuth || !window.ZKNAuth.isLoggedIn || !window.ZKNAuth.isLoggedIn()) return;
+
+    if (window.ZKN && window.ZKN.getSummaryCached) {
+      const sum = await window.ZKN.getSummaryCached(force).catch(() => null);
+      if (sum && sum.rewards !== undefined) return;
+    }
 
     let rewardsCount = 0;
 
     try {
-      // 1) Roleta disponivel?
       const roulette = await ZKNAuth.api('/roulette/status');
-      if (roulette.ok && roulette.data.available) {
-        rewardsCount++;
-      }
+      if (roulette.ok && roulette.data.available) rewardsCount++;
     } catch (e) {}
 
     try {
-      // 2) Rebate disponivel (>= minimo)?
       const rebate = await ZKNAuth.api('/rebate/status');
-      if (rebate.ok && rebate.data && rebate.data.balance >= rebate.data.min_claim) {
-        rewardsCount++;
-      }
+      if (rebate.ok && rebate.data && rebate.data.balance >= rebate.data.min_claim) rewardsCount++;
     } catch (e) {}
 
     try {
       const pending = await ZKNAuth.api('/deposit-bonus/pending');
-      if (pending.ok && pending.data.pending && pending.data.pending.length > 0) {
-        rewardsCount++;
-      }
+      if (pending.ok && pending.data.pending && pending.data.pending.length > 0) rewardsCount++;
     } catch (e) {}
 
-    // Mostra badge se tiver algo
+    if (window.ZKN && window.ZKN.aplicarBadgesUI) {
+      window.ZKN.aplicarBadgesUI(rewardsCount);
+      return;
+    }
+
     const badgeRewards = document.getElementById('badge-rewards');
     if (badgeRewards) {
       if (rewardsCount > 0) {
@@ -230,17 +228,13 @@
         badgeRewards.classList.add('hidden');
       }
     }
-
-    // Badge em Conta (futuro — verifica se tem algo pendente)
-    // Ex: saque pendente, etc
-    // Por enquanto, sem badge
   }
 
   // Roda ao carregar
-  setTimeout(calcularBadges, 500);
+  setTimeout(() => calcularBadges(false), 400);
 
-  // Expõe pra atualizar manualmente
+  // Expõe pra atualizar manualmente (ex: apos girar roleta / resgatar bonus)
   window.ZKNBottomNav = {
-    atualizarBadges: calcularBadges,
+    atualizarBadges: () => calcularBadges(true),
   };
 })();

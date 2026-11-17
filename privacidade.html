@@ -1,9 +1,8 @@
-﻿<!-- privacidade.html -->
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Política de Privacidade</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,105 +11,53 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
-  <script src="assets/loading.js"></script>
-
-  <style>
-    /* Evita scroll horizontal acidental no mobile */
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    /* Carrossel Responsivo */
-    #carrosselBanners {
-      width: 100% !important;
-      max-width: 1000px !important;
-      margin: 24px auto 0 !important;
-      padding: 0 16px !important;
-      box-sizing: border-box;
-    }
-    .carrossel-wrapper {
-      max-width: 1280px;
-      margin: 0 auto;
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    #carrosselTrack {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      align-items: flex-start !important;
-      touch-action: pan-y !important;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: transform 0.5s ease;
-    }
-    #carrosselTrack > div {
-      flex: 0 0 100% !important;
-      min-width: 100% !important;
-      width: 100% !important;
-      cursor: pointer;
-    }
-    #carrosselTrack img {
-      width: 100% !important;
-      height: auto !important;
-      display: block !important;
-      object-fit: contain !important;
-    }
-
-    /* Barra de busca responsiva */
-    .search-box-wrapper {
-      position: relative;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 420px;
-    }
-    .search-box-input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px 12px 44px;
-      background: var(--bg-2);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 16px;
-      outline: none;
-    }
-
-    /* Ajustes específicos para Mobile */
-    @media (max-width: 768px) {
-      #carrosselBanners {
-        margin-top: 14px !important;
-        padding: 0 12px !important;
-      }
-      .carrossel-wrapper {
-        border-radius: 12px;
-      }
-      .winners-ticker {
-        margin-top: 14px !important;
-      }
-      .search-box-wrapper {
-        max-width: 100%;
-        margin-bottom: 16px;
-      }
-      .section-header {
-        gap: 8px;
-      }
-      .section-title {
-        font-size: 18px;
-      }
-      .zkn-footer {
-        padding-bottom: 84px;
-      }
-    }
-  </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
-  <div class="section" style="max-width:800px;">
-    <h1 style="font-family:var(--font-display);font-size:28px;margin-bottom:20px;">🛡️ Política de Privacidade</h1>
-    <p style="color:var(--text-muted);line-height:1.8;">Conteúdo em elaboração. Em breve a política completa estará disponível aqui.</p>
-    <p style="margin-top:20px;"><a href="index.html" style="color:var(--gold);font-weight:700;">← Voltar ao início</a></p>
-  </div>
+
+  <main class="legal-wrap">
+    <div class="legal-card">
+      <h1>Política de Privacidade (LGPD)</h1>
+      <div class="legal-updated">Última atualização: 2026 &middot; Conformidade com a Lei nº 13.709/2018</div>
+
+      <p>A ZKNbet trata os dados pessoais de seus usuários com rigor técnico, transparência e respeito à Lei Geral de Proteção de Dados (LGPD).</p>
+
+      <h2>1. Dados Coletados</h2>
+      <ul>
+        <li><strong>Dados cadastrais:</strong> nome completo, telefone celular, endereço de e-mail e identificador único de conta.</li>
+        <li><strong>Dados financeiros para PIX:</strong> CPF do titular, nome do titular e chave PIX informada para recebimento de saques.</li>
+        <li><strong>Dados técnicos e segurança:</strong> endereço IP em operações sensíveis, tokens de sessão criptografados e registros de prevenção à fraude.</li>
+      </ul>
+
+      <h2>2. Finalidade do Tratamento</h2>
+      <ul>
+        <li>Autenticar o usuário com segurança e proteger operações financeiras.</li>
+        <li>Processar depósitos e saques via PIX junto aos provedores de pagamento autorizados.</li>
+        <li>Prevenir fraudes, lavagem de dinheiro, contas duplicadas e abuso de promoções.</li>
+      </ul>
+
+      <h2>3. Proteção e Armazenamento</h2>
+      <p>As senhas de acesso são protegidas com hash criptográfico (bcrypt), as comunicações trafegam exclusivamente via HTTPS/TLS e não comercializamos nem cedemos seus dados a terceiros para fins publicitários.</p>
+
+      <h2>4. Seus Direitos (LGPD)</h2>
+      <p>Você pode atualizar seus dados em <a href="alterar-dados.html" style="color:var(--gold);font-weight:700;">Alterar Dados</a> ou solicitar esclarecimentos, portabilidade ou exclusão da conta pelos nossos canais oficiais de suporte, respeitados os prazos legais de retenção fiscal e regulatória.</p>
+
+      <p style="margin-top:28px;"><a href="index.html" style="color:var(--gold);font-weight:700;">&larr; Voltar ao início</a></p>
+    </div>
+  </main>
+
+  <footer class="zkn-footer">
+    <div class="zkn-footer-inner">
+      <p><strong>ZKNbet</strong> &copy; 2026 &middot; Todos os direitos reservados</p>
+      <p class="disclaimer">Proibido para menores de 18 anos. Jogue com responsabilidade.</p>
+    </div>
+  </footer>
+
+  <script src="assets/loading.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/validators.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/bottom-nav.js"></script>
 </body>
 </html>
