@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
-  <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
-  <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
 
@@ -338,20 +337,22 @@
         const capaLocal = codigoImg ? `img/PGsoft/${codigoImg}.png` : '';
         
         const inicial = (j.name || '?').charAt(0).toUpperCase();
-        const nomeEsc = (j.name || '').replace(/'/g, "\\'");
         const favBtn = window.ZKNGamesLib && window.ZKNGamesLib.renderFavButton ? window.ZKNGamesLib.renderFavButton(j.game_code) : '';
+        const nomeSafe = escapeHtml(j.name);
+        const providerSafe = escapeHtml(j.provider_name || '');
+        const capaSafe = escapeHtml(capaLocal);
         
         return `
-          <div class="game-card" onclick="jogar('${j.game_code}', '${nomeEsc}')">
+          <div class="game-card" onclick="jogar('${escapeJsAttr(j.game_code)}', '${escapeJsAttr(j.name)}')">
             ${favBtn}
             <div class="game-card-cover">
-              <img src="${capaLocal}" alt="${j.name}" loading="lazy" decoding="async" 
-                   onerror="this.onerror=null; this.style.display='none'; const span=document.createElement('span'); span.className='fallback-txt'; span.innerText='${inicial}'; span.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:bold;color:var(--gold);'; this.parentNode.appendChild(span);">
+              <img src="${capaSafe}" alt="${nomeSafe}" loading="lazy" decoding="async" 
+                   onerror="this.onerror=null; this.style.display='none'; const span=document.createElement('span'); span.className='fallback-txt'; span.innerText='${escapeJsAttr(inicial)}'; span.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:bold;color:var(--gold);'; this.parentNode.appendChild(span);">
               <div class="game-card-play"><div class="play-btn">&#9654;</div></div>
             </div>
             <div class="game-card-info">
-              <div class="game-card-name" title="${j.name}">${j.name}</div>
-              <div class="game-card-provider">${j.provider_name || ''}</div>
+              <div class="game-card-name" title="${nomeSafe}">${nomeSafe}</div>
+              <div class="game-card-provider">${providerSafe}</div>
             </div>
           </div>
         `;
@@ -442,7 +443,7 @@
       const email = user.email || (user.phone + '@zknbet.com');
 
       ZKN.toast('Abrindo jogo...', nome || code);
-      const res = await NitroGames.abrirJogo(code, email);
+      const res = await Rapidverse.abrirJogo(code, email);
 
       if (res.sucesso && res.launch_url) {
         if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) { window.ZKNGameFrame.abrir(res.launch_url, nome || code); } else { window.open(res.launch_url, '_blank', 'noopener'); }
@@ -455,8 +456,8 @@
       iniciarTicker();
 
       const [jogos, provs] = await Promise.all([
-        NitroGames.listarJogos(),
-        NitroGames.listarProvedores(),
+        Rapidverse.listarJogos(),
+        Rapidverse.listarProvedores(),
       ]);
 
       if (jogos.sucesso) {
@@ -467,17 +468,17 @@
       } else {
         document.getElementById('featuredGrid').innerHTML =
           '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">' +
-          (jogos.mensagem || 'Erro ao carregar jogos.') + '</div>';
+          escapeHtml(jogos.mensagem || 'Erro ao carregar jogos.') + '</div>';
       }
 
       if (provs.sucesso && provs.provedores.length) {
         document.getElementById('providersStrip').innerHTML = provs.provedores.map(p => `
-          <div class="provider-chip" onclick="location.href='jogos.html'">${p.name}</div>
+          <div class="provider-chip" onclick="location.href='jogos.html'">${escapeHtml(p.name)}</div>
         `).join('');
       } else {
         const nomes = window.ZKNProviders ? window.ZKNProviders.providersUnicos(ALL_GAMES) : [...new Set(ALL_GAMES.map(j => j.provider_name).filter(Boolean))];
         document.getElementById('providersStrip').innerHTML = nomes.map(n => `
-          <div class="provider-chip" onclick="location.href='jogos.html'">${n}</div>
+          <div class="provider-chip" onclick="location.href='jogos.html'">${escapeHtml(n)}</div>
         `).join('');
       }
 
@@ -537,7 +538,7 @@
     // Carrossel de Banners
     (async function() {
       try {
-        const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+        const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || window.ZKN_API;
         const res = await fetch(apiBase + '/marketing/banners');
         const data = await res.json();
         const banners = (data.banners || []).filter(b => b.type === 'carousel');
@@ -631,7 +632,7 @@
       const now = new Date().getTime();
       if (lastShown && (now - parseInt(lastShown)) < 24 * 60 * 60 * 1000) return;
       try {
-        const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+        const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || window.ZKN_API;
         const res = await fetch(apiBase + '/marketing/banners');
         const data = await res.json();
         const banners = (data.banners || []).filter(b => b.type === 'popup');

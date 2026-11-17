@@ -2,7 +2,7 @@
 // ZKNbet — Auth (sessão + chamadas API)
 // ============================================================
 const AUTH_CONFIG = {
-  apiBase: window.ZKN_CONFIG?.api || 'https://zknbet-api.gabrielrobin63.workers.dev/api',
+  apiBase: (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || window.ZKN_API,
   jwtKey: 'zkn_jwt',
   userKey: 'zkn_user',
 };

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Favoritos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -137,7 +138,6 @@
   <script src="assets/bottom-nav.js"></script>
   <script src="assets/game-frame.js"></script>
   <script src="assets/daily-bonus.js"></script>
-  <script src="assets/providers-map.js"></script>
   <script src="assets/rapidverse.js"></script>
   <script src="assets/games-lib.js"></script>
   <script>
@@ -195,7 +195,7 @@
     // ---------- CARREGAR ----------
     async function carregar() {
       // Carrega jogos da API
-      const res = await NitroGames.listarJogos();
+      const res = await Rapidverse.listarJogos();
 
       if (res.sucesso) {
         // Aplica providers reais
@@ -203,7 +203,7 @@
       } else {
         document.getElementById('favGrid').innerHTML =
           '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">' +
-          (res.mensagem || 'Erro ao carregar jogos.') + '</div>';
+          escapeHtml(res.mensagem || 'Erro ao carregar jogos.') + '</div>';
         return;
       }
 

@@ -1,3 +1,21 @@
+// Helpers locais (usa os globais de app.js quando disponíveis)
+function _esc(v) {
+  if (window.escapeHtml) return window.escapeHtml(v);
+  return String(v == null ? '' : v).replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function _escAttr(v) {
+  if (window.escapeJsAttr) return window.escapeJsAttr(v);
+  return _esc(String(v == null ? '' : v)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\r/g, '\\r')
+    .replace(/\n/g, '\\n')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029'));
+}
+
 // Traduz mensagens do backend para o usuario
 function _traduzirMensagem(msg) {
   if (!msg) return msg;
@@ -110,7 +128,7 @@ async function registrarRecente(code) {
 function renderFavButton(gameCode) {
   var fav = isFavorito(gameCode);
   return '<button class="game-card-fav ' + (fav ? 'active' : '') + '" ' +
-    'onclick="event.stopPropagation(); ZKNGamesLib.toggleFav(this, \'' + gameCode + '\')" ' +
+    'onclick="event.stopPropagation(); ZKNGamesLib.toggleFav(this, \'' + _escAttr(gameCode) + '\')" ' +
     'aria-label="' + (fav ? 'Remover dos favoritos' : 'Adicionar aos favoritos') + '" ' +
     'title="' + (fav ? 'Remover dos favoritos' : 'Adicionar aos favoritos') + '">' +
     (fav ? '★' : '☆') + '</button>';
@@ -120,19 +138,18 @@ function renderFavButton(gameCode) {
 function renderGameCard(j) {
   var capa = j.image_url || '';
   var inicial = (j.name || '?').charAt(0).toUpperCase();
-  var nomeEsc = (j.name || '').replace(/'/g, "\\'");
-  var nomeSafe = (j.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  var providerSafe = (j.provider_name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  var nomeSafe = _esc(j.name);
+  var providerSafe = _esc(j.provider_name || '');
 
   var coverHtml;
   if (capa) {
-    coverHtml = '<img src="' + capa + '" alt="' + nomeSafe + '" loading="lazy" ' +
-      'onerror="this.style.display=\'none\';this.parentNode.insertBefore(document.createTextNode(\'' + inicial + '\'),this.nextSibling)">';
+    coverHtml = '<img src="' + _esc(capa) + '" alt="' + nomeSafe + '" loading="lazy" ' +
+      'onerror="this.style.display=\'none\';this.parentNode.insertBefore(document.createTextNode(\'' + _escAttr(inicial) + '\'),this.nextSibling)">';
   } else {
-    coverHtml = inicial;
+    coverHtml = _esc(inicial);
   }
 
-  return '<div class="game-card" onclick="ZKNGamesLib.abrirJogo(\'' + j.game_code + '\', \'' + nomeEsc + '\')">' +
+  return '<div class="game-card" onclick="ZKNGamesLib.abrirJogo(\'' + _escAttr(j.game_code) + '\', \'' + _escAttr(j.name) + '\')">' +
     renderFavButton(j.game_code) +
     '<div class="game-card-cover">' +
       coverHtml +
@@ -174,12 +191,12 @@ async function abrirJogo(code, nome) {
 
   if (typeof ZKN !== 'undefined') ZKN.toast('Abrindo jogo...', nome || code);
 
-  if (!window.NitroGames || !window.NitroGames.abrirJogo) {
-    if (typeof ZKN !== 'undefined') ZKN.toast('Erro', 'NitroGames não carregou.', 'error');
+  if (!window.Rapidverse || !window.Rapidverse.abrirJogo) {
+    if (typeof ZKN !== 'undefined') ZKN.toast('Erro', 'Rapidverse não carregou.', 'error');
     return;
   }
 
-  var res = await window.NitroGames.abrirJogo(code, email);
+  var res = await window.Rapidverse.abrirJogo(code, email);
   if (res.sucesso && res.launch_url) {
     // SOLUÇÃO FINAL: abrir em nova aba (fora do iframe)
     // Isso resolve o problema de cookies de terceiros

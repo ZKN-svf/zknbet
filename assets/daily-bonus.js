@@ -248,7 +248,7 @@
         popup.querySelector('.daily-bonus-popup').innerHTML = `
           <div class="daily-bonus-popup-icon">😊</div>
           <h3 class="daily-bonus-popup-title">Ops!</h3>
-          <p class="daily-bonus-popup-text">${msg}</p>
+          <p class="daily-bonus-popup-text">${window.escapeHtml ? escapeHtml(msg) : msg}</p>
           <button class="daily-bonus-popup-btn" onclick="this.closest('.daily-bonus-popup-backdrop').remove()">OK</button>
         `;
 

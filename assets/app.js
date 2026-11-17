@@ -39,6 +39,30 @@ const ZKN_USER = {
 function formatBRL(v) {
   return 'R$ ' + Number(v || 0).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
+
+// ---------- Escape de HTML (evita XSS ao montar strings com dados da API) ----------
+const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+function escapeHtml(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, c => HTML_ESCAPES[c]);
+}
+// Para valores usados dentro de strings JS em atributos onclick
+function escapeJsString(v) {
+  return String(v == null ? '' : v)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\r/g, '\\r')
+    .replace(/\n/g, '\\n')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029')
+    .replace(/</g, '\\x3c')
+    .replace(/>/g, '\\x3e');
+}
+function escapeJsAttr(v) {
+  return escapeHtml(escapeJsString(v));
+}
+window.escapeHtml = escapeHtml;
+window.escapeJsString = escapeJsString;
+window.escapeJsAttr = escapeJsAttr;
 function gerarIniciais(nome) {
   if (!nome) return '?';
   const p = nome.trim().split(/\s+/);
@@ -55,7 +79,7 @@ function toast(title, body = '', type = 'success') {
   }
   const el = document.createElement('div');
   el.className = 'toast ' + type;
-  el.innerHTML = `<div class="toast-title">${title}</div>${body ? `<div class="toast-body">${body}</div>` : ''}`;
+  el.innerHTML = `<div class="toast-title">${escapeHtml(title)}</div>${body ? `<div class="toast-body">${escapeHtml(body)}</div>` : ''}`;
   container.appendChild(el);
   setTimeout(() => {
     el.style.animation = 'slideIn 0.25s ease-out reverse';
@@ -164,19 +188,20 @@ function renderHeader() {
   }
 
   atualizarDrawerUser();
+  mostrarBannerEmail();
+}
 
-  // Banner de verificação de email
-  (function() {
-    const u = window.ZKNAuth?.getUser?.();
-    if (!u || u.emailVerified || document.getElementById('zknEmailBanner')) return;
+// Banner de verificação de email (idempotente: só cria uma vez)
+function mostrarBannerEmail() {
+  const u = window.ZKNAuth?.getUser?.();
+  if (!u || u.emailVerified || document.getElementById('zknEmailBanner')) return;
 
-    const banner = document.createElement('div');
-    banner.id = 'zknEmailBanner';
-    banner.style.cssText = 'position:fixed;top:68px;left:0;right:0;z-index:99;background:linear-gradient(90deg,#f5be3c,#ffd76e);color:#0a0f1a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
-    banner.innerHTML = '<span>&#9888;&#65039; Verifique seu email para liberar saques. (olhe a caixa de spam)</span>' +
-      '<button onclick="ZKN.reenviarEmail(this)" style="background:#0a0f1a;color:#f5be3c;border:none;padding:8px 16px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;">Reenviar</button>';
-    document.body.appendChild(banner);
-  })();
+  const banner = document.createElement('div');
+  banner.id = 'zknEmailBanner';
+  banner.style.cssText = 'position:fixed;top:68px;left:0;right:0;z-index:99;background:linear-gradient(90deg,#f5be3c,#ffd76e);color:#0a0f1a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
+  banner.innerHTML = '<span>&#9888;&#65039; Verifique seu email para liberar saques. (olhe a caixa de spam)</span>' +
+    '<button onclick="ZKN.reenviarEmail(this)" style="background:#0a0f1a;color:#f5be3c;border:none;padding:8px 16px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;">Reenviar</button>';
+  document.body.appendChild(banner);
 }
 
 function abrirDrawer() {
@@ -185,19 +210,7 @@ function abrirDrawer() {
   document.getElementById('zknDrawer')?.setAttribute('aria-hidden', 'false');
   document.body.classList.add('drawer-open');
   atualizarDrawerUser();
-
-  // Banner de verificação de email
-  (function() {
-    const u = window.ZKNAuth?.getUser?.();
-    if (!u || u.emailVerified || document.getElementById('zknEmailBanner')) return;
-
-    const banner = document.createElement('div');
-    banner.id = 'zknEmailBanner';
-    banner.style.cssText = 'position:fixed;top:68px;left:0;right:0;z-index:99;background:linear-gradient(90deg,#f5be3c,#ffd76e);color:#0a0f1a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
-    banner.innerHTML = '<span>&#9888;&#65039; Verifique seu email para liberar saques. (olhe a caixa de spam)</span>' +
-      '<button onclick="ZKN.reenviarEmail(this)" style="background:#0a0f1a;color:#f5be3c;border:none;padding:8px 16px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;">Reenviar</button>';
-    document.body.appendChild(banner);
-  })();
+  mostrarBannerEmail();
 }
 function fecharDrawer() {
   document.getElementById('zknDrawer')?.classList.remove('open');
@@ -213,10 +226,10 @@ function atualizarDrawerUser() {
   const user = window.ZKNAuth?.getUser?.();
   if (user) {
     userBox.innerHTML = `
-      <div class="drawer-avatar">${gerarIniciais(user.name)}</div>
+      <div class="drawer-avatar">${escapeHtml(gerarIniciais(user.name))}</div>
       <div class="drawer-user-info">
-        <div class="drawer-user-name">${user.name}</div>
-        <div class="drawer-user-phone">${user.phone}</div>
+        <div class="drawer-user-name">${escapeHtml(user.name)}</div>
+        <div class="drawer-user-phone">${escapeHtml(user.phone)}</div>
       </div>
     `;
     footer.innerHTML = `<button class="drawer-btn" onclick="window.ZKNAuth.logout()">Sair da conta</button>`;
@@ -242,7 +255,9 @@ function abrirIndicacaoDrawer() {
     return;
   }
   const base = location.origin + location.pathname.replace(/\/[^/]*$/, '/');
-  const link = `${base}cadastro.html?ref=${user.refCode}`;
+  const link = `${base}cadastro.html?ref=${encodeURIComponent(user.refCode || '')}`;
+  const linkHtml = escapeHtml(link);
+  const linkJs = escapeHtml(JSON.stringify(link));
 
   const w = window.open('', '_blank', 'width=520,height=380');
   w.document.write(`
@@ -256,8 +271,8 @@ function abrirIndicacaoDrawer() {
     </style></head><body>
       <h2>Seu código de indicação</h2>
       <p>Compartilhe e ganhe comissão em cada aposta dos seus indicados.</p>
-      <div class="code">${link}</div>
-      <button onclick="navigator.clipboard.writeText('${link}');this.textContent='Copiado!'">Copiar link</button>
+      <div class="code">${linkHtml}</div>
+      <button onclick="navigator.clipboard.writeText(${linkJs});this.textContent='Copiado!'">Copiar link</button>
     </body></html>
   `);
 }
@@ -408,6 +423,7 @@ window.ZKN = {
   },
 
   ZKN_USER, formatBRL, toast, gerarIniciais,
+  escapeHtml, escapeJsString, escapeJsAttr,
   renderHeader, abrirDrawer, fecharDrawer, abrirIndicacaoDrawer, atualizarSaldoBtn,
 };
 
@@ -468,12 +484,6 @@ window.ZKN = {
     });
   }).observe(document.body, { childList: true, subtree: true });
 })();
-
-window._animarSaldo = function() {
-  document.querySelectorAll('[data-balance]').forEach(el => {
-    if (typeof animar === 'function') animar(el);
-  });
-};
 
 // Forca a animacao mesmo se o saldo nao mudou (uso no botao de recarregar)
 function forcarAnimacaoSaldo() {
@@ -556,7 +566,7 @@ window.ZKN.abrirResgatarCodigo = function() {
     
     try {
       const token = window.ZKNAuth.getToken();
-      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || window.ZKN_API;
       
       // Usa fetch direto, igual o auth.js faz
       const res = await fetch(apiBase + '/promo/claim', {
@@ -636,56 +646,25 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================================
-// CARREGAR TEMA SAZONAL
+// CARREGAR TEMA SAZONAL (uma única chamada por página)
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || '';
     const res = await fetch(apiBase + '/settings/theme');
     const data = await res.json();
-    
-    if (data.theme && data.theme !== 'default') {
+    const tema = String(data.theme || '').trim();
+
+    if (tema && tema !== 'default' && /^[a-z0-9_-]+$/i.test(tema)) {
       if (!document.getElementById('event-theme-css')) {
         const link = document.createElement('link');
         link.id = 'event-theme-css';
         link.rel = 'stylesheet';
-        link.href = 'assets/events.css';
+        // Cache-bust estável: muda quando o tema muda, mas permite cache entre visitas
+        link.href = 'assets/events.css?v=' + encodeURIComponent(tema);
         document.head.appendChild(link);
       }
-      document.body.classList.add('theme-' + data.theme);
-    }
-  } catch(e) { console.error('Erro ao carregar tema', e); }
-});
-
-// ============================================================
-// CARREGAR TEMA SAZONAL ULTRA
-// ============================================================
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || '';
-    const res = await fetch(apiBase + '/settings/theme');
-    const data = await res.json();
-    
-    if (data.theme && data.theme !== 'default') {
-      // Adiciona o CSS do tema
-      if (!document.getElementById('event-theme-css')) {
-        const link = document.createElement('link');
-        link.id = 'event-theme-css';
-        link.rel = 'stylesheet';
-        link.href = 'assets/events.css?v=' + Date.now(); // Cache bust
-        document.head.appendChild(link);
-      }
-      
-      // Aplica a classe no body
-      document.body.classList.add('theme-' + data.theme);
-
-      // Exemplo de injeção de HTML extra (se precisar)
-      if (data.theme === 'christmas' && !document.getElementById('xmas-lights')) {
-        const lights = document.createElement('div');
-        lights.id = 'xmas-lights';
-        // Aqui poderia injetar luzes via DOM se o CSS não fosse suficiente
-        document.body.appendChild(lights);
-      }
+      document.body.classList.add('theme-' + tema);
     }
   } catch(e) { console.error('Erro ao carregar tema', e); }
 });

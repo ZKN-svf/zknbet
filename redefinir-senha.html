@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Nova Senha</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -155,7 +156,7 @@
           setTimeout(() => location.href = 'login.html', 3000);
         } else {
           box.className = 'status-box active error';
-          box.innerHTML = data.message || 'Erro ao redefinir senha.';
+          box.textContent = data.message || 'Erro ao redefinir senha.';
         }
       } catch (e) {
         box.className = 'status-box active error';

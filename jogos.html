@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet - Catalogo de Jogos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -205,19 +206,21 @@
       grid.innerHTML = lista.map(j => {
         const codigoImg = j.vendor_game_code || j.game_code;
         const capaLocal = codigoImg ? `${PASTA_CAPAS}/${codigoImg}.png` : '';
-        const fallback = (j.image_url || '').replace(/"/g, '&quot;');
+        const fallback = escapeHtml(j.image_url || '');
         const inicial = (j.name || '?').charAt(0).toUpperCase();
-        const nomeEsc = (j.name || '').replace(/'/g, "\\'");
+        const nomeSafe = escapeHtml(j.name);
+        const providerSafe = escapeHtml(j.provider_name || '');
+        const capaSafe = escapeHtml(capaLocal);
         return `
-          <div class="game-card" onclick="jogar('${j.game_code}', '${nomeEsc}')">
+          <div class="game-card" onclick="jogar('${escapeJsAttr(j.game_code)}', '${escapeJsAttr(j.name)}')">
             <div class="game-card-cover">
-              <img src="${capaLocal}" alt="${j.name}" loading="lazy" decoding="async"
-                   data-fb="${fallback}" data-inicial="${inicial}" onerror="capaFalhou(this)">
+              <img src="${capaSafe}" alt="${nomeSafe}" loading="lazy" decoding="async"
+                   data-fb="${fallback}" data-inicial="${escapeHtml(inicial)}" onerror="capaFalhou(this)">
               <div class="game-card-play"><div class="play-btn">&#9654;</div></div>
             </div>
             <div class="game-card-info">
-              <div class="game-card-name" title="${j.name}">${j.name}</div>
-              <div class="game-card-provider">${j.provider_name || ''}</div>
+              <div class="game-card-name" title="${nomeSafe}">${nomeSafe}</div>
+              <div class="game-card-provider">${providerSafe}</div>
             </div>
           </div>
         `;
@@ -235,7 +238,7 @@
       const email = user.email || (user.phone + '@zknbet.com');
 
       ZKN.toast('Abrindo jogo...', nome || code);
-      const res = await NitroGames.abrirJogo(code, email);
+      const res = await Rapidverse.abrirJogo(code, email);
 
       if (res.sucesso && res.launch_url) {
         if (window.ZKNGameFrame && window.ZKNGameFrame.abrir) { window.ZKNGameFrame.abrir(res.launch_url, nome || code); } else { window.open(res.launch_url, '_blank', 'noopener'); }
@@ -287,14 +290,14 @@
       strip.innerHTML = lista.map(function(p) {
         const url = 'jogos.html?provider=' + encodeURIComponent(p.name);
         return '<div class="provider-chip" onclick="location.href=\'' + url + '\'" style="cursor:pointer;">' +
-          '<div style="font-weight:800;font-size:14px;color:#fff;">' + p.name + '</div>' +
+          '<div style="font-weight:800;font-size:14px;color:#fff;">' + escapeHtml(p.name) + '</div>' +
           '<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">' + p.count + ' jogos</div>' +
         '</div>';
       }).join('');
     }
 
     async function iniciar() {
-      const res = await NitroGames.listarJogos();
+      const res = await Rapidverse.listarJogos();
       if (!res.sucesso) {
         document.getElementById('grid').innerHTML =
           '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">' +

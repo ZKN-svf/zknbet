@@ -1,14 +1,12 @@
-/* ZKNbet - client de jogos da Rapidverse (substitui assets/nitrogames.js)
+/* ZKNbet - client de jogos da Rapidverse
  * - Lista:  GET  /api/rapidverse/games   (publico)
  * - Abrir:  POST /api/rapidverse/launch  (precisa de login)
- * Mantem a mesma interface do antigo NitroGames (listarJogos, listarProvedores,
- * abrirJogo) para as paginas atuais continuarem funcionando.
+ * Interface: listarJogos, listarProvedores, abrirJogo.
  */
 (function () {
   'use strict';
 
-  var API = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) ||
-    'https://zknbet-api.gabrielrobin63.workers.dev/api';
+  var API = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || window.ZKN_API;
 
   var _lista = null;      // jogos normalizados
   var _porCode = {};      // game_code -> jogo
@@ -122,7 +120,7 @@
     });
   }
 
-  // O segundo parametro (email) existe so por compatibilidade com o NitroGames.
+  // O segundo parametro (email) existe so por compatibilidade com chamadas antigas.
   function abrirJogo(gameCode) {
     var token = getToken();
     if (!token) return Promise.resolve({ sucesso: false, mensagem: 'Faca login para jogar.' });
@@ -160,10 +158,9 @@
     abrirJogo: abrirJogo
   };
   window.Rapidverse = api;
-  window.NitroGames = api; // alias: paginas antigas continuam funcionando
 
-  // Substitui o antigo providers-map.js (mapeamento de provedoras da NitroGames).
-  // Aqui o provider ja vem certo (vendor_code), entao so devolve a lista.
+  // Mapeamento de provedoras: o provider ja vem certo (vendor_code),
+  // entao so devolve a lista recebida.
   window.ZKNProviders = {
     aplicarProvidersReais: function (lista) { return lista || []; },
     providersUnicos: function (lista) {

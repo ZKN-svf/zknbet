@@ -40,7 +40,7 @@
     gameModal.className = 'game-modal';
     gameModal.innerHTML =
       '<div class="game-main">' +
-        '<link rel="dns-prefetch" href="https://nitrogames.pladarck.shop"><link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin><iframe id="game-iframe" class="game-iframe" data-src-pending="1" allow="autoplay; fullscreen; payment; same-origin; storage-access" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-storage-access-by-user-activation"></iframe>' +
+        '<iframe id="game-iframe" class="game-iframe" data-src-pending="1" allow="autoplay; fullscreen; payment; same-origin; storage-access" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-storage-access-by-user-activation"></iframe>' +
         '<div id="game-loading" class="game-loading">' +
           '<div class="game-loading-spinner"></div>' +
           '<div class="game-loading-text">Carregando ' + currentGameName + '...</div>' +

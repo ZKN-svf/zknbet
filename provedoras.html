@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Provedoras</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -137,11 +138,11 @@
       const countEl = document.getElementById('count');
 
       try {
-        if (typeof NitroGames === 'undefined' || !NitroGames.listarJogos) {
-          throw new Error('NitroGames nao carregou');
+        if (typeof Rapidverse === 'undefined' || !Rapidverse.listarJogos) {
+          throw new Error('Rapidverse nao carregou');
         }
 
-        const res = await NitroGames.listarJogos();
+        const res = await Rapidverse.listarJogos();
         if (!res || !res.sucesso) {
           throw new Error((res && res.mensagem) || 'Erro ao carregar jogos');
         }
@@ -173,14 +174,14 @@
           const url = 'jogos.html?provider=' + encodeURIComponent(p.name);
           return '<div class="provider-chip" onclick="location.href=\'' + url + '\'" style="padding:28px 20px;cursor:pointer;">' +
             '<div style="font-size:32px;margin-bottom:8px;">' + String.fromCodePoint(0x1F3B0) + '</div>' +
-            '<div style="font-size:15px;margin-bottom:4px;">' + p.name + '</div>' +
+            '<div style="font-size:15px;margin-bottom:4px;">' + escapeHtml(p.name) + '</div>' +
             '<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;">' + p.count + ' jogos</div>' +
           '</div>';
         }).join('');
 
       } catch (e) {
         console.error('[PROVEDORAS] erro:', e);
-        grid.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">Erro: ' + (e.message || 'desconhecido') + '</div>';
+        grid.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--red);">Erro: ' + escapeHtml(e.message || 'desconhecido') + '</div>';
         countEl.textContent = 'erro';
       }
     }

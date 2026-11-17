@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Saque PIX</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
-  <link rel="preconnect" href="https://nitrogames.pladarck.shop" crossorigin>
-  <link rel="dns-prefetch" href="https://nitrogames.pladarck.shop">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
 
@@ -261,7 +260,7 @@ document.getElementById('btnSaque').onclick = async () => {
         ]);
 
         if (!pinOk || !pinOk.sucesso) {
-          return setStatus('error', (pinOk && pinOk.mensagem) || 'PIN incorreto.');
+          return setStatus('error', ZKN.escapeHtml((pinOk && pinOk.mensagem) || 'PIN incorreto.'));
         }
 
         // 2) Pega dados de saque
@@ -283,7 +282,7 @@ document.getElementById('btnSaque').onclick = async () => {
         ]);
 
         if (res && res.sucesso) {
-          setStatus('success', `✅ Saque de ${ZKN.formatBRL(valor)} solicitado!<br>Status: ${res.status || 'PENDENTE'}.`);
+          setStatus('success', `✅ Saque de ${ZKN.formatBRL(valor)} solicitado!<br>Status: ${ZKN.escapeHtml(res.status || 'PENDENTE')}.`);
           ZKN.ZKN_USER.balance = ZKN.ZKN_USER.balance - valor;
           ZKN.toast('Saque solicitado!', `${ZKN.formatBRL(valor)} em processamento.`);
           document.getElementById('valorSaque').value = '';
@@ -291,12 +290,12 @@ document.getElementById('btnSaque').onclick = async () => {
         } else {
           // MOSTRA A MENSAGEM REAL (nao mais "Invalid request data" hardcoded)
           const msg = (res && res.mensagem) ? res.mensagem : 'Erro ao processar saque.';
-          setStatus('error', msg);
+          setStatus('error', ZKN.escapeHtml(msg));
           ZKN.toast('Erro no saque', msg, 'error');
           console.log('[SAQUE] resposta completa:', JSON.stringify(res, null, 2));
         }
       } catch (e) {
-        setStatus('error', 'Erro: ' + (e.message || 'Falha na conexao'));
+        setStatus('error', 'Erro: ' + ZKN.escapeHtml(e.message || 'Falha na conexao'));
         ZKN.toast('Erro no saque', e.message || 'Verifique a conexao.', 'error');
       } finally {
         btn.disabled = false;

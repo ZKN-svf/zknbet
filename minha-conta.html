@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; media-src 'self' data: blob: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:">
   <title>ZKNbet — Minha Conta</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -153,12 +154,12 @@
       const user = ZKNAuth.getUser();
       document.getElementById('userInfo').innerHTML = `
         <div style="display:flex;align-items:center;gap:16px;padding:20px;background:var(--bg-3);border-radius:var(--radius);border:1px solid var(--border);">
-          <div class="drawer-avatar" style="width:56px;height:56px;font-size:20px;">${ZKN.gerarIniciais(user.name)}</div>
+          <div class="drawer-avatar" style="width:56px;height:56px;font-size:20px;">${ZKN.escapeHtml(ZKN.gerarIniciais(user.name))}</div>
           <div style="min-width:0;">
-            <div style="font-weight:800;font-size:18px;margin-bottom:2px;">${user.name}</div>
-            <div style="color:var(--text-muted);font-size:14px;">${user.phone}</div>
-            <div style="color:var(--text-muted);font-size:12px;">${user.email || ''}</div>
-            <div style="color:var(--gold);font-size:12px;font-weight:700;margin-top:4px;">Código: ${user.refCode}</div>
+            <div style="font-weight:800;font-size:18px;margin-bottom:2px;">${ZKN.escapeHtml(user.name)}</div>
+            <div style="color:var(--text-muted);font-size:14px;">${ZKN.escapeHtml(user.phone)}</div>
+            <div style="color:var(--text-muted);font-size:12px;">${ZKN.escapeHtml(user.email || '')}</div>
+            <div style="color:var(--gold);font-size:12px;font-weight:700;margin-top:4px;">Código: ${ZKN.escapeHtml(user.refCode)}</div>
           </div>
         </div>
         <div class="saldo-info" style="margin-top:16px;">

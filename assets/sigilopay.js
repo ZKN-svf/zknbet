@@ -1,6 +1,6 @@
 ﻿// SIGILOPAY CLIENT (frontend) - chama o Worker
 function _apiBase() {
-  return (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || 'https://zknbet-api.gabrielrobin63.workers.dev/api';
+  return (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || window.ZKN_API;
 }
 
 function _authHeaders() {
