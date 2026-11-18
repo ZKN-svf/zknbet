@@ -233,6 +233,21 @@
     }
 
     .slot-top-actions { display: flex; align-items: center; gap: 6px; }
+    .slot-login-link {
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fff3a1 0%, #f4e83a 100%);
+      color: #090f1f;
+      font-family: 'Sora', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(244, 232, 58, 0.35);
+    }
     .slot-icon-btn {
       width: 34px;
       height: 34px;
@@ -949,6 +964,7 @@
         <span class="slot-mode-tag" id="modeTag">DEMO</span>
       </div>
       <div class="slot-top-actions">
+        <a href="login.html?back=slot-zkn-777.html" class="slot-login-link" id="guestLoginBtn" style="display:none;">ENTRAR</a>
         <button type="button" class="slot-icon-btn active" id="soundBtn" onclick="toggleSound()" title="Som" aria-label="Alternar som">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="soundIcon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
         </button>
@@ -1091,11 +1107,25 @@
   <script src="assets/config.js"></script>
   <script src="assets/auth.js"></script>
   <script>
-    if (!window.ZKNAuth || !ZKNAuth.requireLogin('slot-zkn-777.html')) {
-      throw new Error('redirecionado');
+    const isUserLoggedIn = !!(window.ZKNAuth && ZKNAuth.isLoggedIn && ZKNAuth.isLoggedIn());
+    if (!isUserLoggedIn) {
+      const glBtn = document.getElementById('guestLoginBtn');
+      if (glBtn) glBtn.style.display = 'inline-flex';
     }
 
     const SYM_ORDER = ['clover', 'coin', 'ruby', 'bell', 'seven', 'crown', 'wild'];
+    const SYM_MAP = {
+      clover: { id: "clover", name: "Trevo Esmeralda", weight: 66, mult: 0.65 },
+      coin:   { id: "coin",   name: "Moeda Imperial",  weight: 45, mult: 1.25 },
+      ruby:   { id: "ruby",   name: "Rubi Real",       weight: 33, mult: 2.6 },
+      bell:   { id: "bell",   name: "Sino Dourado",    weight: 21, mult: 5.2 },
+      seven:  { id: "seven",  name: "777 Ouro",        weight: 12, mult: 12.5 },
+      crown:  { id: "crown",  name: "Coroa Suprema",   weight: 6,  mult: 26.0 },
+      wild:   { id: "wild",   name: "ZKN Wild",        weight: 9,  mult: 42.0 },
+    };
+    const SLOT_LINES = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 4, 8], [6, 4, 2]
+    ];
     const DEFAULT_BETS = [0.5, 1, 2, 5, 10, 25, 50];
     const CELL_H = 74;
     const ICON_BASE = 'img/originals/slot777/';
@@ -1119,6 +1149,89 @@
     let soundOn = true;
     let autoRemaining = 0;
     let currentGrid = ['seven', 'coin', 'clover', 'wild', 'seven', 'ruby', 'crown', 'bell', 'seven'];
+
+    // Motor de Simulação Local para Visitante / Modo Demo Offline
+    function localRandomSymbol(excludeWild) {
+      const pool = excludeWild ? SYM_ORDER.filter(s => s !== 'wild') : SYM_ORDER;
+      const weights = pool.map(id => SYM_MAP[id].weight);
+      const totalW = weights.reduce((a, b) => a + b, 0);
+      let r = Math.random() * totalW;
+      for (let i = 0; i < pool.length; i++) {
+        if (r < weights[i]) return pool[i];
+        r -= weights[i];
+      }
+      return pool[0];
+    }
+
+    function avaliarGridLocal(grid, betAmount, bonusMult) {
+      const winLines = [];
+      let totalMult = 0;
+      let wildCount = 0;
+      for (const id of grid) { if (id === 'wild') wildCount++; }
+
+      const hasWildCol0 = (grid[0] === 'wild' || grid[3] === 'wild' || grid[6] === 'wild');
+      const hasWildCol1 = (grid[1] === 'wild' || grid[4] === 'wild' || grid[7] === 'wild');
+      const hasWildCol2 = (grid[2] === 'wild' || grid[5] === 'wild' || grid[8] === 'wild');
+      const isBonusTrigger = hasWildCol0 && hasWildCol1 && hasWildCol2;
+
+      for (let lineIndex = 0; lineIndex < SLOT_LINES.length; lineIndex++) {
+        const [a, b, c] = SLOT_LINES[lineIndex];
+        const trio = [grid[a], grid[b], grid[c]];
+        const nonWild = trio.filter(id => id !== 'wild');
+        let targetId = null;
+        if (nonWild.length === 0) targetId = 'wild';
+        else if (nonWild.every(id => id === nonWild[0])) targetId = nonWild[0];
+
+        if (targetId) {
+          const mult = SYM_MAP[targetId].mult;
+          totalMult += mult;
+          winLines.push({
+            lineIndex,
+            cells: [a, b, c],
+            symbol: targetId,
+            mult,
+            amount: Math.round(betAmount * mult * 100) / 100
+          });
+        }
+      }
+
+      const allNonWild = grid.filter(id => id !== 'wild');
+      const isFullBoard = winLines.length > 0 && (
+        allNonWild.length === 0 || allNonWild.every(id => id === allNonWild[0])
+      );
+      if (isFullBoard) totalMult *= 5;
+      const extraMult = Number(bonusMult) > 1 ? Number(bonusMult) : 1;
+      totalMult *= extraMult;
+      const winAmount = Math.round(betAmount * totalMult * 100) / 100;
+
+      return {
+        winLines,
+        wildCount,
+        isBonusTrigger,
+        isFullBoard,
+        boardMultiplier: isFullBoard ? 5 : 1,
+        bonusMultiplier: extraMult,
+        totalMultiplier: Math.round(totalMult * 100) / 100,
+        winAmount
+      };
+    }
+
+    function simularGiroLocal(bet, isFs, fsMult) {
+      const grid = Array.from({ length: 9 }, () => localRandomSymbol(false));
+      const mult = isFs ? (fsMult || freeSpinsMult) : 1;
+      const outcome = avaliarGridLocal(grid, bet, mult);
+      return { ok: true, mode: 'demo', grid, outcome };
+    }
+
+    function simularCompraBonusLocal(bet) {
+      const grid = Array.from({ length: 9 }, () => localRandomSymbol(true));
+      const rows = [0, 1, 2].sort(() => Math.random() - 0.5);
+      grid[0 + rows[0] * 3] = 'wild';
+      grid[1 + rows[1] * 3] = 'wild';
+      grid[2 + rows[2] * 3] = 'wild';
+      const outcome = avaliarGridLocal(grid, bet, 1);
+      return { ok: true, mode: 'demo', grid, outcome };
+    }
 
     // Estrutura do Pool dos Carretéis: 7 células por coluna
     // [0..2] = As 3 células visíveis paradas
@@ -1731,22 +1844,81 @@
       }
 
       try {
-        const res = await ZKNAuth.api('/originals/slot777/spin', {
-          method: 'POST',
-          body: { bet: currentBet }
-        });
+        let resData;
+        if (!isUserLoggedIn) {
+          await new Promise(r => setTimeout(r, isTurbo ? 100 : 250));
+          const fsActive = !!(activeBonus && activeBonus.spinsLeft > 0);
+          if (fsActive) {
+            activeBonus.spinsLeft--;
+            const sim = simularGiroLocal(activeBonus.bet || currentBet, true, activeBonus.multiplier);
+            let retriggered = false;
+            let extraSpins = 0;
+            if (sim.outcome.isBonusTrigger) {
+              retriggered = true;
+              extraSpins = 5;
+              activeBonus.spinsLeft += 5;
+              activeBonus.totalSpins += 5;
+            }
+            activeBonus.totalWin = Math.round(((activeBonus.totalWin || 0) + sim.outcome.winAmount) * 100) / 100;
+            resData = {
+              ok: true,
+              mode: 'demo',
+              isFreeSpin: true,
+              retriggered,
+              extraSpins,
+              grid: sim.grid,
+              bet: activeBonus.bet || currentBet,
+              win: sim.outcome.winAmount,
+              winLines: sim.outcome.winLines,
+              isFullBoard: sim.outcome.isFullBoard,
+              freeSpins: { ...activeBonus }
+            };
+          } else {
+            const sim = simularGiroLocal(currentBet, false, 1);
+            let bonusTriggered = false;
+            let fsInfo = null;
+            if (sim.outcome.isBonusTrigger) {
+              bonusTriggered = true;
+              fsInfo = {
+                spinsLeft: freeSpinsCount,
+                totalSpins: freeSpinsCount,
+                multiplier: freeSpinsMult,
+                totalWin: 0,
+                bet: currentBet
+              };
+            }
+            resData = {
+              ok: true,
+              mode: 'demo',
+              isFreeSpin: false,
+              bonusTriggered,
+              freeSpins: fsInfo,
+              grid: sim.grid,
+              bet: currentBet,
+              win: sim.outcome.winAmount,
+              winLines: sim.outcome.winLines,
+              isFullBoard: sim.outcome.isFullBoard
+            };
+          }
+        } else {
+          const res = await ZKNAuth.api('/originals/slot777/spin', {
+            method: 'POST',
+            body: { bet: currentBet }
+          });
 
-        if (!res.ok || !res.data || !res.data.ok) {
-          stopReelsEmergency();
-          setMascotState('idle');
-          document.getElementById('slotMsg').textContent = (res.data && res.data.message) || 'Erro ao girar.';
-          autoRemaining = 0;
-          document.getElementById('autoBtn').classList.remove('active');
-          document.getElementById('autoLabel').textContent = 'Auto';
-          if (currentMode === 'demo' && debitBet > 0) updateBalanceUI(currentBalance + debitBet);
-          return;
+          if (!res.ok || !res.data || !res.data.ok) {
+            stopReelsEmergency();
+            setMascotState('idle');
+            document.getElementById('slotMsg').textContent = (res.data && res.data.message) || 'Erro ao girar.';
+            autoRemaining = 0;
+            document.getElementById('autoBtn').classList.remove('active');
+            document.getElementById('autoLabel').textContent = 'Auto';
+            if (currentMode === 'demo' && debitBet > 0) updateBalanceUI(currentBalance + debitBet);
+            return;
+          }
+          resData = res.data;
         }
-        await concluirResultado(res.data);
+        await concluirResultado(resData);
       } catch (e) {
         stopReelsEmergency();
         setMascotState('idle');
@@ -1807,18 +1979,42 @@
       }
 
       try {
-        const res = await ZKNAuth.api('/originals/slot777/buy-bonus', {
-          method: 'POST',
-          body: { bet: currentBet }
-        });
-        if (!res.ok || !res.data || !res.data.ok) {
-          stopReelsEmergency();
-          setMascotState('idle');
-          document.getElementById('slotMsg').textContent = (res.data && res.data.message) || 'Erro ao comprar bônus.';
-          if (currentMode === 'demo') updateBalanceUI(currentBalance + buyCost);
-          return;
+        let resData;
+        if (!isUserLoggedIn) {
+          await new Promise(r => setTimeout(r, isTurbo ? 100 : 250));
+          const sim = simularCompraBonusLocal(currentBet);
+          resData = {
+            ok: true,
+            mode: 'demo',
+            bonusTriggered: true,
+            grid: sim.grid,
+            bet: currentBet,
+            win: sim.outcome.winAmount,
+            winLines: sim.outcome.winLines,
+            isFullBoard: sim.outcome.isFullBoard,
+            freeSpins: {
+              spinsLeft: freeSpinsCount,
+              totalSpins: freeSpinsCount,
+              multiplier: freeSpinsMult,
+              totalWin: 0,
+              bet: currentBet
+            }
+          };
+        } else {
+          const res = await ZKNAuth.api('/originals/slot777/buy-bonus', {
+            method: 'POST',
+            body: { bet: currentBet }
+          });
+          if (!res.ok || !res.data || !res.data.ok) {
+            stopReelsEmergency();
+            setMascotState('idle');
+            document.getElementById('slotMsg').textContent = (res.data && res.data.message) || 'Erro ao comprar bônus.';
+            if (currentMode === 'demo') updateBalanceUI(currentBalance + buyCost);
+            return;
+          }
+          resData = res.data;
         }
-        await concluirResultado(res.data);
+        await concluirResultado(resData);
       } catch (e) {
         stopReelsEmergency();
         setMascotState('idle');
@@ -1889,7 +2085,23 @@
         im.src = url;
       }));
 
-      const infoPromise = ZKNAuth.api('/originals/slot777/info').then(res => { tick(); return res; });
+      const infoPromise = isUserLoggedIn
+        ? ZKNAuth.api('/originals/slot777/info').then(res => { tick(); return res; }).catch(() => ({ ok: false }))
+        : Promise.resolve({
+            ok: true,
+            data: {
+              ok: true,
+              mode: 'demo',
+              balance: 1000,
+              allowedBets: DEFAULT_BETS,
+              targetRtp: 95.0,
+              bonusBuyMult: 30,
+              freeSpinsCount: 10,
+              freeSpinsMult: 4,
+              symbols: SYM_ORDER.map(id => ({ id: SYM_MAP[id].id, name: SYM_MAP[id].name, mult: SYM_MAP[id].mult })),
+              activeBonus: null
+            }
+          }).then(res => { tick(); return res; });
       const results = await Promise.all([...preloadImgs, infoPromise]);
       const info = results[results.length - 1];
 
@@ -1925,6 +2137,9 @@
             '<div><div class="pay-item-name">' + s.name + '</div><div class="pay-item-mult">' + s.mult + 'x</div></div>' +
           '</div>'
         ).join('');
+      } else {
+        updateBalanceUI(1000);
+        renderBetChips();
       }
 
       enterBtn.classList.add('show');
