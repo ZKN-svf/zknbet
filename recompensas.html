@@ -12,96 +12,278 @@
   <link rel="stylesheet" href="assets/icons.css">
   <link rel="stylesheet" href="assets/events.css">
   <style>
-    /* ============================================================ */
-    /* RECOMPENSAS                                                  */
-    /* ============================================================ */
-    .rewards-hero {
-      max-width: 560px;
+    /* ============================================================
+       RECOMPENSAS — Casino Dark UI
+       ============================================================ */
+    .rewards-wrap {
+      max-width: 480px;
       margin: 0 auto;
-      padding: 32px 24px 96px;
+      padding: 16px 12px 24px;
+      position: relative;
+      z-index: 1;
     }
 
-    .rewards-title {
-      font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
-      font-size: 32px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
+    .rw-top-bar {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       gap: 12px;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
-    .rewards-title svg {
-      width: 32px;
-      height: 32px;
-      color: var(--gold);
-    }
-
-    .rewards-subtitle {
-      color: var(--text-muted);
-      font-size: 15px;
-      margin-bottom: 32px;
-      line-height: 1.5;
-      text-align: center;
-    }
-
-    .reward-section { margin-bottom: 40px; }
-
-    .reward-section-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .reward-section-header svg { width: 26px; height: 26px; flex-shrink: 0; }
-
-    .reward-section-title {
-      font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
-      font-size: 22px;
+    .rw-heading {
+      font-family: var(--font-display, 'Sora', sans-serif);
+      font-size: 20px;
       font-weight: 800;
       letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+    }
+
+    .rw-heading::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      border-radius: 2px;
+      background: var(--grad-gold);
+    }
+
+    .rw-status-chip {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 4px 10px;
+      white-space: nowrap;
+    }
+
+    .rw-status-chip.ready {
+      color: var(--gold);
+      border-color: var(--border-gold);
+      background: rgba(244, 232, 58, 0.10);
+    }
+
+    /* Segmented Tabs */
+    .rw-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin-bottom: 14px;
+      padding-bottom: 2px;
+    }
+    .rw-tabs::-webkit-scrollbar { display: none; }
+
+    .rw-tab {
+      padding: 7px 14px;
+      min-height: 34px;
+      border-radius: 999px;
+      background: var(--bg-2);
+      border: 1px solid var(--border-strong);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+    .rw-tab:hover { color: var(--text); border-color: var(--border-gold); }
+    .rw-tab.active {
+      background: var(--gold);
+      color: var(--gold-dark, #090f1f);
+      border-color: transparent;
+    }
+
+    .rw-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .reward-section.hidden-tab { display: none; }
+
+    /* Compact Casino Cards */
+    .reward-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .rw-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .rw-card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .rw-card-badge-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(244, 232, 58, 0.10);
+      border: 1px solid rgba(244, 232, 58, 0.24);
+      color: var(--gold);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .rw-card-badge-icon.green {
+      background: rgba(16, 185, 129, 0.10);
+      border-color: rgba(16, 185, 129, 0.25);
+      color: var(--green);
+    }
+    .rw-card-badge-icon.teal {
+      background: rgba(40, 229, 184, 0.10);
+      border-color: rgba(40, 229, 184, 0.25);
+      color: var(--teal);
+    }
+    .rw-card-badge-icon svg { width: 17px; height: 17px; }
+
+    .reward-section-title {
+      font-family: var(--font-display, 'Sora', sans-serif);
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      color: var(--text);
     }
 
     .reward-section-sub {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-muted);
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
-    .reward-card {
-      background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-0) 100%);
-      border: 1px solid var(--border-gold);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    .rw-tag-pill {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
-    /* ============================================================ */
-    /* ROLETA                                                       */
-    /* ============================================================ */
+    /* ============================================================
+       INLINE PROMO CODE TICKET
+       ============================================================ */
+    .promo-inline-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-0);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 5px;
+      transition: border-color var(--transition);
+    }
+    .promo-inline-box:focus-within {
+      border-color: var(--gold);
+    }
+    .promo-inline-input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      padding: 9px 10px;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      outline: none;
+    }
+    .promo-inline-input::placeholder {
+      letter-spacing: 0.2px;
+      text-transform: none;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+    .promo-inline-btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      background: var(--gold);
+      color: var(--gold-dark, #090f1f);
+      border: none;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+    .promo-inline-btn:hover:not(:disabled) {
+      background: var(--gold-2);
+    }
+    .promo-inline-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .promo-inline-feedback {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+      min-height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* ============================================================
+       CASINO ROULETTE WHEEL (Metallic Gold + Crimson + Graphite SVG)
+       ============================================================ */
+    .wheel-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 0 2px;
+    }
+
     .wheel-container {
       position: relative;
-      width: 300px;
-      height: 300px;
+      width: 288px;
+      height: 288px;
       max-width: 100%;
-      margin: 8px auto 28px;
+      margin: 4px auto 16px;
+    }
+
+    .wheel-outer-halo {
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(244, 232, 58, 0.14) 55%, transparent 72%);
+      pointer-events: none;
     }
 
     .wheel-pointer {
       position: absolute;
-      top: -18px;
+      top: -12px;
       left: 50%;
       transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 16px solid transparent;
-      border-right: 16px solid transparent;
-      border-top: 28px solid var(--gold);
-      z-index: 10;
-      filter: drop-shadow(0 4px 12px rgba(245, 190, 60, 0.8));
+      width: 30px;
+      height: 36px;
+      z-index: 12;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.75));
+      pointer-events: none;
     }
 
     .wheel {
@@ -109,43 +291,15 @@
       height: 100%;
       border-radius: 50%;
       position: relative;
-      background: #1a2332; /* substituído via JS pelo conic-gradient */
-      box-shadow:
-        0 0 0 8px #0a0f1a,
-        0 0 0 12px var(--gold),
-        0 12px 48px rgba(0, 0, 0, 0.6),
-        inset 0 0 60px rgba(0, 0, 0, 0.4);
-      transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+      transition: transform 5s cubic-bezier(0.14, 0.74, 0.12, 1);
       will-change: transform;
+      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.72);
     }
 
-    /* Cada rótulo parte do centro e aponta para o meio do setor */
-    .wheel-segment {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 50%;
-      height: 0;
-      transform-origin: 0 0;
-      pointer-events: none;
-    }
-
-    .wheel-segment span {
-      position: absolute;
-      right: 18px;
-      top: 0;
-      transform: translateY(-50%);
-      font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
-      font-size: 17px;
-      font-weight: 800;
-      color: #fff;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
-      white-space: nowrap;
-    }
-
-    /* Rótulos do lado esquerdo giram 180° para não ficarem de cabeça para baixo */
-    .wheel-segment.flip span {
-      transform: translateY(-50%) rotate(180deg);
+    .wheel svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .wheel-center {
@@ -153,92 +307,93 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 80px;
-      height: 80px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-0) 100%);
-      border: 4px solid var(--gold);
+      background: radial-gradient(circle at 32% 28%, #2e3340 0%, #15171e 72%, #0c0d11 100%);
+      border: 3px solid #f4c838;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 32px rgba(245, 190, 60, 0.5);
-      z-index: 5;
-      font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--gold);
-      text-align: center;
-      line-height: 1.2;
+      box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.8),
+        inset 0 1px 2px rgba(255, 255, 255, 0.25);
+      z-index: 6;
+      pointer-events: none;
     }
 
-    .wheel-center { pointer-events: none; }
-    .wheel-center-text { text-align: center; }
-    .wheel-center-text { color: #fff; }
+    .wheel-center-text {
+      font-family: var(--font-display, 'Sora', sans-serif);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      color: var(--text);
+      line-height: 1;
+    }
     .wheel-center .logo-z { color: var(--gold); }
 
     .wheel-result {
-      font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
-      font-size: 32px;
+      font-family: var(--font-display, 'Sora', sans-serif);
+      font-size: 22px;
       font-weight: 800;
       color: var(--green);
-      min-height: 44px;
-      margin-bottom: 20px;
+      min-height: 28px;
+      margin-bottom: 12px;
       text-align: center;
-      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
     }
-
-    .wheel-result.win { animation: win-pulse 0.6s ease-out; }
+    .wheel-result:empty { display: none; }
+    .wheel-result.win { animation: win-pulse 0.45s ease-out; }
 
     @keyframes win-pulse {
-      0%   { transform: scale(0.8); opacity: 0; }
-      50%  { transform: scale(1.1); }
+      0% { transform: scale(0.88); opacity: 0.2; }
+      60% { transform: scale(1.06); }
       100% { transform: scale(1); opacity: 1; }
     }
 
-    /* ============================================================ */
-    /* BOTÕES                                                       */
-    /* ============================================================ */
+    /* ============================================================
+       BUTTONS & STATS
+       ============================================================ */
     .reward-btn {
       width: 100%;
-      padding: 16px 24px;
-      font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
-      font-size: 16px;
+      padding: 13px 18px;
+      font-family: var(--font-display, 'Sora', sans-serif);
+      font-size: 14px;
       font-weight: 800;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
       border: none;
-      border-radius: 12px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      gap: 8px;
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
     }
-
-    .reward-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .reward-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
 
     .reward-btn.gold {
       background: var(--grad-gold);
-      color: var(--gold-dark, #0a0a00);
-      box-shadow: 0 4px 20px rgba(245, 190, 60, 0.4);
+      color: var(--gold-dark, #090f1f);
+      box-shadow: 0 4px 16px rgba(244, 232, 58, 0.25);
     }
     .reward-btn.gold:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(245, 190, 60, 0.6);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(244, 232, 58, 0.38);
     }
 
     .reward-btn.green {
-      background: var(--grad-green);
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(0, 214, 127, 0.4);
+      background: var(--grad-teal, var(--grad-green));
+      color: #061310;
+      box-shadow: 0 4px 16px rgba(40, 229, 184, 0.22);
     }
     .reward-btn.green:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(0, 214, 127, 0.6);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(40, 229, 184, 0.35);
     }
 
     .reward-btn:disabled {
-      opacity: 0.5;
+      opacity: 0.55;
       cursor: not-allowed;
       background: var(--bg-3);
       color: var(--text-muted);
@@ -246,40 +401,37 @@
       transform: none;
     }
 
-    .reward-btn:focus-visible,
-    .rewards-popup-btn:focus-visible {
-      outline: 3px solid #fff;
-      outline-offset: 3px;
-    }
-
-    /* ============================================================ */
-    /* CASHBACK E BÔNUS                                             */
-    /* ============================================================ */
     .reward-stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 14px;
     }
 
-    .reward-stat { border-radius: 12px; padding: 16px; text-align: center; }
-    .reward-stat.green { background: rgba(0, 214, 127, 0.08); border: 1px solid rgba(0, 214, 127, 0.2); }
-    .reward-stat.gold  { background: rgba(245, 190, 60, 0.08); border: 1px solid rgba(245, 190, 60, 0.2); }
+    .reward-stat {
+      border-radius: var(--radius-sm);
+      padding: 12px 10px;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .reward-stat.green { border-color: rgba(16, 185, 129, 0.25); }
+    .reward-stat.gold  { border-color: rgba(244, 232, 58, 0.22); }
 
     .reward-stat-label {
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.6px;
+      letter-spacing: 0.5px;
       font-weight: 700;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .reward-stat-value {
-      font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
-      font-size: 22px;
+      font-family: var(--font-display, 'Sora', sans-serif);
+      font-size: 18px;
       font-weight: 800;
-      letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
     }
     .reward-stat.green .reward-stat-value { color: var(--green); }
     .reward-stat.gold .reward-stat-value  { color: var(--gold); }
@@ -288,288 +440,329 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      margin-top: 16px;
-      padding-top: 16px;
+      gap: 6px;
+      margin-top: 12px;
+      padding-top: 12px;
       border-top: 1px solid var(--border);
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-muted);
       text-align: center;
     }
-    .reward-info svg { width: 14px; height: 14px; color: var(--gold); flex-shrink: 0; }
+    .reward-info svg { width: 13px; height: 13px; color: var(--gold); flex-shrink: 0; }
 
-    .pending-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-
+    .pending-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
     .pending-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 16px;
-      background: rgba(245, 190, 60, 0.06);
-      border: 1px solid rgba(245, 190, 60, 0.2);
-      border-radius: 10px;
-      gap: 12px;
+      padding: 12px 14px;
+      background: var(--bg-3);
+      border: 1px solid var(--border-gold);
+      border-radius: var(--radius-sm);
+      gap: 10px;
     }
     .pending-item-info { min-width: 0; }
-    .pending-item-title { font-weight: 800; font-size: 14px; color: var(--text); }
-    .pending-item-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .pending-item-title { font-weight: 700; font-size: 13.5px; color: var(--text); }
+    .pending-item-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
     .pending-item-value {
-      font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
-      font-size: 18px;
+      font-family: var(--font-display, 'Sora', sans-serif);
+      font-size: 16px;
       font-weight: 800;
       color: var(--gold);
+      font-variant-numeric: tabular-nums;
       flex-shrink: 0;
     }
 
-    .empty-msg { text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px 0; }
+    .empty-msg {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      padding: 14px 8px;
+      background: var(--bg-3);
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--border-strong);
+    }
 
-    /* ============================================================ */
-    /* POPUPS                                                       */
-    /* ============================================================ */
+    /* ============================================================
+       POPUPS (Clean Product Style)
+       ============================================================ */
     .rewards-popup-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(5, 7, 13, 0.82);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       z-index: 99990;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.22s ease;
     }
     .rewards-popup-backdrop.open { opacity: 1; pointer-events: auto; }
 
     .rewards-popup {
-      background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-0) 100%);
-      border: 2px solid var(--gold);
-      border-radius: 24px;
-      padding: 32px 28px;
+      background: var(--bg-2);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px;
       max-width: 360px;
       width: 100%;
       text-align: center;
-      box-shadow: 0 20px 80px rgba(245, 190, 60, 0.5);
-      transform: scale(0.8) translateY(20px);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(12px) scale(0.96);
+      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-    .rewards-popup-backdrop.open .rewards-popup { transform: scale(1) translateY(0); }
+    .rewards-popup-backdrop.open .rewards-popup { transform: translateY(0) scale(1); }
 
     .rewards-popup-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 20px;
-      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 14px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: rewards-popup-bounce 1s ease-in-out infinite;
     }
-    .rewards-popup-icon.gold  { background: rgba(245, 190, 60, 0.15); border: 2px solid var(--gold);  color: var(--gold); }
-    .rewards-popup-icon.green { background: rgba(0, 214, 127, 0.15);  border: 2px solid var(--green); color: var(--green); }
-    .rewards-popup-icon svg { width: 40px; height: 40px; }
-
-    @keyframes rewards-popup-bounce {
-      0%, 100% { transform: translateY(0); }
-      50%      { transform: translateY(-8px); }
-    }
+    .rewards-popup-icon.gold  { background: rgba(244, 232, 58, 0.12); border: 1px solid var(--border-gold); color: var(--gold); }
+    .rewards-popup-icon.green { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--green); }
+    .rewards-popup-icon svg { width: 26px; height: 26px; }
 
     .rewards-popup-title {
-      font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
-      font-size: 24px;
+      font-family: var(--font-display, 'Sora', sans-serif);
+      font-size: 18px;
       font-weight: 800;
-      color: var(--gold);
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 6px;
     }
-    .rewards-popup-text { font-size: 14px; color: var(--text); margin-bottom: 8px; line-height: 1.5; }
+    .rewards-popup-text { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
 
     .rewards-popup-amount {
-      font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
-      font-size: 36px;
+      font-family: var(--font-display, 'Sora', sans-serif);
+      font-size: 28px;
       font-weight: 800;
-      letter-spacing: -1px;
-      margin: 16px 0;
+      margin: 12px 0 4px;
+      font-variant-numeric: tabular-nums;
     }
     .rewards-popup-amount.gold  { color: var(--gold); }
     .rewards-popup-amount.green { color: var(--green); }
 
-    .rewards-popup-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
-
+    .rewards-popup-actions { display: flex; gap: 8px; margin-top: 18px; }
     .rewards-popup-btn {
-      padding: 14px 24px;
-      font-family: var(--font-display, 'Sora', 'Inter', sans-serif);
-      font-size: 15px;
+      flex: 1;
+      padding: 12px 14px;
+      font-family: var(--font-display, 'Sora', sans-serif);
+      font-size: 13px;
       font-weight: 800;
       border: none;
-      border-radius: 12px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .rewards-popup-btn.primary {
-      background: var(--grad-gold);
-      color: var(--gold-dark, #0a0a00);
-      box-shadow: 0 4px 20px rgba(245, 190, 60, 0.4);
-    }
-    .rewards-popup-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(245, 190, 60, 0.6); }
-    .rewards-popup-btn.secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--border-strong); }
-    .rewards-popup-btn.secondary:hover { color: var(--text); border-color: var(--border-gold); }
+    .rewards-popup-btn.primary { background: var(--grad-gold); color: var(--gold-dark, #090f1f); }
+    .rewards-popup-btn.secondary { background: var(--bg-3); color: var(--text-muted); border: 1px solid var(--border-strong); }
 
-    @media (max-width: 480px) {
-      .wheel-container { width: 260px; height: 260px; }
-      .wheel-segment span { font-size: 15px; right: 14px; }
-      .wheel-center { width: 68px; height: 68px; font-size: 12px; }
-      .rewards-title { font-size: 26px; }
-      .wheel-result { font-size: 26px; }
-      .reward-section-title { font-size: 20px; }
-      .reward-stats { grid-template-columns: 1fr; }
+    @media (max-width: 380px) {
+      .wheel-container { width: 256px; height: 256px; }
+      .wheel-center { width: 56px; height: 56px; }
+      .wheel-center-text { font-size: 11px; }
+    }
+
+    @media (min-width: 901px) {
+      .rewards-wrap { max-width: 1020px; padding: 28px 24px 48px; }
+      .rw-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        align-items: start;
+        gap: 20px;
+      }
+      #roulette-section { grid-row: span 2; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       .wheel { transition-duration: 0.01s; }
-      .rewards-popup-icon, .wheel-result.win { animation: none; }
+      .wheel-result.win { animation: none; }
     }
   </style>
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
 
-  <main class="rewards-hero">
-    <h1 class="rewards-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polyline points="20 12 20 22 4 22 4 12"/>
-        <rect x="2" y="7" width="20" height="5"/>
-        <line x1="12" y1="22" x2="12" y2="7"/>
-        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
-        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
-      </svg>
-      Recompensas
-    </h1>
-    <p class="rewards-subtitle">Gire a roleta, resgate cashback e bônus de depósito.</p>
+  <main class="rewards-wrap">
+    <div class="rw-top-bar">
+      <h1 class="rw-heading">Recompensas</h1>
+      <span class="rw-status-chip" id="rwDailyStatus">Giro diário</span>
+    </div>
 
-    <!-- ============================================================ -->
-    <!-- SEÇÃO 1 — ROLETA                                             -->
-    <!-- ============================================================ -->
-    <section class="reward-section" id="roulette-section">
-      <div class="reward-section-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-        </svg>
-        <div>
-          <div class="reward-section-title">Roleta diária</div>
-          <div class="reward-section-sub">1 giro grátis por dia · Prêmios até R$ 10</div>
-        </div>
-      </div>
+    <div class="rw-tabs" role="tablist" aria-label="Filtrar recompensas">
+      <button type="button" class="rw-tab active" data-rw-tab="all">Tudo</button>
+      <button type="button" class="rw-tab" data-rw-tab="roulette-section">Roleta</button>
+      <button type="button" class="rw-tab" data-rw-tab="promo-section">Código Promo</button>
+      <button type="button" class="rw-tab" data-rw-tab="rebate-section">Cashback</button>
+      <button type="button" class="rw-tab" data-rw-tab="bonus-section">Depósitos</button>
+    </div>
 
-      <div class="reward-card">
-        <div class="wheel-container">
-          <div class="wheel-pointer" aria-hidden="true"></div>
-          <div class="wheel" id="rouletteWheel" role="img" aria-label="Roleta com prêmios até R$ 10"></div>
-          <div class="wheel-center" aria-hidden="true">
-            <div class="wheel-center-text"><span class="logo-z">Z</span>KN<br>BET</div>
+    <div class="rw-grid">
+      <!-- ROLETA DIÁRIA -->
+      <section class="reward-section" id="roulette-section">
+        <div class="reward-card">
+          <div class="rw-card-head">
+            <div class="rw-card-title-group">
+              <span class="rw-card-badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><line x1="12" y1="3" x2="12" y2="9.5"/><line x1="12" y1="14.5" x2="12" y2="21"/><line x1="3" y1="12" x2="9.5" y2="12"/><line x1="14.5" y1="12" x2="21" y2="12"/>
+                </svg>
+              </span>
+              <div>
+                <div class="reward-section-title">Roleta da Sorte</div>
+                <div class="reward-section-sub">1 giro grátis por dia · Até R$ 10,00</div>
+              </div>
+            </div>
+            <span class="rw-tag-pill">1x rollover</span>
+          </div>
+
+          <div class="wheel-stage">
+            <div class="wheel-container">
+              <div class="wheel-outer-halo" aria-hidden="true"></div>
+              <svg class="wheel-pointer" viewBox="0 0 32 38" aria-hidden="true">
+                <defs>
+                  <linearGradient id="ptrGold" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#fff4aa"/>
+                    <stop offset="50%" stop-color="#f4c41c"/>
+                    <stop offset="100%" stop-color="#9e6203"/>
+                  </linearGradient>
+                </defs>
+                <path d="M16 36 L3 10 Q16 2 29 10 Z" fill="url(#ptrGold)" stroke="#4a2b00" stroke-width="1.6"/>
+                <circle cx="16" cy="12" r="4" fill="#b91c1c" stroke="#fff3b0" stroke-width="1.2"/>
+              </svg>
+              <div class="wheel" id="rouletteWheel" role="img" aria-label="Roleta com prêmios até R$ 10"></div>
+              <div class="wheel-center" aria-hidden="true">
+                <div class="wheel-center-text"><span class="logo-z">Z</span>KN</div>
+              </div>
+            </div>
+
+            <div class="wheel-result" id="rouletteResult" aria-live="polite"></div>
+
+            <button class="reward-btn gold" id="spinBtn" type="button" onclick="girarRoleta()">Girar Roleta</button>
           </div>
         </div>
+      </section>
 
-        <div class="wheel-result" id="rouletteResult" aria-live="polite"></div>
-
-        <button class="reward-btn gold" id="spinBtn" type="button" onclick="girarRoleta()">Girar</button>
-
-        <div class="reward-info">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-          </svg>
-          Rollover de 1x sobre o valor ganho
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- SEÇÃO 2 — CASHBACK                                           -->
-    <!-- ============================================================ -->
-    <section class="reward-section">
-      <div class="reward-section-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="12" y1="1" x2="12" y2="23"/>
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-        </svg>
-        <div>
-          <div class="reward-section-title">Cashback</div>
-          <div class="reward-section-sub">Ganhe de volta uma % do que perder</div>
-        </div>
-      </div>
-
-      <div class="reward-card">
-        <div class="reward-stats">
-          <div class="reward-stat green">
-            <div class="reward-stat-label">Disponível</div>
-            <div class="reward-stat-value" id="rebateBalance">R$ 0,00</div>
+      <!-- CÓDIGO PROMOCIONAL (INLINE) -->
+      <section class="reward-section" id="promo-section">
+        <div class="reward-card">
+          <div class="rw-card-head">
+            <div class="rw-card-title-group">
+              <span class="rw-card-badge-icon teal">
+                <span class="ico ico-ticket" style="width:18px;height:18px;"></span>
+              </span>
+              <div>
+                <div class="reward-section-title">Resgatar Código</div>
+                <div class="reward-section-sub">Ative cupons e códigos de bônus</div>
+              </div>
+            </div>
+            <span class="rw-tag-pill">Instantâneo</span>
           </div>
-          <div class="reward-stat gold">
-            <div class="reward-stat-label">Total acumulado</div>
-            <div class="reward-stat-value" id="rebateTotal">R$ 0,00</div>
+
+          <form class="promo-inline-box" id="pagePromoForm" onsubmit="enviarCodigoPagina(event)">
+            <input type="text" id="pagePromoInput" class="promo-inline-input" placeholder="Digite o código (ex: ZKN10)" autocomplete="off" spellcheck="false" aria-label="Código promocional">
+            <button type="submit" id="pagePromoBtn" class="promo-inline-btn">Aplicar</button>
+          </form>
+
+          <div class="promo-inline-feedback">
+            <span id="pagePromoFeedback">Crédito imediato no saldo principal.</span>
+            <a href="ofertas.html" style="color:var(--gold);font-weight:700;">Ver ofertas &gt;</a>
           </div>
         </div>
+      </section>
 
-        <button class="reward-btn green" id="rebateBtn" type="button" onclick="resgatarRebate()" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-          <span id="rebateBtnText">Carregando...</span>
-        </button>
+      <!-- CASHBACK -->
+      <section class="reward-section" id="rebate-section">
+        <div class="reward-card">
+          <div class="rw-card-head">
+            <div class="rw-card-title-group">
+              <span class="rw-card-badge-icon green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="12" y1="1" x2="12" y2="23"/>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+              </span>
+              <div>
+                <div class="reward-section-title">Cashback</div>
+                <div class="reward-section-sub">Retorno automático sobre perdas</div>
+              </div>
+            </div>
+          </div>
 
-        <div class="reward-info">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-          </svg>
-          <span id="rebateInfo">Carregando...</span>
+          <div class="reward-stats">
+            <div class="reward-stat green">
+              <div class="reward-stat-label">Disponível</div>
+              <div class="reward-stat-value" id="rebateBalance">R$ 0,00</div>
+            </div>
+            <div class="reward-stat gold">
+              <div class="reward-stat-label">Acumulado</div>
+              <div class="reward-stat-value" id="rebateTotal">R$ 0,00</div>
+            </div>
+          </div>
+
+          <button class="reward-btn green" id="rebateBtn" type="button" onclick="resgatarRebate()" disabled>
+            <span id="rebateBtnText">Carregando...</span>
+          </button>
+
+          <div class="reward-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <span id="rebateInfo">Carregando...</span>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ============================================================ -->
-    <!-- SEÇÃO 3 — BÔNUS DE DEPÓSITO                                  -->
-    <!-- ============================================================ -->
-    <section class="reward-section">
-      <div class="reward-section-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polyline points="20 12 20 22 4 22 4 12"/>
-          <rect x="2" y="7" width="20" height="5"/>
-          <line x1="12" y1="22" x2="12" y2="7"/>
-          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
-          <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
-        </svg>
-        <div>
-          <div class="reward-section-title">Bônus de depósito</div>
-          <div class="reward-section-sub">Resgate os bônus dos seus depósitos</div>
+      <!-- BÔNUS DE DEPÓSITO -->
+      <section class="reward-section" id="bonus-section">
+        <div class="reward-card">
+          <div class="rw-card-head">
+            <div class="rw-card-title-group">
+              <span class="rw-card-badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="20 12 20 22 4 22 4 12"/>
+                  <rect x="2" y="7" width="20" height="5"/>
+                  <line x1="12" y1="22" x2="12" y2="7"/>
+                </svg>
+              </span>
+              <div>
+                <div class="reward-section-title">Bônus de Depósito</div>
+                <div class="reward-section-sub">Bônus liberados nos seus PIX</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pending-list" id="pendingList">
+            <div class="empty-msg">Carregando...</div>
+          </div>
+
+          <button class="reward-btn gold" id="claimBonusBtn" type="button" onclick="resgatarBonus()" style="display:none;">
+            <span id="claimBonusText">Resgatar todos</span>
+          </button>
+
+          <div class="reward-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <span id="bonusInfo">Rollover de 5x sobre o bônus</span>
+          </div>
         </div>
-      </div>
-
-      <div class="reward-card">
-        <div class="pending-list" id="pendingList">
-          <div class="empty-msg">Carregando...</div>
-        </div>
-
-        <button class="reward-btn gold" id="claimBonusBtn" type="button" onclick="resgatarBonus()" style="display:none;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="20 12 20 22 4 22 4 12"/>
-            <rect x="2" y="7" width="20" height="5"/>
-            <line x1="12" y1="22" x2="12" y2="7"/>
-          </svg>
-          <span id="claimBonusText">Resgatar todos</span>
-        </button>
-
-        <div class="reward-info">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-          </svg>
-          <span id="bonusInfo">Rollover de 5x sobre o bônus</span>
-        </div>
-      </div>
-    </section>
+      </section>
+    </div>
   </main>
+
+  <footer class="zkn-footer">
+    <div class="zkn-footer-inner">
+      <p><strong>ZKNbet</strong> &copy; 2026 &middot; Todos os direitos reservados</p>
+      <p class="disclaimer">Proibido para menores de 18 anos. Jogue com responsabilidade.</p>
+    </div>
+  </footer>
 
   <script src="assets/loading.js"></script>
   <script src="assets/config.js"></script>
@@ -580,9 +773,6 @@
   <script>
     if (!ZKNAuth.requireLogin('recompensas.html')) throw new Error('redirecionado');
 
-    // ============================================================
-    // UTILITÁRIOS
-    // ============================================================
     const $ = (id) => document.getElementById(id);
     const BRL = (v) => 'R$ ' + (Number(v) || 0).toFixed(2).replace('.', ',');
     const esc = (s) => String(s).replace(/[&<>"']/g, (c) => (
@@ -599,63 +789,170 @@
       return (r && r.data && r.data.message) || padrao;
     }
 
+    // Tabs de filtro
+    document.querySelectorAll('.rw-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.rw-tab').forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = tab.dataset.rwTab;
+        document.querySelectorAll('.rw-grid > .reward-section').forEach((sec) => {
+          sec.classList.toggle('hidden-tab', target !== 'all' && sec.id !== target);
+        });
+      });
+    });
+
     // ============================================================
-    // ROLETA — 6 setores (R$ 1, 2, 3, 5, 7, 10)
-    // Os valores e as cores ficam num único lugar: a roda é montada por aqui.
+    // CÓDIGO PROMOCIONAL INLINE
+    // ============================================================
+    async function enviarCodigoPagina(e) {
+      e.preventDefault();
+      const input = $('pagePromoInput');
+      const btn = $('pagePromoBtn');
+      const fb = $('pagePromoFeedback');
+      const code = String(input.value || '').trim().toUpperCase();
+
+      if (!code) {
+        fb.style.color = 'var(--gold)';
+        fb.textContent = 'Digite um código antes de aplicar.';
+        input.focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '...';
+      fb.style.color = 'var(--text-muted)';
+      fb.textContent = 'Validando código...';
+
+      try {
+        const res = await ZKN.resgatarCodigoPromo(code);
+        if (res.ok) {
+          fb.style.color = 'var(--green)';
+          fb.textContent = 'Código ' + res.code + ' aplicado: +' + BRL(res.value) + ' no saldo.';
+          input.value = '';
+          ZKN.toast('Código resgatado!', '+' + BRL(res.value) + ' creditado no seu saldo.', 'success');
+          atualizarGlobais();
+        } else {
+          fb.style.color = 'var(--red)';
+          fb.textContent = res.mensagem;
+          ZKN.toast('Código inválido', res.mensagem, 'error');
+        }
+      } catch (err) {
+        fb.style.color = 'var(--red)';
+        fb.textContent = 'Erro de conexão. Tente novamente.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Aplicar';
+      }
+    }
+
+    // ============================================================
+    // ROLETA — 10 setores em SVG metálico de cassino real
     // ============================================================
     const SETORES = [
-      { v: 0.10, c: '#e74c3c', label: 'R$ 0,10' },
-      { v: 0.20, c: '#3498db', label: 'R$ 0,20' },
-      { v: 0.30, c: '#2ecc71', label: 'R$ 0,30' },
-      { v: 0.50, c: '#f39c12', label: 'R$ 0,50' },
-      { v: 0.75, c: '#9b59b6', label: 'R$ 0,75' },
-      { v: 1.00, c: '#1abc9c', label: 'R\$ 1' },
-      { v: 2.00, c: '#e67e22', label: 'R\$ 2' },
-      { v: 3.00, c: '#c0392b', label: 'R\$ 3' },
-      { v: 5.00, c: '#8e44ad', label: 'R\$ 5' },
-      { v: 10.00, c: '#f1c40f', label: 'R\$ 10' }
+      { v: 0.10, bg: '#1b1d24', text: '#e5e7eb', label: '0,10' },
+      { v: 0.20, bg: '#8a1220', text: '#ffffff', label: '0,20' },
+      { v: 0.30, bg: '#1b1d24', text: '#e5e7eb', label: '0,30' },
+      { v: 0.50, bg: '#8a1220', text: '#ffffff', label: '0,50' },
+      { v: 0.75, bg: '#1b1d24', text: '#e5e7eb', label: '0,75' },
+      { v: 1.00, bg: '#8a1220', text: '#ffffff', label: 'R$ 1' },
+      { v: 2.00, bg: '#1b1d24', text: '#f4e83a', label: 'R$ 2' },
+      { v: 3.00, bg: '#8a1220', text: '#ffffff', label: 'R$ 3' },
+      { v: 5.00, bg: '#1b1d24', text: '#f4e83a', label: 'R$ 5' },
+      { v: 10.00, bg: 'url(#sliceGoldMax)', text: '#160d00', label: 'R$ 10', jackpot: true }
     ];
     const GRAUS = 360 / SETORES.length;
     const VOLTAS = 6;
     let girando = false;
     let rotacaoAtual = 0;
 
+    function polarToCartesian(cx, cy, r, deg) {
+      const rad = (deg - 90) * Math.PI / 180;
+      return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+    }
+
     function montarRoleta() {
       const wheel = $('rouletteWheel');
+      const cx = 160, cy = 160, outerR = 156, ringR = 140;
 
-      // O conic-gradient começa no topo (12h) e vai no sentido horário
-      const paradas = SETORES.map((s, i) => s.c + ' ' + (i * GRAUS) + 'deg ' + ((i + 1) * GRAUS) + 'deg');
-      wheel.style.background = 'conic-gradient(from 0deg, ' + paradas.join(', ') + ')';
+      let slicesSvg = '';
+      let pegsSvg = '';
 
       SETORES.forEach((s, i) => {
-        // rotate(0deg) aponta para as 3h; o meio do setor i está a (i*60+30)° do topo
-        const angulo = i * GRAUS + GRAUS / 2 - 90;
-        const seg = document.createElement('div');
-        seg.className = 'wheel-segment' + (angulo > 90 && angulo < 270 ? ' flip' : '');
-        seg.style.transform = 'rotate(' + angulo + 'deg)';
-        const label = document.createElement('span');
-        label.textContent = s.label || ('R\$ ' + s.v);
-        seg.appendChild(label);
-        wheel.appendChild(seg);
+        const a0 = i * GRAUS;
+        const a1 = (i + 1) * GRAUS;
+        const p0 = polarToCartesian(cx, cy, ringR, a0);
+        const p1 = polarToCartesian(cx, cy, ringR, a1);
+        const pathD = `M ${cx} ${cy} L ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} A ${ringR} ${ringR} 0 0 1 ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} Z`;
+
+        slicesSvg += `<path d="${pathD}" fill="${s.bg}" stroke="#c8961c" stroke-width="1.2"/>`;
+
+        const mid = a0 + GRAUS / 2;
+        const txtPos = polarToCartesian(cx, cy, 101, mid);
+        const textRot = mid - 90;
+        const flip = mid > 180 ? 180 : 0;
+        slicesSvg += `<text x="${txtPos.x.toFixed(2)}" y="${txtPos.y.toFixed(2)}" fill="${s.text}" font-family="Sora, Inter, sans-serif" font-weight="800" font-size="${s.jackpot ? '15' : '13'}" text-anchor="middle" dominant-baseline="central" transform="rotate(${(textRot + flip).toFixed(2)} ${txtPos.x.toFixed(2)} ${txtPos.y.toFixed(2)})">${esc(s.label)}</text>`;
+
+        // Pinos metálicos no aro dourado (2 por setor = 20 pinos)
+        [a0, a0 + GRAUS / 2].forEach((ang, idxPeg) => {
+          const pp = polarToCartesian(cx, cy, 148, ang);
+          const isLit = idxPeg === 0;
+          pegsSvg += `<circle cx="${pp.x.toFixed(2)}" cy="${pp.y.toFixed(2)}" r="${isLit ? '3.3' : '2.2'}" fill="${isLit ? '#fff7c2' : '#7a4b00'}" stroke="#422600" stroke-width="0.7"/>`;
+        });
       });
+
+      wheel.innerHTML = `
+        <svg viewBox="0 0 320 320" aria-hidden="true">
+          <defs>
+            <linearGradient id="rimGold" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#fff099"/>
+              <stop offset="35%" stop-color="#d49b12"/>
+              <stop offset="70%" stop-color="#8b5503"/>
+              <stop offset="100%" stop-color="#f4c838"/>
+            </linearGradient>
+            <linearGradient id="sliceGoldMax" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffe875"/>
+              <stop offset="55%" stop-color="#eab308"/>
+              <stop offset="100%" stop-color="#a16207"/>
+            </linearGradient>
+            <radialGradient id="wheelShade" cx="50%" cy="50%" r="50%">
+              <stop offset="68%" stop-color="#000" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#000" stop-opacity="0.38"/>
+            </radialGradient>
+          </defs>
+          <circle cx="${cx}" cy="${cy}" r="${outerR}" fill="url(#rimGold)" stroke="#3f2400" stroke-width="2"/>
+          <circle cx="${cx}" cy="${cy}" r="${ringR + 1}" fill="#0c0e13"/>
+          ${slicesSvg}
+          <circle cx="${cx}" cy="${cy}" r="${ringR}" fill="url(#wheelShade)" pointer-events="none"/>
+          <circle cx="${cx}" cy="${cy}" r="${ringR}" fill="none" stroke="#f5c528" stroke-width="2"/>
+          ${pegsSvg}
+        </svg>`;
     }
 
     function roletaIndisponivel(ultimoValor) {
       const btn = $('spinBtn');
+      const statusChip = $('rwDailyStatus');
       btn.disabled = true;
       btn.textContent = 'Volte amanhã';
+      if (statusChip) {
+        statusChip.textContent = 'Giro usado hoje';
+        statusChip.classList.remove('ready');
+      }
       if (ultimoValor) {
         const result = $('rouletteResult');
-        result.textContent = BRL(ultimoValor);
+        result.textContent = 'Ganho hoje: ' + BRL(ultimoValor);
         result.style.color = 'var(--gold)';
       }
     }
 
     async function checkRoulette() {
+      const statusChip = $('rwDailyStatus');
       try {
         const r = await ZKNAuth.api('/roulette/status');
         if (r.ok && r.data && r.data.available === false) {
           roletaIndisponivel(r.data.last_amount);
+        } else if (statusChip) {
+          statusChip.textContent = '1 giro disponível';
+          statusChip.classList.add('ready');
         }
       } catch (e) { console.warn('[roulette status]', e); }
     }
@@ -678,7 +975,7 @@
         if (!r.ok || !r.data || !r.data.ok) {
           result.textContent = erroDaApi(r, 'Não foi possível girar');
           result.style.color = 'var(--red)';
-          btn.textContent = 'Girar';
+          btn.textContent = 'Girar Roleta';
           btn.disabled = false;
           girando = false;
           return;
@@ -686,26 +983,25 @@
 
         const valor = Number(r.data.amount);
         let idx = SETORES.findIndex((s) => s.v === valor);
-        if (idx < 0) idx = 0; // valor fora da roda: o prêmio mostrado continua sendo o do servidor
+        if (idx < 0) idx = 0;
 
-        // Posição absoluta: o centro do setor sorteado precisa parar sob o ponteiro (topo)
         const alvo = 360 - (idx * GRAUS + GRAUS / 2);
         const base = rotacaoAtual - (rotacaoAtual % 360);
         rotacaoAtual = base + VOLTAS * 360 + alvo;
         wheel.style.transform = 'rotate(' + rotacaoAtual + 'deg)';
 
         setTimeout(() => {
-          result.textContent = BRL(valor);
+          result.textContent = '+ ' + BRL(valor) + ' creditado!';
           result.style.color = 'var(--green)';
           result.classList.add('win');
-          btn.textContent = 'Volte amanhã';
+          roletaIndisponivel();
           atualizarGlobais();
           girando = false;
-        }, 5200);
+        }, 5100);
       } catch (e) {
         result.textContent = 'Erro de conexão';
         result.style.color = 'var(--red)';
-        btn.textContent = 'Girar';
+        btn.textContent = 'Girar Roleta';
         btn.disabled = false;
         girando = false;
       }
@@ -803,7 +1099,7 @@
         $('claimBonusText').textContent = 'Resgatar ' + BRL(totalBonusPendente);
       } catch (e) {
         console.warn('[bonus pending]', e);
-        listEl.innerHTML = '<div class="empty-msg">Não foi possível carregar os bônus. Tente novamente.</div>';
+        listEl.innerHTML = '<div class="empty-msg">Não foi possível carregar os bônus.</div>';
         btn.style.display = 'none';
       }
     }
@@ -834,14 +1130,10 @@
     // ============================================================
     // POPUPS DE RECOMPENSAS
     // ============================================================
-    const SVG_ROULETTE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+    const SVG_ROULETTE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><line x1="12" y1="3" x2="12" y2="9.5"/></svg>';
     const SVG_MONEY    = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
-    const SVG_GIFT     = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>';
+    const SVG_GIFT     = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/></svg>';
 
-    /**
-     * Mostra um popup e devolve uma Promise que resolve com
-     * 'primary' | 'secondary' | 'dismiss' quando ele fecha.
-     */
     function criarPopup({ svg, cor, titulo, texto, valor, btnPrimary, btnSecondary }) {
       return new Promise((resolve) => {
         const backdrop = document.createElement('div');
@@ -853,8 +1145,8 @@
             '<p class="rewards-popup-text">' + esc(texto) + '</p>' +
             (valor ? '<div class="rewards-popup-amount ' + cor + '">' + esc(valor) + '</div>' : '') +
             '<div class="rewards-popup-actions">' +
-              '<button type="button" class="rewards-popup-btn primary" data-action="primary">' + esc(btnPrimary) + '</button>' +
               '<button type="button" class="rewards-popup-btn secondary" data-action="secondary">' + esc(btnSecondary) + '</button>' +
+              '<button type="button" class="rewards-popup-btn primary" data-action="primary">' + esc(btnPrimary) + '</button>' +
             '</div>' +
           '</div>';
 
@@ -868,7 +1160,7 @@
           fechado = true;
           document.removeEventListener('keydown', onKey);
           backdrop.classList.remove('open');
-          setTimeout(() => { backdrop.remove(); resolve(acao); }, 300);
+          setTimeout(() => { backdrop.remove(); resolve(acao); }, 250);
         };
         const onKey = (e) => { if (e.key === 'Escape') fechar('dismiss'); };
         document.addEventListener('keydown', onKey);
@@ -887,7 +1179,7 @@
     }
 
     async function mostrarPopupsRecompensas() {
-      if (jaMostrouPopups()) return; // uma vez por sessão, para não irritar quem volta à página
+      if (jaMostrouPopups()) return;
 
       let roletaDisponivel = false;
       let rebateDisponivel = 0;
@@ -904,34 +1196,31 @@
         }
       } catch (e) {}
 
-      // totalBonusPendente já foi preenchido por carregarBonusPendente()
       const bonusDisponivel = totalBonusPendente;
-
       if (!roletaDisponivel && !rebateDisponivel && !bonusDisponivel) return;
       marcarPopupsMostrados();
 
-      // Os popups aparecem um de cada vez: o próximo só abre depois que o anterior fecha
       if (roletaDisponivel) {
         const acao = await criarPopup({
           svg: SVG_ROULETTE, cor: 'gold',
-          titulo: 'Roleta disponível!',
-          texto: 'Você tem 1 giro grátis hoje. Gire e ganhe até R$ 10!',
-          btnPrimary: 'Girar agora', btnSecondary: 'Ver depois'
+          titulo: 'Roleta disponível',
+          texto: 'Seu giro diário gratuito está liberado.',
+          btnPrimary: 'Girar agora', btnSecondary: 'Depois'
         });
         if (acao === 'primary') {
           $('roulette-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
           girarRoleta();
-          return; // o usuário está acompanhando o giro; não empilha outros popups
+          return;
         }
       }
 
       if (rebateDisponivel > 0) {
         const acao = await criarPopup({
           svg: SVG_MONEY, cor: 'green',
-          titulo: 'Cashback disponível!',
+          titulo: 'Cashback disponível',
           texto: 'Você tem cashback acumulado para resgatar.',
           valor: BRL(rebateDisponivel),
-          btnPrimary: 'Resgatar agora', btnSecondary: 'Ver depois'
+          btnPrimary: 'Resgatar', btnSecondary: 'Depois'
         });
         if (acao === 'primary') await resgatarRebate();
       }
@@ -939,18 +1228,15 @@
       if (bonusDisponivel > 0) {
         const acao = await criarPopup({
           svg: SVG_GIFT, cor: 'gold',
-          titulo: 'Bônus disponível!',
-          texto: 'Você tem bônus de depósito para resgatar.',
+          titulo: 'Bônus disponível',
+          texto: 'Você tem bônus de depósito pronto para resgate.',
           valor: BRL(bonusDisponivel),
-          btnPrimary: 'Resgatar agora', btnSecondary: 'Ver depois'
+          btnPrimary: 'Resgatar', btnSecondary: 'Depois'
         });
         if (acao === 'primary') await resgatarBonus();
       }
     }
 
-    // ============================================================
-    // INIT
-    // ============================================================
     (async function init() {
       montarRoleta();
       await Promise.all([checkRoulette(), carregarRebate(), carregarBonusPendente()]);

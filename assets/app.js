@@ -669,94 +669,118 @@ function forcarAnimacaoSaldo() {
 window.forcarAnimacaoSaldo = forcarAnimacaoSaldo;
 
 // ============================================================
-// RESGATAR CODIGO PROMOCIONAL (Modal)
+// RESGATAR CODIGO PROMOCIONAL (Helper compartilhado + Modal)
 // ============================================================
 window.ZKN = window.ZKN || {};
+window.ZKN.resgatarCodigoPromo = async function(rawCode) {
+  const codeValue = String(rawCode || '').trim().toUpperCase();
+  if (!codeValue) {
+    return { ok: false, mensagem: 'Digite um código antes de resgatar.' };
+  }
+  const token = window.ZKNAuth?.getToken ? window.ZKNAuth.getToken() : '';
+  const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || window.ZKN_API;
+  const res = await fetch(apiBase + '/promo/claim', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    body: JSON.stringify({ code: codeValue })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    return { ok: false, mensagem: data.message || 'Código inválido ou expirado.' };
+  }
+  if (window.ZKN?.invalidarResumo) window.ZKN.invalidarResumo();
+  if (window.ZKNSaldo?.atualizar) window.ZKNSaldo.atualizar();
+  return { ok: true, value: Number(data.value || 0), code: data.code || codeValue };
+};
+
 window.ZKN.abrirResgatarCodigo = function() {
   const backdrop = document.createElement('div');
-  backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
-  
+  backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(5,7,13,0.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;';
+
   backdrop.innerHTML = `
-    <div style="background:linear-gradient(180deg, #1a2332 0%, #0a0f1a 100%); border:2px solid #f5be3c; border-radius:24px; padding:32px 24px; max-width:400px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(245,190,60,0.3); position:relative;">
-      <button id="btnFecharModal" style="position:absolute;top:12px;right:16px;background:transparent;border:none;color:#8a94a6;font-size:24px;cursor:pointer;">&times;</button>
-      <div style="font-size:56px;margin-bottom:16px;"><span class="ico ico-ticket" style="width:3.5rem;height:3.5rem;vertical-align:middle;"></span></div>
-      <h3 style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#f5be3c;margin-bottom:8px;">Resgatar Código</h3>
-      <p style="font-size:14px;color:#8a94a6;margin-bottom:20px;">Digite o código promocional para receber seu bônus.</p>
-      
-      <input id="inputPromoCode" type="text" placeholder="Ex: ZKN10" style="width:100%;padding:16px;background:#15171C;border:1px solid #333;border-radius:10px;color:#fff;font-size:18px;text-align:center;text-transform:uppercase;margin-bottom:16px;outline:none;font-weight:700;">
-      
-      <div style="display:flex;gap:8px;">
-        <button id="btnCancelarPromo" style="flex:1;padding:14px;border-radius:10px;background:#2a2a2a;border:1px solid #444;color:#fff;font-weight:700;cursor:pointer;">Cancelar</button>
-        <button id="btnConfirmarPromo" style="flex:1;padding:14px;border-radius:10px;background:linear-gradient(135deg, #00d67f, #00b96d);color:#fff;font-weight:800;border:none;cursor:pointer;">Resgatar</button>
+    <div role="dialog" aria-modal="true" aria-labelledby="promoModalTitle" style="background:#18191e;border:1px solid rgba(255,255,255,0.10);border-radius:16px;padding:20px;max-width:400px;width:100%;text-align:left;box-shadow:0 20px 50px rgba(0,0,0,0.65);position:relative;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(244,232,58,0.12);border:1px solid rgba(244,232,58,0.28);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;">
+            <span class="ico ico-ticket" style="width:18px;height:18px;"></span>
+          </span>
+          <div>
+            <h3 id="promoModalTitle" style="font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--text);margin:0;">Código promocional</h3>
+            <p style="font-size:12px;color:var(--text-muted);margin:2px 0 0;">Saldo creditado na hora após validação.</p>
+          </div>
+        </div>
+        <button id="btnFecharModal" type="button" aria-label="Fechar" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--text-muted);font-size:18px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">&times;</button>
       </div>
+
+      <div style="display:flex;gap:8px;background:#101115;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:5px;align-items:center;">
+        <input id="inputPromoCode" type="text" autocomplete="off" spellcheck="false" placeholder="Digite o código (ex: ZKN10)" style="flex:1;min-width:0;padding:10px 12px;background:transparent;border:none;color:#fff;font-size:15px;letter-spacing:1.4px;text-transform:uppercase;outline:none;font-weight:700;">
+        <button id="btnConfirmarPromo" type="button" style="padding:10px 16px;border-radius:9px;background:var(--gold,#f4e83a);color:#090f1f;font-weight:800;font-size:13px;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;">Resgatar</button>
+      </div>
+
+      <div id="promoModalFeedback" style="min-height:18px;margin-top:10px;font-size:12px;color:var(--text-muted);">Rollover 1x · 1 uso por conta.</div>
     </div>
   `;
-  
+
   document.body.appendChild(backdrop);
-  
+
   const input = backdrop.querySelector('#inputPromoCode');
   const btnFechar = backdrop.querySelector('#btnFecharModal');
-  const btnCancelar = backdrop.querySelector('#btnCancelarPromo');
   const btnConfirmar = backdrop.querySelector('#btnConfirmarPromo');
-  
+  const feedback = backdrop.querySelector('#promoModalFeedback');
+
+  const fechar = () => {
+    document.removeEventListener('keydown', onKey);
+    backdrop.remove();
+  };
+  const onKey = (e) => { if (e.key === 'Escape') fechar(); };
+  document.addEventListener('keydown', onKey);
+  backdrop.addEventListener('click', (e) => { if (e.target === backdrop) fechar(); });
+  btnFechar.onclick = fechar;
   input.focus();
-  
-  btnFechar.onclick = () => backdrop.remove();
-  btnCancelar.onclick = () => backdrop.remove();
-  
+
   btnConfirmar.onclick = async () => {
     const codeValue = String(input.value || '').trim().toUpperCase();
-    
     if (!codeValue) {
-      if (window.ZKN && window.ZKN.toast) window.ZKN.toast('Atenção', 'Digite um código antes de resgatar.', 'warning');
+      feedback.style.color = 'var(--gold)';
+      feedback.textContent = 'Digite um código antes de confirmar.';
+      input.focus();
       return;
     }
-    
+
     btnConfirmar.disabled = true;
-    btnConfirmar.textContent = 'Verificando...';
-    
+    btnConfirmar.textContent = 'Validando...';
+    feedback.style.color = 'var(--text-muted)';
+    feedback.textContent = 'Verificando código...';
+
     try {
-      const token = window.ZKNAuth.getToken();
-      const apiBase = (window.ZKN_CONFIG && window.ZKN_CONFIG.api) || window.ZKN_API;
-      
-      // Usa fetch direto, igual o auth.js faz
-      const res = await fetch(apiBase + '/promo/claim', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify({ code: codeValue })
-      });
-      
-      const data = await res.json().catch(() => ({}));
-      
-      if (res.ok) {
-        if (window.ZKN && window.ZKN.toast) {
-          window.ZKN.toast('Sucesso!', 'Você ganhou R$ ' + Number(data.value).toFixed(2).replace('.', ','), 'success');
+      const result = await window.ZKN.resgatarCodigoPromo(codeValue);
+      if (result.ok) {
+        if (window.ZKN?.toast) {
+          window.ZKN.toast('Código resgatado!', '+' + formatBRL(result.value) + ' creditado no saldo.', 'success');
         }
-        backdrop.remove();
-        if (window.ZKNSaldo && window.ZKNSaldo.atualizar) {
-          window.ZKNSaldo.atualizar();
-        }
+        fechar();
       } else {
-        if (window.ZKN && window.ZKN.toast) {
-          window.ZKN.toast('Erro', data.message || 'Código inválido', 'error');
-        }
+        feedback.style.color = 'var(--red)';
+        feedback.textContent = result.mensagem;
         btnConfirmar.disabled = false;
         btnConfirmar.textContent = 'Resgatar';
       }
     } catch (e) {
-      if (window.ZKN && window.ZKN.toast) {
-        window.ZKN.toast('Erro', e.message, 'error');
-      }
+      feedback.style.color = 'var(--red)';
+      feedback.textContent = e.message || 'Erro de conexão.';
       btnConfirmar.disabled = false;
       btnConfirmar.textContent = 'Resgatar';
     }
   };
-  
-  input.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') btnConfirmar.click();
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      btnConfirmar.click();
+    }
   });
 };
 // ============================================================
