@@ -1,7 +1,7 @@
 ﻿// ============================================================
-// BOTTOM NAV - barra de navegacao inferior
-// 5 botoes: Inicio, Recompensas, Pesquisa, Conta, Convidar
-// Badges pulsando quando ha algo disponivel
+// BOTTOM NAV - barra de navegacao inferior (95H.com style)
+// 5 tabs: Inicio, Promocao, Convidar (center FAB), Saque, Perfil
+// Center button: raised circular medallion with golden glow ring
 // ============================================================
 
 (function() {
@@ -10,176 +10,61 @@
   const paginaAtual = location.pathname.split('/').pop() || 'index.html';
   if (PAGINAS_SEM_NAV.includes(paginaAtual)) return;
 
-  // SVGs
+  // Clean minimal SVG icons
   const SVG_HOME = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
-  const SVG_GIFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>';
-  const SVG_SEARCH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
-  const SVG_USER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-  const SVG_HANDSHAKE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 17l-5-5"/><path d="M14 14l5-5"/><path d="M3 3l3 3"/><path d="M21 3l-3 3"/><path d="M3 21l3-3"/><path d="M21 21l-3-3"/><path d="M14 10l-4 4"/><path d="M10 14l-4 4"/><path d="M14 14l4 4"/></svg>';
+  const SVG_PROMO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>';
+  const SVG_INVITE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>';
+  const SVG_WITHDRAW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
+  const SVG_PROFILE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
   const itens = [
-    { id: 'home',    label: 'Início',      href: 'index.html',       svg: SVG_HOME },
-    { id: 'rewards', label: 'Recompensas', href: 'recompensas.html', svg: SVG_GIFT },
-    { id: 'search',  label: 'Buscar',      href: 'jogos.html',       svg: SVG_SEARCH },
-    { id: 'account', label: 'Conta',       href: 'minha-conta.html', svg: SVG_USER },
-    { id: 'invite',  label: 'Convidar',    href: 'indicacao.html',   svg: SVG_HANDSHAKE },
+    { id: 'home',     label: 'Início',    href: 'index.html',       svg: SVG_HOME,     isFab: false },
+    { id: 'promo',    label: 'Promoção',  href: 'recompensas.html', svg: SVG_PROMO,    isFab: false },
+    { id: 'invite',   label: 'Convidar',  href: 'indicacao.html',   svg: SVG_INVITE,   isFab: true  },
+    { id: 'withdraw', label: 'Saque',     href: 'saque.html',       svg: SVG_WITHDRAW, isFab: false },
+    { id: 'profile',  label: 'Perfil',    href: 'minha-conta.html', svg: SVG_PROFILE,  isFab: false },
   ];
 
-  // Cria CSS
-  const style = document.createElement('style');
-  style.textContent = `
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      background: rgba(10, 15, 26, 0.96);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-top: 1px solid rgba(245, 190, 60, 0.3);
-      border-radius: 20px 20px 0 0;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
-      z-index: 9998;
-      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
-    }
-
-    .bottom-nav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      padding: 6px 2px;
-      color: #8a94a6;
-      text-decoration: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      border-radius: 12px;
-      position: relative;
-      transition: all 0.18s ease;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-    }
-
-    .bottom-nav-item:hover {
-      color: #f5be3c;
-      background: rgba(245, 190, 60, 0.08);
-    }
-
-    .bottom-nav-item.active {
-      color: #f5be3c;
-    }
-
-    .bottom-nav-item.active::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 20px;
-      height: 3px;
-      background: #f5be3c;
-      border-radius: 2px;
-    }
-
-    .bottom-nav-icon {
-      width: 22px;
-      height: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .bottom-nav-icon svg {
-      width: 22px;
-      height: 22px;
-    }
-
-    .bottom-nav-badge {
-      position: absolute;
-      top: -4px;
-      right: -8px;
-      min-width: 16px;
-      height: 16px;
-      padding: 0 4px;
-      background: #ff4757;
-      color: #fff;
-      font-size: 10px;
-      font-weight: 800;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #0a0f1a;
-      animation: badge-pulse 1.5s ease-in-out infinite;
-      font-family: 'Inter', sans-serif;
-    }
-
-    @keyframes badge-pulse {
-      0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7);
-      }
-      50% {
-        transform: scale(1.15);
-        box-shadow: 0 0 0 6px rgba(255, 71, 87, 0);
-      }
-    }
-
-    /* Espaço pro bottom nav no body */
-    body {
-      padding-bottom: 80px !important;
-    }
-
-    /* Desktop (>900px): navega pelo header superior, esconde barra inferior */
-    @media (min-width: 901px) {
-      .bottom-nav {
-        display: none !important;
-      }
-      body {
-        padding-bottom: 0 !important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
+  // Active detection
+  function isActive(item) {
+    if (item.id === 'home' && (paginaAtual === 'index.html' || paginaAtual === '')) return true;
+    if (item.id === 'promo' && (paginaAtual === 'recompensas.html' || paginaAtual === 'ofertas.html')) return true;
+    if (item.id === 'invite' && paginaAtual === 'indicacao.html') return true;
+    if (item.id === 'withdraw' && (paginaAtual === 'saque.html' || paginaAtual === 'saque-primeiro-acesso.html')) return true;
+    if (item.id === 'profile' && (paginaAtual === 'minha-conta.html' || paginaAtual === 'alterar-dados.html' || paginaAtual === 'alterar-senha.html')) return true;
+    return false;
+  }
 
   // Cria nav
   const nav = document.createElement('nav');
   nav.className = 'bottom-nav';
   nav.setAttribute('aria-label', 'Menu de navegação');
 
-  itens.forEach(item => {
+  itens.forEach(function(item) {
     const a = document.createElement('a');
-    a.className = 'bottom-nav-item';
     a.href = item.href;
     a.dataset.id = item.id;
 
-    if (item.id === 'home' && (paginaAtual === 'index.html' || paginaAtual === '')) {
-      a.classList.add('active');
-    }
-    if (item.id === 'rewards' && paginaAtual === 'recompensas.html') {
-      a.classList.add('active');
-    }
-    if (item.id === 'search' && (paginaAtual === 'jogos.html' || paginaAtual === 'favoritos.html')) {
-      a.classList.add('active');
-    }
-    if (item.id === 'account' && (paginaAtual === 'minha-conta.html' || paginaAtual === 'alterar-dados.html' || paginaAtual === 'alterar-senha.html')) {
-      a.classList.add('active');
-    }
-    if (item.id === 'invite' && paginaAtual === 'indicacao.html') {
-      a.classList.add('active');
+    if (item.isFab) {
+      // Center FAB: raised circular medallion
+      a.className = 'bottom-nav-fab';
+      a.innerHTML =
+        '<div class="bottom-nav-fab-ring">' +
+          '<div class="bottom-nav-fab-circle">' +
+            item.svg +
+          '</div>' +
+        '</div>' +
+        '<span class="bottom-nav-fab-label">' + item.label + '</span>';
+    } else {
+      a.className = 'bottom-nav-item' + (isActive(item) ? ' active' : '');
+      a.innerHTML =
+        '<div class="bottom-nav-icon">' +
+          item.svg +
+          '<span class="bottom-nav-badge hidden" id="badge-' + item.id + '"></span>' +
+        '</div>' +
+        '<span>' + item.label + '</span>';
     }
 
-    a.innerHTML = '<div class="bottom-nav-icon">' + item.svg + '<span class="bottom-nav-badge hidden" id="badge-' + item.id + '"></span></div><span>' + item.label + '</span>';
     nav.appendChild(a);
   });
 
@@ -189,28 +74,28 @@
   // ============================================================
   // BADGES — calcula quantas coisas disponiveis
   // ============================================================
-  async function calcularBadges(force = false) {
+  async function calcularBadges(force) {
     if (!window.ZKNAuth || !window.ZKNAuth.isLoggedIn || !window.ZKNAuth.isLoggedIn()) return;
 
     if (window.ZKN && window.ZKN.getSummaryCached) {
-      const sum = await window.ZKN.getSummaryCached(force).catch(() => null);
+      var sum = await window.ZKN.getSummaryCached(force).catch(function() { return null; });
       if (sum && sum.rewards !== undefined) return;
     }
 
-    let rewardsCount = 0;
+    var rewardsCount = 0;
 
     try {
-      const roulette = await ZKNAuth.api('/roulette/status');
+      var roulette = await ZKNAuth.api('/roulette/status');
       if (roulette.ok && roulette.data.available) rewardsCount++;
     } catch (e) {}
 
     try {
-      const rebate = await ZKNAuth.api('/rebate/status');
+      var rebate = await ZKNAuth.api('/rebate/status');
       if (rebate.ok && rebate.data && rebate.data.balance >= rebate.data.min_claim) rewardsCount++;
     } catch (e) {}
 
     try {
-      const pending = await ZKNAuth.api('/deposit-bonus/pending');
+      var pending = await ZKNAuth.api('/deposit-bonus/pending');
       if (pending.ok && pending.data.pending && pending.data.pending.length > 0) rewardsCount++;
     } catch (e) {}
 
@@ -219,22 +104,23 @@
       return;
     }
 
-    const badgeRewards = document.getElementById('badge-rewards');
-    if (badgeRewards) {
+    // Fallback: apply to promo badge (was 'rewards' in old nav)
+    var badgePromo = document.getElementById('badge-promo');
+    if (badgePromo) {
       if (rewardsCount > 0) {
-        badgeRewards.textContent = rewardsCount;
-        badgeRewards.classList.remove('hidden');
+        badgePromo.textContent = rewardsCount;
+        badgePromo.classList.remove('hidden');
       } else {
-        badgeRewards.classList.add('hidden');
+        badgePromo.classList.add('hidden');
       }
     }
   }
 
   // Roda ao carregar
-  setTimeout(() => calcularBadges(false), 400);
+  setTimeout(function() { calcularBadges(false); }, 400);
 
-  // Expõe pra atualizar manualmente (ex: apos girar roleta / resgatar bonus)
+  // Expoe pra atualizar manualmente (ex: apos girar roleta / resgatar bonus)
   window.ZKNBottomNav = {
-    atualizarBadges: () => calcularBadges(true),
+    atualizarBadges: function() { return calcularBadges(true); },
   };
 })();

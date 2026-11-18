@@ -30,6 +30,10 @@ function _traduzirMensagem(msg) {
 let _favsCache = [];
 let _recentesCache = [];
 
+var SVG_HEART_FILLED = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+var SVG_HEART_OUTLINE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+var SVG_PLAY = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+
 // ---------- Favoritos ----------
 async function carregarFavoritos() {
   if (!window.ZKNAuth || !window.ZKNAuth.isLoggedIn()) {
@@ -78,7 +82,7 @@ async function toggleFavorito(code) {
   return !jaFav;
 }
 
-// ---------- Toggle do botão ----------
+// ---------- Toggle do botao ----------
 async function toggleFav(btn, code) {
   if (btn) btn.disabled = true;
 
@@ -93,8 +97,9 @@ async function toggleFav(btn, code) {
     if (btn) {
       if (agoraFav) btn.classList.add('active');
       else btn.classList.remove('active');
-      btn.textContent = agoraFav ? '★' : '☆';
+      btn.innerHTML = agoraFav ? SVG_HEART_FILLED : SVG_HEART_OUTLINE;
       btn.title = agoraFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos';
+      btn.setAttribute('aria-label', btn.title);
       btn.disabled = false;
     }
   } catch (e) {
@@ -124,14 +129,14 @@ async function registrarRecente(code) {
   if (window.__RECENTES_UPDATED__) window.__RECENTES_UPDATED__();
 }
 
-// ---------- Render: botão de favoritar ----------
+// ---------- Render: botao de favoritar (heart icon, translucent dark glass) ----------
 function renderFavButton(gameCode) {
   var fav = isFavorito(gameCode);
   return '<button class="game-card-fav ' + (fav ? 'active' : '') + '" ' +
     'onclick="event.stopPropagation(); ZKNGamesLib.toggleFav(this, \'' + _escAttr(gameCode) + '\')" ' +
     'aria-label="' + (fav ? 'Remover dos favoritos' : 'Adicionar aos favoritos') + '" ' +
     'title="' + (fav ? 'Remover dos favoritos' : 'Adicionar aos favoritos') + '">' +
-    (fav ? '★' : '☆') + '</button>';
+    (fav ? SVG_HEART_FILLED : SVG_HEART_OUTLINE) + '</button>';
 }
 
 function _onCoverError(img) {
@@ -151,7 +156,7 @@ function _onCoverError(img) {
   }
 }
 
-// ---------- Render: card individual ----------
+// ---------- Render: card individual (portrait 3:4, provider tag overlay) ----------
 function renderGameCard(j) {
   var capa = j.image_url || '';
   var fallback = j.fallback_image_url || '';
@@ -173,12 +178,17 @@ function renderGameCard(j) {
     ? '<span class="game-card-rtp">' + rtpVal.toFixed(1) + '% RTP</span>'
     : '';
 
+  var providerTag = providerSafe
+    ? '<span class="game-card-provider-tag">' + providerSafe + '</span>'
+    : '';
+
   return '<div class="game-card" onclick="ZKNGamesLib.abrirJogo(\'' + _escAttr(j.game_code) + '\', \'' + _escAttr(j.name) + '\')">' +
     renderFavButton(j.game_code) +
     '<div class="game-card-cover">' +
       coverHtml +
       rtpBadge +
-      '<div class="game-card-play"><div class="play-btn">&#9654;</div></div>' +
+      providerTag +
+      '<div class="game-card-play"><div class="play-btn">' + SVG_PLAY + '</div></div>' +
     '</div>' +
     '<div class="game-card-info">' +
       '<div class="game-card-name" title="' + nomeSafe + '">' + nomeSafe + '</div>' +
@@ -214,14 +224,126 @@ function classificarCategoria(j) {
   return 'slots';
 }
 
-// ---------- Render: seção inteira ----------
-function renderGameSection(containerEl, jogos) {
+function _getAdjacentDisclosure(containerEl) {
+  var sib = containerEl.nextElementSibling;
+  if (sib && sib.classList && sib.classList.contains('games-disclosure')) {
+    return sib;
+  }
+  return null;
+}
+
+function _cleanupDynamicDisclosure(containerEl) {
+  var sib = containerEl.nextElementSibling;
+  while (sib && (sib.classList.contains('games-counter') || sib.classList.contains('games-load-more'))) {
+    var next = sib.nextElementSibling;
+    sib.remove();
+    sib = next;
+  }
+}
+
+// ---------- Render: secao inteira com progressive disclosure ----------
+function renderGameSection(containerEl, jogos, opts) {
   if (!containerEl) return;
+
+  var staticDisclosure = _getAdjacentDisclosure(containerEl);
+  _cleanupDynamicDisclosure(containerEl);
+
   if (!jogos || jogos.length === 0) {
+    if (staticDisclosure) staticDisclosure.style.display = 'none';
     containerEl.innerHTML = '<div class="game-card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Nenhum jogo para mostrar.</div>';
     return;
   }
-  containerEl.innerHTML = jogos.map(function(j) { return renderGameCard(j); }).join('');
+
+  var perPage = (opts && opts.perPage) || 20;
+  var showAll = (opts && opts.showAll) || false;
+  var total = jogos.length;
+  var shown = showAll ? total : Math.min(perPage, total);
+
+  containerEl.innerHTML = jogos.slice(0, shown).map(function(j) { return renderGameCard(j); }).join('');
+
+  if (staticDisclosure) {
+    staticDisclosure.style.display = '';
+    var countEl = staticDisclosure.querySelector('.games-disclosure-count');
+    var btnEl = staticDisclosure.querySelector('.games-disclosure-btn');
+    if (countEl) {
+      countEl.innerHTML = 'Mostrando <strong>' + shown + '</strong> de <strong>' + total + '</strong> jogos';
+    }
+    if (btnEl) {
+      if (shown < total) {
+        btnEl.style.display = '';
+        btnEl.onclick = function() {
+          var nextShown = Math.min(shown + perPage, total);
+          var fragment = '';
+          for (var i = shown; i < nextShown; i++) {
+            fragment += renderGameCard(jogos[i]);
+          }
+          containerEl.insertAdjacentHTML('beforeend', fragment);
+          shown = nextShown;
+          if (countEl) {
+            countEl.innerHTML = 'Mostrando <strong>' + shown + '</strong> de <strong>' + total + '</strong> jogos';
+          }
+          if (shown >= total) {
+            btnEl.style.display = 'none';
+            btnEl.onclick = null;
+          }
+        };
+      } else {
+        btnEl.style.display = 'none';
+        btnEl.onclick = null;
+      }
+    }
+    return;
+  }
+
+  if (shown < total) {
+    _renderCounter(containerEl, shown, total);
+    _renderLoadMore(containerEl, jogos, shown, perPage, total);
+  }
+}
+
+function _renderCounter(containerEl, shown, total) {
+  var sib = containerEl.nextElementSibling;
+  if (sib && sib.classList.contains('games-counter')) sib.remove();
+
+  var counter = document.createElement('div');
+  counter.className = 'games-counter';
+  counter.innerHTML = 'Mostrando <strong>' + shown + '</strong> de <strong>' + total + '</strong> jogos';
+  containerEl.insertAdjacentElement('afterend', counter);
+}
+
+function _renderLoadMore(containerEl, jogos, shown, perPage, total) {
+  var counter = containerEl.nextElementSibling;
+  if (counter && counter.classList.contains('games-counter') && counter.nextElementSibling && counter.nextElementSibling.classList.contains('games-load-more')) {
+    counter.nextElementSibling.remove();
+  }
+
+  if (shown >= total) return;
+
+  var btn = document.createElement('button');
+  btn.className = 'games-load-more';
+  btn.type = 'button';
+  btn.textContent = 'Carregar mais';
+
+  btn.addEventListener('click', function() {
+    var nextShown = Math.min(shown + perPage, total);
+    var fragment = '';
+    for (var i = shown; i < nextShown; i++) {
+      fragment += renderGameCard(jogos[i]);
+    }
+    containerEl.insertAdjacentHTML('beforeend', fragment);
+    shown = nextShown;
+    _renderCounter(containerEl, shown, total);
+    if (shown >= total) {
+      btn.remove();
+    }
+  });
+
+  var currentCounter = containerEl.nextElementSibling;
+  if (currentCounter && currentCounter.classList.contains('games-counter')) {
+    currentCounter.insertAdjacentElement('afterend', btn);
+  } else {
+    containerEl.insertAdjacentElement('afterend', btn);
+  }
 }
 
 // ---------- Abrir jogo ----------

@@ -1,147 +1,610 @@
 ﻿/* ============================================================
-   TEMAS SAZONAIS ULTRA PREMIUM - ZKNBET
+   SEASONAL THEMES - ZKNBET
+   Complete CSS variable override system per theme
    ============================================================ */
 
-/* --- HALLOWEEN (A Noite das Bruxas) --- */
+
+/* =============================================================
+   HALLOWEEN - Dark Purple / Burnt Orange
+   ============================================================= */
+
 body.theme-halloween {
-  background-color: #050005;
-  background-image: 
-    radial-gradient(circle at 50% -20%, rgba(255, 60, 0, 0.4) 0%, transparent 70%),
-    linear-gradient(to bottom, transparent 0%, #050005 100%);
-  color: #e0d0d0;
-}
-/* Teias laterais via borda animada */
-body.theme-halloween::before {
-  content: "";
-  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-  pointer-events: none; z-index: 9998;
-  background: 
-    url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L200,200 M0,0 L80,200 M0,0 L200,80 M0,0 L160,200 M0,0 L200,160" stroke="rgba(255,255,255,0.08)" stroke-width="2" fill="none"/><path d="M50,0 Q70,30 0,50 M100,0 Q130,40 0,100 M0,50 Q30,70 0,100 M0,100 Q40,130 0,150" stroke="rgba(255,255,255,0.08)" stroke-width="2" fill="none"/></svg>') no-repeat top left,
-    url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M200,200 L0,0 M200,200 L120,0 M200,200 L0,120 M200,200 L40,0 M200,200 L0,40" stroke="rgba(255,255,255,0.08)" stroke-width="2" fill="none"/><path d="M150,200 Q130,170 200,150 M100,200 Q70,160 200,100 M200,150 Q170,130 200,100 M200,100 Q160,70 200,50" stroke="rgba(255,255,255,0.08)" stroke-width="2" fill="none"/></svg>') no-repeat bottom right;
-  background-size: 300px 300px;
-  opacity: 0.8;
-}
-/* Card formatado como lápide */
-body.theme-halloween .card {
-  border-radius: 40px 40px 8px 8px !important; /* Topo arredondado, base reta */
-  border-top: 4px solid #ff5e00 !important;
-  border-left: 2px solid rgba(255, 94, 0, 0.2) !important;
-  border-right: 2px solid rgba(255, 94, 0, 0.2) !important;
-  border-bottom: 2px solid rgba(255, 94, 0, 0.5) !important;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 -20px 40px rgba(255, 94, 0, 0.1) !important;
-  background: linear-gradient(to bottom, #1a1114, #0d090a) !important;
-}
-body.theme-halloween .btn-primary {
-  background: #ff5e00 !important;
-  box-shadow: 0 0 20px #ff5e00, inset 0 0 10px rgba(255,255,255,0.3) !important;
-  border-radius: 8px 8px 20px 20px !important;
+  --bg-0: #0d0520 !important;
+  --bg-1: #1a0a2e !important;
+  --bg-2: #261040 !important;
+  --bg-3: #33164f !important;
+  --bg-card: #261040 !important;
+  --bg-elevated: #33164f !important;
+  --bg-input: #1f0b35 !important;
+  --border: rgba(255, 94, 0, 0.1) !important;
+  --border-strong: rgba(255, 94, 0, 0.25) !important;
+  --border-gold: rgba(255, 94, 0, 0.45) !important;
+  --text: #ede0f0 !important;
+  --text-muted: #a090b0 !important;
+  --text-dim: #604878 !important;
+  --gold: #ff5e00 !important;
+  --gold-2: #ff8533 !important;
+  --gold-hover: #e04e00 !important;
+  --gold-dark: #ffffff !important;
+  --green: #9b59b6 !important;
+  --red: #ff2222 !important;
+  --teal: #c060ff !important;
+  --grad-gold: linear-gradient(135deg, #ff5e00 0%, #ff8533 50%, #ffab40 100%) !important;
+  --grad-green: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%) !important;
+  --grad-teal: linear-gradient(135deg, #c060ff 0%, #9b59b6 100%) !important;
+  --grad-dark: linear-gradient(180deg, #1a0a2e 0%, #0d0520 100%) !important;
+  --grad-card: linear-gradient(180deg, #261040 0%, #1a0a2e 100%) !important;
+  --shadow-gold: 0 0 30px rgba(255, 94, 0, 0.35) !important;
+  --shadow-teal: 0 0 24px rgba(192, 96, 255, 0.3) !important;
+  --shadow: 0 8px 24px rgba(13, 5, 32, 0.6) !important;
+  --shadow-lg: 0 20px 60px rgba(13, 5, 32, 0.8) !important;
+
+  background-color: #0d0520 !important;
+  background-image:
+    radial-gradient(ellipse at 50% -10%, rgba(255, 94, 0, 0.25) 0%, transparent 60%),
+    radial-gradient(ellipse at 20% 80%, rgba(139, 0, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 60%, rgba(255, 94, 0, 0.08) 0%, transparent 40%) !important;
+  color: #ede0f0 !important;
 }
 
-/* --- NATAL (Magia de Inverno) --- */
-body.theme-christmas {
-  background-color: #020a04;
-  background-image: radial-gradient(circle at 50% 0%, rgba(255, 0, 0, 0.15) 0%, transparent 60%);
-  color: #f0fdf4;
+/* Cobweb overlay */
+body.theme-halloween::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9998;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 25%),
+    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 25%),
+    repeating-conic-gradient(from 0deg at 0% 0%, transparent 0deg, rgba(255, 255, 255, 0.015) 3deg, transparent 6deg) 0 0 / 300px 300px no-repeat,
+    repeating-conic-gradient(from 180deg at 100% 0%, transparent 0deg, rgba(255, 255, 255, 0.015) 3deg, transparent 6deg) 100% 0 / 300px 300px no-repeat;
+  opacity: 0.9;
 }
-/* O topo da tela vira um teto com pisca-pisca */
+
+body.theme-halloween .card {
+  border: 1px solid rgba(255, 94, 0, 0.2) !important;
+  border-top: 3px solid #ff5e00 !important;
+  box-shadow:
+    0 0 20px rgba(255, 94, 0, 0.1),
+    0 15px 40px rgba(13, 5, 32, 0.7),
+    inset 0 1px 0 rgba(255, 94, 0, 0.1) !important;
+  background: linear-gradient(180deg, #1f0b35 0%, #150730 100%) !important;
+}
+
+body.theme-halloween .btn-primary {
+  background: linear-gradient(135deg, #ff5e00 0%, #ff8533 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow:
+    0 0 20px rgba(255, 94, 0, 0.5),
+    0 4px 15px rgba(255, 94, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  animation: halloween-ember-pulse 2.5s ease-in-out infinite;
+}
+
+body.theme-halloween .btn-secondary {
+  background: rgba(255, 94, 0, 0.12) !important;
+  border: 1px solid rgba(255, 94, 0, 0.3) !important;
+  color: #ff8533 !important;
+}
+
+body.theme-halloween .btn-secondary:hover {
+  background: rgba(255, 94, 0, 0.2) !important;
+  border-color: rgba(255, 94, 0, 0.5) !important;
+}
+
+body.theme-halloween .zkn-header {
+  background: rgba(13, 5, 32, 0.92) !important;
+  border-bottom: 1px solid rgba(255, 94, 0, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(255, 94, 0, 0.1) !important;
+}
+
+body.theme-halloween .bottom-nav {
+  background: linear-gradient(180deg, rgba(26, 10, 46, 0.95), rgba(13, 5, 32, 0.98)) !important;
+  border-top: 1px solid rgba(255, 94, 0, 0.3) !important;
+  box-shadow: 0 -4px 24px rgba(255, 94, 0, 0.2) !important;
+}
+
+body.theme-halloween .bottom-nav-fab-ring {
+  background: conic-gradient(from 180deg, #ff5e00, #ff8533, #c060ff, #ff5e00) !important;
+  box-shadow: 0 0 22px rgba(255, 94, 0, 0.6), 0 6px 16px rgba(13, 5, 32, 0.85) !important;
+}
+
+body.theme-halloween .bottom-nav-fab-circle {
+  background: radial-gradient(circle at 30% 25%, #ff9e40 0%, #ff5e00 50%, #9b2c00 100%) !important;
+  color: #fff !important;
+}
+
+body.theme-halloween .announcement-bar {
+  background: #1f0b35 !important;
+  border-color: rgba(255, 94, 0, 0.2) !important;
+}
+
+body.theme-halloween .game-card {
+  border: 1px solid rgba(255, 94, 0, 0.15) !important;
+  box-shadow: 0 6px 20px rgba(13, 5, 32, 0.6) !important;
+}
+
+body.theme-halloween .game-card:hover {
+  border-color: rgba(255, 94, 0, 0.4) !important;
+  box-shadow: 0 8px 30px rgba(255, 94, 0, 0.2) !important;
+}
+
+body.theme-halloween .section-title::before {
+  background: linear-gradient(135deg, #ff5e00, #ff8533) !important;
+  box-shadow: 0 0 10px rgba(255, 94, 0, 0.5) !important;
+}
+
+@keyframes halloween-ember-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(255, 94, 0, 0.4),
+      0 4px 15px rgba(255, 94, 0, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 35px rgba(255, 94, 0, 0.7),
+      0 4px 25px rgba(255, 94, 0, 0.5);
+  }
+}
+
+
+/* =============================================================
+   CHRISTMAS - Deep Red / Forest Green
+   ============================================================= */
+
+body.theme-christmas {
+  --bg-0: #060a04 !important;
+  --bg-1: #0a1408 !important;
+  --bg-2: #12200e !important;
+  --bg-3: #1a2c14 !important;
+  --bg-card: #12200e !important;
+  --bg-elevated: #1a2c14 !important;
+  --bg-input: #0e1a0a !important;
+  --border: rgba(255, 255, 255, 0.08) !important;
+  --border-strong: rgba(211, 47, 47, 0.3) !important;
+  --border-gold: rgba(211, 47, 47, 0.45) !important;
+  --text: #f0fdf4 !important;
+  --text-muted: #90b898 !important;
+  --text-dim: #3d6648 !important;
+  --gold: #d32f2f !important;
+  --gold-2: #ef5350 !important;
+  --gold-hover: #b71c1c !important;
+  --gold-dark: #ffffff !important;
+  --green: #2e7d32 !important;
+  --red: #ff1744 !important;
+  --teal: #43a047 !important;
+  --grad-gold: linear-gradient(135deg, #d32f2f 0%, #ef5350 100%) !important;
+  --grad-green: linear-gradient(135deg, #2e7d32 0%, #43a047 100%) !important;
+  --grad-teal: linear-gradient(135deg, #43a047 0%, #2e7d32 100%) !important;
+  --grad-dark: linear-gradient(180deg, #0a1408 0%, #060a04 100%) !important;
+  --grad-card: linear-gradient(180deg, #12200e 0%, #0a1408 100%) !important;
+  --shadow-gold: 0 0 24px rgba(211, 47, 47, 0.3) !important;
+  --shadow-teal: 0 0 20px rgba(67, 160, 71, 0.3) !important;
+  --shadow: 0 8px 24px rgba(6, 10, 4, 0.5) !important;
+  --shadow-lg: 0 20px 60px rgba(6, 10, 4, 0.7) !important;
+
+  background-color: #060a04 !important;
+  background-image:
+    radial-gradient(ellipse at 30% 0%, rgba(139, 0, 0, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 0%, rgba(10, 61, 10, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(139, 0, 0, 0.08) 0%, transparent 40%) !important;
+  color: #f0fdf4 !important;
+}
+
+/* Snowfall effect */
 body.theme-christmas::before {
   content: "";
-  position: fixed; top: 0; left: 0; width: 100vw; height: 120px;
-  pointer-events: none; z-index: 9999;
-  background-image: 
-    radial-gradient(circle at 10% 20px, #ff0000 4px, transparent 5px),
-    radial-gradient(circle at 20% 40px, #00ff00 4px, transparent 5px),
-    radial-gradient(circle at 30% 15px, #ffff00 4px, transparent 5px),
-    radial-gradient(circle at 40% 35px, #0000ff 4px, transparent 5px),
-    radial-gradient(circle at 50% 25px, #ff0000 4px, transparent 5px),
-    radial-gradient(circle at 60% 45px, #00ff00 4px, transparent 5px),
-    radial-gradient(circle at 70% 20px, #ffff00 4px, transparent 5px),
-    radial-gradient(circle at 80% 40px, #0000ff 4px, transparent 5px),
-    radial-gradient(circle at 90% 30px, #ff0000 4px, transparent 5px);
-  animation: blink 1.5s infinite alternate;
-  opacity: 0.8;
-  filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9998;
+  background-image:
+    radial-gradient(circle, #fff 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(255,255,255,0.6) 0.8px, transparent 1.2px);
+  background-size: 180px 240px, 260px 320px, 140px 200px;
+  background-position: 0 0, 60px 30px, 120px 80px;
+  animation: christmas-snowfall 8s linear infinite, christmas-snowfall-2 12s linear infinite, christmas-snowfall-3 10s linear infinite;
+  opacity: 0.5;
 }
-@keyframes blink {
-  0% { opacity: 0.4; filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); }
-  100% { opacity: 1; filter: drop-shadow(0 0 20px rgba(255,255,255,1)); }
-}
+
 body.theme-christmas .card {
-  border: 2px solid rgba(255,255,255,0.1) !important;
-  border-top: 4px solid #d32f2f !important;
-  box-shadow: inset 0 0 30px rgba(255, 0, 0, 0.1), 0 15px 40px rgba(0,0,0,0.8) !important;
-  background: linear-gradient(180deg, #1a1114 0%, #0a0505 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top: 3px solid #d32f2f !important;
+  box-shadow:
+    inset 0 0 25px rgba(139, 0, 0, 0.08),
+    0 12px 35px rgba(6, 10, 4, 0.7) !important;
+  background: linear-gradient(180deg, #12200e 0%, #0a1408 100%) !important;
 }
+
 body.theme-christmas .btn-primary {
-  background: linear-gradient(180deg, #d32f2f, #8b0000) !important;
-  box-shadow: 0 5px 0 #5c0000, 0 10px 20px rgba(0,0,0,0.5) !important;
+  background: linear-gradient(135deg, #d32f2f 0%, #8b0000 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow:
+    0 4px 0 #5c0000,
+    0 8px 20px rgba(139, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-/* --- PÁSCOA (Primavera) --- */
-body.theme-easter {
-  background-color: #0d1a0d;
-  background-image: 
-    linear-gradient(180deg, #0d1a0d 0%, #050805 100%);
-  color: #dcfce7;
-}
-body.theme-easter::before {
-  content: "";
-  position: fixed; bottom: 0; left: 0; width: 100vw; height: 150px;
-  pointer-events: none; z-index: 9998;
-  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 150" xmlns="http://www.w3.org/2000/svg"><path d="M0,150 Q150,100 300,150 T600,150 T900,150 T1200,150 L1200,150 L0,150 Z" fill="rgba(50, 200, 50, 0.2)"/><path d="M0,150 Q150,50 300,150 T600,150 T900,150 T1200,150 L1200,150 L0,150 Z" fill="rgba(50, 200, 50, 0.1)"/></svg>') no-repeat bottom center;
-  background-size: cover;
-}
-body.theme-easter .card {
-  border: 2px solid rgba(100, 255, 100, 0.2) !important;
-  border-radius: 24px !important;
-  box-shadow: 0 10px 30px rgba(0, 255, 0, 0.1) !important;
-  background: #0f1a0f !important;
-}
-body.theme-easter .btn-primary {
-  background: #2e7d32 !important;
-  border-radius: 50px !important; /* Botões arredondados (formato de ovo) */
-  box-shadow: inset 0 -4px 0 rgba(0,0,0,0.2) !important;
+body.theme-christmas .btn-secondary {
+  background: rgba(10, 61, 10, 0.25) !important;
+  border: 1px solid rgba(46, 125, 50, 0.4) !important;
+  color: #66bb6a !important;
 }
 
-/* --- ANO NOVO (Festa) --- */
-body.theme-newyear {
-  background-color: #000;
-  color: #fff;
+body.theme-christmas .btn-secondary:hover {
+  background: rgba(10, 61, 10, 0.4) !important;
+  border-color: rgba(46, 125, 50, 0.6) !important;
 }
-/* Explosão de confetes e fogos no fundo */
+
+body.theme-christmas .zkn-header {
+  background: rgba(6, 10, 4, 0.92) !important;
+  border-bottom: 1px solid rgba(211, 47, 47, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(139, 0, 0, 0.1) !important;
+}
+
+body.theme-christmas .bottom-nav {
+  background: linear-gradient(180deg, rgba(10, 20, 8, 0.95), rgba(6, 10, 4, 0.98)) !important;
+  border-top: 1px solid rgba(211, 47, 47, 0.3) !important;
+  box-shadow: 0 -4px 20px rgba(139, 0, 0, 0.2) !important;
+}
+
+body.theme-christmas .bottom-nav-fab-ring {
+  background: conic-gradient(from 180deg, #d32f2f, #43a047, #ffd700, #d32f2f) !important;
+  box-shadow: 0 0 22px rgba(211, 47, 47, 0.5), 0 6px 16px rgba(6, 10, 4, 0.85) !important;
+}
+
+body.theme-christmas .bottom-nav-fab-circle {
+  background: radial-gradient(circle at 30% 25%, #ef5350 0%, #d32f2f 50%, #7f0000 100%) !important;
+  color: #fff !important;
+}
+
+body.theme-christmas .announcement-bar {
+  background: #12200e !important;
+  border-color: rgba(211, 47, 47, 0.2) !important;
+}
+
+body.theme-christmas .game-card {
+  border: 1px solid rgba(46, 125, 50, 0.15) !important;
+  box-shadow: 0 6px 20px rgba(6, 10, 4, 0.5) !important;
+}
+
+body.theme-christmas .game-card:hover {
+  border-color: rgba(211, 47, 47, 0.3) !important;
+  box-shadow: 0 8px 30px rgba(139, 0, 0, 0.15) !important;
+}
+
+body.theme-christmas .section-title::before {
+  background: linear-gradient(135deg, #d32f2f, #8b0000) !important;
+  box-shadow: 0 0 10px rgba(211, 47, 47, 0.4) !important;
+}
+
+@keyframes christmas-snowfall {
+  0% { background-position: 0 0, 60px 30px, 120px 80px; }
+  100% { background-position: 0 240px, 60px 350px, 120px 280px; }
+}
+
+@keyframes christmas-snowfall-2 {
+  0% { background-position: 0 0, 60px 30px, 120px 80px; }
+  100% { background-position: -30px 320px, 90px 420px, 80px 360px; }
+}
+
+@keyframes christmas-snowfall-3 {
+  0% { background-position: 0 0, 60px 30px, 120px 80px; }
+  100% { background-position: 20px 200px, 40px 280px, 150px 240px; }
+}
+
+
+/* =============================================================
+   EASTER - Spring Greens / Pastels
+   ============================================================= */
+
+body.theme-easter {
+  --bg-0: #081810 !important;
+  --bg-1: #0d2818 !important;
+  --bg-2: #143822 !important;
+  --bg-3: #1c482c !important;
+  --bg-card: #143822 !important;
+  --bg-elevated: #1c482c !important;
+  --bg-input: #0f2e1a !important;
+  --border: rgba(184, 240, 216, 0.1) !important;
+  --border-strong: rgba(184, 240, 216, 0.22) !important;
+  --border-gold: rgba(230, 213, 255, 0.35) !important;
+  --text: #e8ffe8 !important;
+  --text-muted: #90c8a0 !important;
+  --text-dim: #4a7858 !important;
+  --gold: #c4a0ff !important;
+  --gold-2: #e6d5ff !important;
+  --gold-hover: #a070e0 !important;
+  --gold-dark: #0d2818 !important;
+  --green: #60d898 !important;
+  --red: #ff8a9e !important;
+  --teal: #b8f0d8 !important;
+  --grad-gold: linear-gradient(135deg, #c4a0ff 0%, #e6d5ff 50%, #ffd6e0 100%) !important;
+  --grad-green: linear-gradient(135deg, #60d898 0%, #b8f0d8 100%) !important;
+  --grad-teal: linear-gradient(135deg, #b8f0d8 0%, #60d898 100%) !important;
+  --grad-dark: linear-gradient(180deg, #0d2818 0%, #081810 100%) !important;
+  --grad-card: linear-gradient(180deg, #143822 0%, #0d2818 100%) !important;
+  --shadow-gold: 0 0 24px rgba(196, 160, 255, 0.2) !important;
+  --shadow-teal: 0 0 20px rgba(184, 240, 216, 0.25) !important;
+  --shadow: 0 8px 24px rgba(8, 24, 16, 0.4) !important;
+  --shadow-lg: 0 20px 60px rgba(8, 24, 16, 0.6) !important;
+
+  background-color: #081810 !important;
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(230, 213, 255, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 40%, rgba(184, 240, 216, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(255, 214, 224, 0.05) 0%, transparent 40%) !important;
+  color: #e8ffe8 !important;
+}
+
+/* Soft meadow glow at bottom */
+body.theme-easter::before {
+  content: "";
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 200px;
+  pointer-events: none;
+  z-index: 9998;
+  background:
+    linear-gradient(to top, rgba(184, 240, 216, 0.08) 0%, transparent 100%),
+    radial-gradient(ellipse at 25% 100%, rgba(230, 213, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 100%, rgba(255, 214, 224, 0.06) 0%, transparent 50%);
+  opacity: 1;
+}
+
+body.theme-easter .card {
+  border: 1px solid rgba(184, 240, 216, 0.15) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 8px 25px rgba(8, 24, 16, 0.4),
+    0 0 15px rgba(184, 240, 216, 0.05) !important;
+  background: linear-gradient(180deg, #143822 0%, #0f2e1a 100%) !important;
+}
+
+body.theme-easter .btn-primary {
+  background: linear-gradient(135deg, #c4a0ff 0%, #e6d5ff 100%) !important;
+  color: #0d2818 !important;
+  border: none !important;
+  border-radius: 50px !important;
+  box-shadow:
+    0 4px 15px rgba(196, 160, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  font-weight: 600;
+}
+
+body.theme-easter .btn-secondary {
+  background: rgba(184, 240, 216, 0.1) !important;
+  border: 1px solid rgba(184, 240, 216, 0.25) !important;
+  color: #b8f0d8 !important;
+  border-radius: 50px !important;
+}
+
+body.theme-easter .btn-secondary:hover {
+  background: rgba(184, 240, 216, 0.18) !important;
+  border-color: rgba(184, 240, 216, 0.4) !important;
+}
+
+body.theme-easter .zkn-header {
+  background: rgba(8, 24, 16, 0.9) !important;
+  border-bottom: 1px solid rgba(184, 240, 216, 0.1) !important;
+  box-shadow: 0 4px 20px rgba(8, 24, 16, 0.3) !important;
+}
+
+body.theme-easter .bottom-nav {
+  background: linear-gradient(180deg, rgba(13, 40, 24, 0.94), rgba(8, 24, 16, 0.98)) !important;
+  border-top: 1px solid rgba(184, 240, 216, 0.22) !important;
+  box-shadow: 0 -4px 20px rgba(184, 240, 216, 0.1) !important;
+}
+
+body.theme-easter .bottom-nav-fab-ring {
+  background: conic-gradient(from 180deg, #c4a0ff, #b8f0d8, #ffd6e0, #c4a0ff) !important;
+  box-shadow: 0 0 20px rgba(196, 160, 255, 0.45), 0 6px 16px rgba(8, 24, 16, 0.7) !important;
+}
+
+body.theme-easter .bottom-nav-fab-circle {
+  background: radial-gradient(circle at 30% 25%, #ffd6e0 0%, #e6d5ff 45%, #a070e0 100%) !important;
+  color: #0d2818 !important;
+}
+
+body.theme-easter .announcement-bar {
+  background: #143822 !important;
+  border-color: rgba(184, 240, 216, 0.16) !important;
+}
+
+body.theme-easter .game-card {
+  border: 1px solid rgba(184, 240, 216, 0.1) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 6px 20px rgba(8, 24, 16, 0.4) !important;
+}
+
+body.theme-easter .game-card:hover {
+  border-color: rgba(230, 213, 255, 0.25) !important;
+  box-shadow: 0 8px 30px rgba(196, 160, 255, 0.1) !important;
+}
+
+body.theme-easter .section-title::before {
+  background: linear-gradient(135deg, #c4a0ff, #b8f0d8, #ffd6e0) !important;
+  box-shadow: 0 0 10px rgba(196, 160, 255, 0.3) !important;
+}
+
+
+/* =============================================================
+   NEW YEAR - Black / Gold Luxury
+   ============================================================= */
+
+body.theme-newyear {
+  --bg-0: #030303 !important;
+  --bg-1: #050505 !important;
+  --bg-2: #0f0f0f !important;
+  --bg-3: #1a1a1a !important;
+  --bg-card: #121212 !important;
+  --bg-elevated: #1c1c1c !important;
+  --bg-input: #0a0a0a !important;
+  --border: rgba(255, 215, 0, 0.1) !important;
+  --border-strong: rgba(255, 215, 0, 0.25) !important;
+  --border-gold: rgba(255, 215, 0, 0.5) !important;
+  --text: #ffffff !important;
+  --text-muted: #b0a080 !important;
+  --text-dim: #605030 !important;
+  --gold: #ffd700 !important;
+  --gold-2: #ffe44d !important;
+  --gold-hover: #e6c200 !important;
+  --gold-dark: #030303 !important;
+  --green: #ffd700 !important;
+  --red: #ff3344 !important;
+  --teal: #ffc830 !important;
+  --grad-gold: linear-gradient(135deg, #ffd700 0%, #ffec80 50%, #ffd700 100%) !important;
+  --grad-green: linear-gradient(135deg, #ffd700 0%, #e6c200 100%) !important;
+  --grad-teal: linear-gradient(135deg, #ffc830 0%, #ffd700 100%) !important;
+  --grad-dark: linear-gradient(180deg, #0f0f0f 0%, #030303 100%) !important;
+  --grad-card: linear-gradient(180deg, #161616 0%, #0a0a0a 100%) !important;
+  --shadow-gold: 0 0 30px rgba(255, 215, 0, 0.3) !important;
+  --shadow-teal: 0 0 24px rgba(255, 200, 48, 0.3) !important;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.7) !important;
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.9) !important;
+
+  background-color: #030303 !important;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 40%) !important;
+  color: #ffffff !important;
+}
+
+/* Sparkle / shimmer overlay */
 body.theme-newyear::before {
   content: "";
-  position: fixed; inset: 0; pointer-events: none; z-index: 9998;
-  background-image: 
-    radial-gradient(circle at 10% 10%, #ffd700 3px, transparent 4px),
-    radial-gradient(circle at 90% 20%, #ff0000 3px, transparent 4px),
-    radial-gradient(circle at 20% 80%, #00ffff 3px, transparent 4px),
-    radial-gradient(circle at 80% 90%, #ffd700 3px, transparent 4px),
-    radial-gradient(circle at 50% 50%, #ffffff 2px, transparent 3px);
-  background-size: 200px 200px;
-  animation: confetti-fall 4s linear infinite;
-  opacity: 0.7;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9998;
+  background-image:
+    radial-gradient(circle, #ffd700 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(255, 236, 128, 0.7) 0.8px, transparent 1.2px),
+    radial-gradient(circle, rgba(255, 215, 0, 0.5) 0.5px, transparent 1px);
+  background-size: 120px 140px, 200px 180px, 80px 100px;
+  background-position: 0 0, 50px 40px, 30px 70px;
+  animation: newyear-sparkle 6s ease-in-out infinite alternate;
+  opacity: 0.4;
 }
-@keyframes confetti-fall {
-  0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
-  100% { background-position: 0 200px, 0 200px, 0 200px, 0 200px, 0 200px; }
-}
+
 body.theme-newyear .card {
-  border: 2px solid rgba(255, 215, 0, 0.5) !important;
-  background: linear-gradient(135deg, #1a1a1a, #050505) !important;
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.2) !important;
+  border: 1px solid rgba(255, 215, 0, 0.2) !important;
+  box-shadow:
+    0 0 25px rgba(255, 215, 0, 0.08),
+    0 15px 40px rgba(0, 0, 0, 0.7) !important;
+  background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%) !important;
 }
+
 body.theme-newyear .btn-primary {
-  background: linear-gradient(45deg, #ffd700, #ff8c00) !important;
+  background: linear-gradient(135deg, #ffd700 0%, #ffb800 50%, #ffd700 100%) !important;
   color: #000 !important;
-  text-shadow: 0 1px 2px rgba(255,255,255,0.4);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6) !important;
-  animation: pulse-gold 2s infinite;
+  border: none !important;
+  box-shadow:
+    0 0 25px rgba(255, 215, 0, 0.5),
+    0 4px 15px rgba(255, 215, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  animation: newyear-btn-glow 2s ease-in-out infinite;
 }
-@keyframes pulse-gold {
-  0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
-  50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
-  100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+
+body.theme-newyear .btn-secondary {
+  background: rgba(255, 215, 0, 0.08) !important;
+  border: 1px solid rgba(255, 215, 0, 0.3) !important;
+  color: #ffd700 !important;
+}
+
+body.theme-newyear .btn-secondary:hover {
+  background: rgba(255, 215, 0, 0.15) !important;
+  border-color: rgba(255, 215, 0, 0.5) !important;
+}
+
+body.theme-newyear .zkn-header {
+  background: rgba(5, 5, 5, 0.95) !important;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.08) !important;
+}
+
+body.theme-newyear .bottom-nav {
+  background: linear-gradient(180deg, rgba(12, 12, 12, 0.96), rgba(3, 3, 3, 0.99)) !important;
+  border-top: 1px solid rgba(255, 215, 0, 0.32) !important;
+  box-shadow: 0 -4px 24px rgba(255, 215, 0, 0.18) !important;
+}
+
+body.theme-newyear .bottom-nav-fab-ring {
+  background: conic-gradient(from 180deg, #ffd700, #fff4b8, #d4a017, #ffd700) !important;
+  box-shadow: 0 0 26px rgba(255, 215, 0, 0.65), 0 6px 18px rgba(0, 0, 0, 0.9) !important;
+}
+
+body.theme-newyear .bottom-nav-fab-circle {
+  background: radial-gradient(circle at 30% 25%, #fff8c4 0%, #ffd700 45%, #b8860b 100%) !important;
+  color: #030303 !important;
+}
+
+body.theme-newyear .announcement-bar {
+  background: #0f0f0f !important;
+  border-color: rgba(255, 215, 0, 0.2) !important;
+}
+
+body.theme-newyear .game-card {
+  border: 1px solid rgba(255, 215, 0, 0.12) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6) !important;
+}
+
+body.theme-newyear .game-card:hover {
+  border-color: rgba(255, 215, 0, 0.35) !important;
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.15),
+    0 8px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.theme-newyear .section-title::before {
+  background: linear-gradient(135deg, #ffd700, #ffec80, #ffd700) !important;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.5) !important;
+}
+
+@keyframes newyear-sparkle {
+  0% {
+    opacity: 0.3;
+    background-position: 0 0, 50px 40px, 30px 70px;
+  }
+  50% {
+    opacity: 0.6;
+    background-position: 10px 15px, 40px 55px, 45px 60px;
+  }
+  100% {
+    opacity: 0.3;
+    background-position: -5px 10px, 60px 30px, 20px 80px;
+  }
+}
+
+@keyframes newyear-btn-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(255, 215, 0, 0.4),
+      0 4px 15px rgba(255, 215, 0, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 35px rgba(255, 215, 0, 0.7),
+      0 4px 25px rgba(255, 215, 0, 0.5);
+  }
 }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
+  <link rel="stylesheet" href="assets/events.css">
   <style>
     body { padding-top: 0; }
     .admin-header {
@@ -405,13 +406,14 @@
         <button class="admin-tab active" data-tab="dashboard">Dashboard</button>
         <button class="admin-tab" data-tab="users">Usuários</button>
         <button class="admin-tab" data-tab="transactions">Transações</button>
-        <button class="admin-tab" data-tab="bonuses">💎 Bônus &amp; Owner</button>
-        <button class="admin-tab" data-tab="rapidverse">🎮 RapidVerse</button>
-        <button class="admin-tab" data-tab="catalogo">🎰 Jogos</button>
+        <button class="admin-tab" data-tab="bonuses"><span class="ico ico-gift"></span> Bônus &amp; Owner</button>
+        <button class="admin-tab" data-tab="commissions"><span class="ico ico-handshake"></span> Comissões</button>
+        <button class="admin-tab" data-tab="rapidverse"><span class="ico ico-gamepad"></span> RapidVerse</button>
+        <button class="admin-tab" data-tab="catalogo"><span class="ico ico-trophy"></span> Jogos</button>
         <button class="admin-tab" data-tab="withdraws">Saques</button>
         <button class="admin-tab" data-tab="marketing">Marketing</button>
-        <button class="admin-tab" data-tab="events">🎃 Eventos</button>
-        <button class="admin-tab" data-tab="settings">⚙️ Configurações</button>
+        <button class="admin-tab" data-tab="events"><span class="ico ico-crown"></span> Eventos</button>
+        <button class="admin-tab" data-tab="settings"><span class="ico ico-edit"></span> Configurações</button>
         <button class="admin-tab" data-tab="promo">Promo Codes</button>
         <button class="admin-tab" data-tab="audit">Auditoria</button>
       </div>
@@ -527,6 +529,84 @@
             <table class="admin-table">
               <thead><tr><th>ID</th><th>Depósito</th><th>Bônus</th><th>Status</th><th>Ações</th></tr></thead>
               <tbody id="dbTiersTable"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMISSÕES DE INDICAÇÃO (TIERS ESCALONADOS) -->
+      <div id="tab-commissions" class="tab-content hidden">
+        <div id="commAlertMsg" style="display:none;margin-bottom:16px;padding:12px 16px;border-radius:var(--radius-sm);background:rgba(244,232,58,0.12);border:1px solid var(--border-gold);color:var(--gold);font-size:13px;"></div>
+
+        <div class="stats-grid" style="margin-bottom:24px;">
+          <div class="stat-card green">
+            <div class="stat-label">Total pago em comissões</div>
+            <div class="stat-value green" id="commTotalPaid">R$ 0,00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pagamentos realizados</div>
+            <div class="stat-value gold" id="commTotalCount">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Faixas configuradas</div>
+            <div class="stat-value" id="commTiersCount">0</div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+            <div>
+              <h3 style="font-family:var(--font-display);font-size:18px;font-weight:800;">Faixas de Comissão Escalonada</h3>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Baseado na quantidade de indicados ativos (que já depositaram ao menos 1 vez).</p>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button type="button" id="btnAddCommTier" class="admin-btn secondary" onclick="addCommTierRow()">+ Adicionar faixa</button>
+              <button type="button" id="btnSaveCommTiers" class="admin-btn" onclick="salvarComissoesAdmin()">Salvar faixas</button>
+            </div>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Mín. Indicados</th>
+                  <th>Máx. Indicados</th>
+                  <th>Taxa (%)</th>
+                  <th>Teto p/ Depósito (R$)</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="commTiersBody">
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <h3 style="font-family:var(--font-display);font-size:18px;font-weight:800;margin-bottom:12px;">Distribuição por Faixa</h3>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Faixa (Indicados Ativos)</th><th>Taxa</th><th>Indicadores na Faixa</th></tr>
+              </thead>
+              <tbody id="commDistTable">
+                <tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <h3 style="font-family:var(--font-display);font-size:18px;font-weight:800;margin-bottom:12px;">Top 10 Indicadores</h3>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Usuário</th><th>Código</th><th>Ativos</th><th>Pagamentos</th><th>Comissão Total</th></tr>
+              </thead>
+              <tbody id="commTopTable">
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -754,10 +834,10 @@
 
           <select id="themeSelect" class="admin-input" style="margin-bottom:16px; font-size:16px; padding:12px;">
             <option value="default">Padrão (ZKNbet)</option>
-            <option value="halloween">🎃 Halloween</option>
-            <option value="christmas">🎄 Natal</option>
-            <option value="easter">🐇 Páscoa</option>
-            <option value="newyear">🥂 Ano Novo</option>
+            <option value="halloween">Halloween</option>
+            <option value="christmas">Natal</option>
+            <option value="easter">Páscoa</option>
+            <option value="newyear">Ano Novo</option>
           </select>
 
           <button class="admin-btn" onclick="aplicarTema(event)">Aplicar Tema</button>
@@ -834,6 +914,136 @@
       el.innerHTML = `<div class="toast-title">${esc(title)}</div>${msg ? `<div class="toast-body">${esc(msg)}</div>` : ''}`;
       c.appendChild(el);
       setTimeout(() => el.remove(), 4000);
+    }
+
+    // ============================================================
+    // COMISSÕES DE INDICAÇÃO (TIERS ESCALONADOS)
+    // ============================================================
+    let _commTiersDraft = [];
+
+    function renderCommTiersEditor() {
+      const tb = document.getElementById('commTiersBody');
+      if (!tb) return;
+      if (!_commTiersDraft.length) {
+        tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Nenhuma faixa configurada. Clique em "+ Adicionar faixa".</td></tr>';
+        return;
+      }
+      tb.innerHTML = _commTiersDraft.map((t, idx) => `
+        <tr>
+          <td data-label="Mín. Indicados"><input type="number" min="0" step="1" class="admin-input" data-comm-idx="${idx}" data-comm-field="min_referrals" value="${Number(t.min_referrals ?? 0)}" style="max-width:110px;"></td>
+          <td data-label="Máx. Indicados"><input type="number" min="0" step="1" class="admin-input" data-comm-idx="${idx}" data-comm-field="max_referrals" value="${Number(t.max_referrals ?? 0)}" style="max-width:110px;"></td>
+          <td data-label="Taxa (%)"><input type="number" min="0" max="100" step="0.5" class="admin-input" data-comm-idx="${idx}" data-comm-field="rate_pct" value="${(Number(t.rate ?? 0) * 100).toFixed(1)}" style="max-width:100px;"></td>
+          <td data-label="Teto p/ Depósito (R$)"><input type="number" min="0" step="1" class="admin-input" data-comm-idx="${idx}" data-comm-field="max_per_deposit" value="${Number(t.max_per_deposit ?? 500)}" style="max-width:130px;"></td>
+          <td><button type="button" class="admin-btn danger" style="padding:6px 10px;font-size:11px;" onclick="removeCommTierRow(${idx})">Remover</button></td>
+        </tr>
+      `).join('');
+
+      tb.querySelectorAll('input[data-comm-idx]').forEach(inp => {
+        inp.addEventListener('input', function() {
+          const i = Number(this.dataset.commIdx);
+          const f = this.dataset.commField;
+          if (!_commTiersDraft[i]) return;
+          if (f === 'rate_pct') {
+            _commTiersDraft[i].rate = Math.max(0, Math.min(1, (parseFloat(this.value) || 0) / 100));
+          } else {
+            _commTiersDraft[i][f] = parseFloat(this.value) || 0;
+          }
+        });
+      });
+    }
+
+    function addCommTierRow() {
+      const last = _commTiersDraft[_commTiersDraft.length - 1];
+      const nextMin = last ? (Number(last.max_referrals || 0) + 1) : 0;
+      _commTiersDraft.push({
+        min_referrals: nextMin,
+        max_referrals: nextMin + 19,
+        rate: 0.05,
+        max_per_deposit: 500,
+      });
+      renderCommTiersEditor();
+    }
+
+    function removeCommTierRow(idx) {
+      _commTiersDraft.splice(idx, 1);
+      renderCommTiersEditor();
+    }
+
+    async function carregarComissoesAdmin() {
+      const alertBox = document.getElementById('commAlertMsg');
+      if (alertBox) alertBox.style.display = 'none';
+      try {
+        const [tiersRes, statsRes] = await Promise.all([
+          api('/admin/commission-tiers'),
+          api('/admin/commission-stats'),
+        ]);
+        const msg = tiersRes.message || statsRes.message;
+        if (msg && alertBox) {
+          alertBox.style.display = 'block';
+          alertBox.innerHTML = '<span class="ico ico-warning"></span> ' + esc(msg);
+        }
+        _commTiersDraft = (tiersRes.tiers || []).map(t => ({
+          min_referrals: Number(t.min_referrals),
+          max_referrals: Number(t.max_referrals),
+          rate: Number(t.rate),
+          max_per_deposit: Number(t.max_per_deposit ?? 500),
+        }));
+        renderCommTiersEditor();
+
+        document.getElementById('commTotalPaid').textContent = fmtBRL(statsRes.total_paid || 0);
+        document.getElementById('commTotalCount').textContent = Number(statsRes.total_count || 0);
+        document.getElementById('commTiersCount').textContent = (tiersRes.tiers || []).length;
+
+        const dist = statsRes.tier_distribution || [];
+        const distTb = document.getElementById('commDistTable');
+        distTb.innerHTML = dist.length
+          ? dist.map(d => `<tr>
+              <td data-label="Faixa">${esc(d.min_referrals)} – ${Number(d.max_referrals) >= 999999 ? (esc(d.min_referrals) + '+') : esc(d.max_referrals)}</td>
+              <td data-label="Taxa" style="font-weight:700;color:var(--gold);">${(Number(d.rate || 0) * 100).toFixed(1)}%</td>
+              <td data-label="Indicadores">${Number(d.referrer_count || 0)}</td>
+            </tr>`).join('')
+          : '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Sem dados de distribuição.</td></tr>';
+
+        const top = statsRes.top_referrers || [];
+        const topTb = document.getElementById('commTopTable');
+        topTb.innerHTML = top.length
+          ? top.map(r => `<tr>
+              <td data-label="Usuário"><strong>${esc(r.name || r.uid)}</strong><br><small style="color:var(--text-muted);">${esc(r.email || '')}</small></td>
+              <td data-label="Código"><code>${esc(r.ref_code || '-')}</code></td>
+              <td data-label="Ativos">${Number(r.active_referrals || 0)}</td>
+              <td data-label="Pagamentos">${Number(r.commission_count || 0)}</td>
+              <td data-label="Comissão Total" style="font-weight:800;color:var(--green);">${fmtBRL(r.total_commission || 0)}</td>
+            </tr>`).join('')
+          : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Nenhuma comissão paga ainda.</td></tr>';
+      } catch (e) {
+        toast('Erro ao carregar comissões', e.message, 'error');
+      }
+    }
+
+    async function salvarComissoesAdmin() {
+      if (!_commTiersDraft.length) return toast('Erro', 'Adicione pelo menos 1 faixa.', 'error');
+      const btn = document.getElementById('btnSaveCommTiers');
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+      try {
+        const payload = _commTiersDraft.map(t => ({
+          min_referrals: Math.trunc(Number(t.min_referrals)),
+          max_referrals: Math.trunc(Number(t.max_referrals)),
+          rate: Number(t.rate),
+          max_per_deposit: Number(t.max_per_deposit ?? 500),
+        }));
+        await api('/admin/commission-tiers', {
+          method: 'PUT',
+          body: JSON.stringify({ tiers: payload }),
+        });
+        toast('Faixas salvas!', 'Comissões atualizadas com sucesso.', 'success');
+        await carregarComissoesAdmin();
+      } catch (e) {
+        toast('Erro ao salvar', e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Salvar faixas';
+      }
     }
 
     // ============================================================
@@ -1156,23 +1366,23 @@
       try {
         const d = await api('/admin/settings/sigilopay/test', { method: 'POST' });
         const authLine = d.auth_ok
-          ? `<div style="color:var(--green);">✅ <strong>Autenticação OK</strong> (HTTP ${esc(d.auth_status)}) — Saldo na SigiloPay: <strong>${fmtBRL(d.balance?.available)}</strong> (Pendente: ${fmtBRL(d.balance?.pending)})</div>`
-          : `<div style="color:var(--red);">❌ <strong>Falha na autenticação</strong> (HTTP ${esc(d.auth_status)}) — verifique Public Key e Secret Key.</div>`;
+          ? `<div style="color:var(--green);"><span class="ico ico-check"></span> <strong>Autenticação OK</strong> (HTTP ${esc(d.auth_status)}) — Saldo na SigiloPay: <strong>${fmtBRL(d.balance?.available)}</strong> (Pendente: ${fmtBRL(d.balance?.pending)})</div>`
+          : `<div style="color:var(--red);"><span class="ico ico-x"></span> <strong>Falha na autenticação</strong> (HTTP ${esc(d.auth_status)}) — verifique Public Key e Secret Key.</div>`;
 
         let pixLine = '';
         if (d.pix_ok) {
-          pixLine = `<div style="color:var(--green);margin-top:6px;">✅ <strong>Geração PIX OK</strong> — A adquirente gerou o QR Code de teste normalmente.</div>`;
+          pixLine = `<div style="color:var(--green);margin-top:6px;"><span class="ico ico-check"></span> <strong>Geração PIX OK</strong> — A adquirente gerou o QR Code de teste normalmente.</div>`;
         } else {
           const isSmartRouting = d.error_code === 'GATEWAY_ACQUIRER_ERROR' || /AISmartRouting|Nenhuma integra/i.test(d.upstream_message || '');
           pixLine = `
-            <div style="color:var(--red);margin-top:6px;">❌ <strong>Falha ao gerar QR Code PIX</strong> (HTTP ${esc(d.pix_status)}${d.error_code ? ' · ' + esc(d.error_code) : ''})</div>
+            <div style="color:var(--red);margin-top:6px;"><span class="ico ico-x"></span> <strong>Falha ao gerar QR Code PIX</strong> (HTTP ${esc(d.pix_status)}${d.error_code ? ' · ' + esc(d.error_code) : ''})</div>
             <div style="margin-top:4px;color:var(--text-muted);word-break:break-word;">Resposta SigiloPay: <code>${esc(d.upstream_message || 'Erro desconhecido')}</code></div>
-            ${isSmartRouting ? '<div style="margin-top:8px;padding:10px;border-radius:6px;background:rgba(245,190,60,0.12);border:1px solid rgba(245,190,60,0.35);color:var(--gold);">⚠️ Suas chaves autenticaram, mas nenhuma adquirente PIX está ativa no bloco <strong>AI Smart Routing</strong> dentro do painel da SigiloPay. Acesse <strong>app.sigilopay.com.br → Adquirentes / Smart Routing</strong> e ative uma integração PIX, ou salve chaves de outra conta acima.</div>' : ''}
+            ${isSmartRouting ? '<div style="margin-top:8px;padding:10px;border-radius:6px;background:rgba(245,190,60,0.12);border:1px solid rgba(245,190,60,0.35);color:var(--gold);"><span class="ico ico-warning"></span> Suas chaves autenticaram, mas nenhuma adquirente PIX está ativa no bloco <strong>AI Smart Routing</strong> dentro do painel da SigiloPay. Acesse <strong>app.sigilopay.com.br → Adquirentes / Smart Routing</strong> e ative uma integração PIX, ou salve chaves de outra conta acima.</div>' : ''}
           `;
         }
         box.innerHTML = authLine + pixLine;
       } catch (e) {
-        box.innerHTML = `<div style="color:var(--red);">❌ Erro ao executar diagnóstico: ${esc(e.message)}</div>`;
+        box.innerHTML = `<div style="color:var(--red);"><span class="ico ico-x"></span> Erro ao executar diagnóstico: ${esc(e.message)}</div>`;
       } finally {
         btn.disabled = false;
         btn.textContent = 'Testar Gateway PIX';
@@ -1245,6 +1455,7 @@
         if (tab === 'users') carregarUsers();
         if (tab === 'transactions') carregarTransactions();
         if (tab === 'bonuses') carregarBonusesEWallet();
+        if (tab === 'commissions') carregarComissoesAdmin();
         if (tab === 'rapidverse') carregarRapidverseModo();
         if (tab === 'catalogo') carregarCatalogo();
         if (tab === 'withdraws') carregarWithdraws();
@@ -1409,10 +1620,10 @@
           body: JSON.stringify({ game_code, vendor_code, mode })
         });
         box.style.color = 'var(--green)';
-        box.innerHTML = '✅ Sucesso (' + esc(d.mode) + '): <a href="' + esc(d.game_url) + '" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:underline;">' + esc(d.game_url) + '</a>';
+        box.innerHTML = '<span class="ico ico-check"></span> Sucesso (' + esc(d.mode) + '): <a href="' + esc(d.game_url) + '" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:underline;">' + esc(d.game_url) + '</a>';
       } catch (e) {
         box.style.color = 'var(--red)';
-        box.textContent = '❌ Erro: ' + e.message;
+        box.textContent = 'Erro: ' + e.message;
       }
       btn.disabled = false; btn.textContent = 'Testar lançamento';
     }

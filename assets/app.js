@@ -79,7 +79,8 @@ function toast(title, body = '', type = 'success') {
   }
   const el = document.createElement('div');
   el.className = 'toast ' + type;
-  el.innerHTML = `<div class="toast-title">${escapeHtml(title)}</div>${body ? `<div class="toast-body">${escapeHtml(body)}</div>` : ''}`;
+  const iconClass = type === 'error' ? 'ico-x' : (type === 'warning' ? 'ico-warning' : 'ico-check');
+  el.innerHTML = `<div class="toast-title"><span class="ico ${iconClass}" style="margin-right:6px;"></span>${escapeHtml(title)}</div>${body ? `<div class="toast-body">${escapeHtml(body)}</div>` : ''}`;
   container.appendChild(el);
   setTimeout(() => {
     el.style.animation = 'slideIn 0.25s ease-out reverse';
@@ -193,7 +194,7 @@ function renderHeader() {
             <span class="z">Z</span><span class="rest">KNbet</span>
           </a>
     
-          <button class="drawer-close" onclick="ZKN.fecharDrawer()" aria-label="Fechar">✕</button>
+          <button class="drawer-close" onclick="ZKN.fecharDrawer()" aria-label="Fechar"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
 
         <div class="drawer-user" id="drawerUser"></div>
@@ -209,8 +210,8 @@ function renderHeader() {
           <a class="drawer-link" href="jogos.html"><span class="ico ico-gamepad"></span> Todos os jogos</a>
           <a class="drawer-link" href="provedoras.html"><span class="ico ico-trophy"></span> Provedoras</a>
           <a class="drawer-link" href="favoritos.html"><span class="ico ico-star"></span> Favoritos</a>
-          <a class="drawer-link" href="recompensas.html">🎰 Recompensas</a>
-          <a class="drawer-link" href="ofertas.html">🎁 Ofertas</a>
+          <a class="drawer-link" href="recompensas.html"><span class="ico ico-trophy"></span> Recompensas</a>
+          <a class="drawer-link" href="ofertas.html"><span class="ico ico-gift"></span> Ofertas</a>
 
           <div class="drawer-section-title">Carteira</div>
           <a class="drawer-link" href="deposito.html"><span class="ico ico-money"></span> Depositar</a>
@@ -220,11 +221,11 @@ function renderHeader() {
 
           <div class="drawer-section-title">Indicação</div>
           <a class="drawer-link" href="indicacao.html"><span class="ico ico-handshake"></span> Indique e ganhe</a>
-          <button class="drawer-link drawer-link-btn" onclick="ZKN.abrirIndicacaoDrawer()">🔗 Seu código de indicação</button>
+          <button class="drawer-link drawer-link-btn" onclick="ZKN.abrirIndicacaoDrawer()"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Seu código de indicação</button>
 
           <div class="drawer-section-title">Ajuda</div>
           <a class="drawer-link" data-support-link href="https://t.me/Micaelasilva7" target="_blank" rel="noopener"><span class="ico ico-telegram"></span> Suporte (Telegram)</a>
-          <a class="drawer-link" href="jogo-responsavel.html">🛡️ Jogo Responsável</a>
+          <a class="drawer-link" href="jogo-responsavel.html"><span class="ico ico-shield"></span> Jogo Responsável</a>
         </nav>
 
         <div class="drawer-footer" id="drawerFooter"></div>
@@ -268,7 +269,7 @@ function mostrarBannerEmail() {
   const banner = document.createElement('div');
   banner.id = 'zknEmailBanner';
   banner.style.cssText = 'position:fixed;top:68px;left:0;right:0;z-index:99;background:linear-gradient(90deg,#f5be3c,#ffd76e);color:#0a0f1a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
-  banner.innerHTML = '<span>&#9888;&#65039; Verifique seu email para liberar saques. (olhe a caixa de spam)</span>' +
+  banner.innerHTML = '<span><span class="ico ico-warning" style="width:1em;height:1em;vertical-align:middle;margin-right:4px;"></span> Verifique seu email para liberar saques. (olhe a caixa de spam)</span>' +
     '<button onclick="ZKN.reenviarEmail(this)" style="background:#0a0f1a;color:#f5be3c;border:none;padding:8px 16px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;">Reenviar</button>';
   document.body.appendChild(banner);
 }
@@ -428,7 +429,7 @@ function invalidarResumo() {
 
 function aplicarBadgesUI(totalBadges) {
   const n = Number(totalBadges || 0);
-  ['desktop-badge-rewards', 'badge-rewards'].forEach(id => {
+  ['desktop-badge-rewards', 'badge-rewards', 'badge-promo'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     if (n > 0) {
@@ -603,7 +604,7 @@ window.ZKN = {
     const r = await window.ZKNAuth.reenviarVerificacao();
     if (r.sucesso) {
       toast('Email enviado!', 'Verifique sua caixa de entrada.');
-      btn.textContent = 'Enviado \u2713';
+      btn.textContent = 'Enviado';
       setTimeout(() => { btn.disabled = false; btn.textContent = 'Reenviar'; }, 30000);
     } else {
       toast('Erro', r.mensagem, 'error');

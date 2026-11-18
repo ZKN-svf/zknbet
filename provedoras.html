@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
+  <link rel="stylesheet" href="assets/events.css">
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -82,7 +83,7 @@
         grid.innerHTML = lista.map(function(p) {
           const url = 'jogos.html?provider=' + encodeURIComponent(p.name);
           return '<div class="provider-chip" onclick="location.href=\'' + url + '\'" style="padding:28px 20px;cursor:pointer;">' +
-            '<div style="font-size:32px;margin-bottom:8px;">' + String.fromCodePoint(0x1F3B0) + '</div>' +
+            '<div style="font-size:32px;margin-bottom:8px;color:var(--gold);"><span class="ico ico-gamepad"></span></div>' +
             '<div style="font-size:15px;margin-bottom:4px;">' + escapeHtml(p.name) + '</div>' +
             '<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;">' + p.count + ' jogos</div>' +
           '</div>';

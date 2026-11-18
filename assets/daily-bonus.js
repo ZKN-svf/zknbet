@@ -50,7 +50,7 @@
   const botao = document.createElement('button');
   botao.id = 'daily-bonus-btn';
   botao.className = 'daily-bonus-btn';
-  botao.innerHTML = '🎁 <span>Bônus surpresa!</span>';
+  botao.innerHTML = '<span class="ico ico-gift" style="width:1.2em;height:1.2em;vertical-align:middle;"></span> <span>Bônus surpresa!</span>';
   botao.onclick = abrirPopup;
 
   // CSS embutido
@@ -105,14 +105,14 @@
     // Desabilita botao
     botao.disabled = true;
     botao.style.opacity = '0.7';
-    botao.innerHTML = '⏳ Verificando...';
+    botao.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <span>Verificando...</span>';
 
     // Cria o popup
     const popup = document.createElement('div');
     popup.className = 'daily-bonus-popup-backdrop';
     popup.innerHTML = `
       <div class="daily-bonus-popup">
-        <div class="daily-bonus-popup-icon">🎁</div>
+        <div class="daily-bonus-popup-icon"><span class="ico ico-gift" style="width:3.5rem;height:3.5rem;"></span></div>
         <h3 class="daily-bonus-popup-title">Bônus surpresa!</h3>
         <p class="daily-bonus-popup-text">Preparando sua surpresa...</p>
       </div>
@@ -222,7 +222,7 @@
         // Atualiza popup com valor
         const popupBox = popup.querySelector('.daily-bonus-popup');
         popupBox.innerHTML = `
-          <div class="daily-bonus-popup-icon">🎉</div>
+          <div class="daily-bonus-popup-icon"><span class="ico ico-check" style="width:3.5rem;height:3.5rem;"></span></div>
           <h3 class="daily-bonus-popup-title">Parabéns!</h3>
           <p class="daily-bonus-popup-text">Você ganhou</p>
           <div class="daily-bonus-popup-amount">R$ ${Number(data.amount || 0).toFixed(2).replace('.', ',')}</div>
@@ -246,7 +246,7 @@
         // Ja resgatou hoje ou erro
         const msg = data.message || 'Voce ja ganhou hoje. Volte amanha!';
         popup.querySelector('.daily-bonus-popup').innerHTML = `
-          <div class="daily-bonus-popup-icon">😊</div>
+          <div class="daily-bonus-popup-icon"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#f5be3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
           <h3 class="daily-bonus-popup-title">Ops!</h3>
           <p class="daily-bonus-popup-text">${window.escapeHtml ? escapeHtml(msg) : msg}</p>
           <button class="daily-bonus-popup-btn" onclick="this.closest('.daily-bonus-popup-backdrop').remove()">OK</button>
@@ -259,7 +259,7 @@
     })
     .catch(() => {
       popup.querySelector('.daily-bonus-popup').innerHTML = `
-        <div class="daily-bonus-popup-icon">😞</div>
+        <div class="daily-bonus-popup-icon"><span class="ico ico-warning" style="width:3.5rem;height:3.5rem;color:#ef4444;"></span></div>
         <h3 class="daily-bonus-popup-title">Erro</h3>
         <p class="daily-bonus-popup-text">Nao foi possivel resgatar. Tente mais tarde.</p>
         <button class="daily-bonus-popup-btn" onclick="this.closest('.daily-bonus-popup-backdrop').remove()">OK</button>

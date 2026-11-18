@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
+  <link rel="stylesheet" href="assets/events.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
@@ -46,7 +47,7 @@
         <div class="qr-wrap">
           <div class="qr-frame" id="qrcode"></div>
           <div class="timer">
-            <span>⏱</span>
+            <span class="ico ico-clock"></span>
             <span id="timerText">03:00</span>
           </div>
         </div>
@@ -101,7 +102,7 @@
       if (!match) {
         const menor = [...bonusTiers].sort((a, b) => Number(a.deposit_amount) - Number(b.deposit_amount))[0];
         if (menor) {
-          box.innerHTML = '🎁 Deposite a partir de <strong>' + ZKN.formatBRL(menor.deposit_amount) + '</strong> para ganhar <strong>+' + ZKN.formatBRL(menor.bonus_amount) + '</strong> de bônus!';
+          box.innerHTML = '<span class="ico ico-gift"></span> Deposite a partir de <strong>' + ZKN.formatBRL(menor.deposit_amount) + '</strong> para ganhar <strong>+' + ZKN.formatBRL(menor.bonus_amount) + '</strong> de bônus!';
           box.classList.add('visible');
         } else {
           box.classList.remove('visible');
@@ -109,7 +110,7 @@
         return;
       }
       const rule = bonusConfig && Number(bonusConfig.first_deposit_only) === 1 ? ' (1º depósito)' : '';
-      box.innerHTML = '🎁 Este valor libera <strong>+' + ZKN.formatBRL(match.bonus_amount) + '</strong> de bônus' + rule + ' em <a href="recompensas.html" style="color:var(--gold);text-decoration:underline;">Recompensas</a>!';
+      box.innerHTML = '<span class="ico ico-gift"></span> Este valor libera <strong>+' + ZKN.formatBRL(match.bonus_amount) + '</strong> de bônus' + rule + ' em <a href="recompensas.html" style="color:var(--gold);text-decoration:underline;">Recompensas</a>!';
       box.classList.add('visible');
     }
 
@@ -193,7 +194,7 @@
     function confirmarPagamentoUI(saldoAgora) {
       pixPago = true;
       pararTudo();
-      setStatus('success', '✅ Pagamento confirmado! Saldo atualizado.');
+      setStatus('success', '<span class="ico ico-check"></span> Pagamento confirmado! Saldo atualizado.');
       document.getElementById('progressFill').style.width = '100%';
       const diff = saldoAgora > saldoInicial ? saldoAgora - saldoInicial : parseFloat(document.getElementById('valor').value || '0');
       ZKN.toast('Depósito confirmado!', `${ZKN.formatBRL(diff)} adicionados ao seu saldo.`);
@@ -233,12 +234,12 @@
       if (!identifierAtual || pixPago) return;
 
       pararTudo();
-      setStatus('error', '⏱ PIX expirado após 3 minutos. Gere um novo QR Code.');
+      setStatus('error', '<span class="ico ico-clock"></span> PIX expirado após 3 minutos. Gere um novo QR Code.');
       document.getElementById('progressFill').style.width = '100%';
 
       const qrFrame = document.getElementById('qrcode');
       if (qrFrame) {
-        qrFrame.innerHTML = '<div style="color:#94a3b8;padding:40px;text-align:center;font-family:Inter,sans-serif;">⏱<br><br>PIX expirado<br><small>Gere um novo QR Code</small></div>';
+        qrFrame.innerHTML = '<div style="color:#94a3b8;padding:40px;text-align:center;font-family:Inter,sans-serif;"><span class="ico ico-clock"></span><br><br>PIX expirado<br><small>Gere um novo QR Code</small></div>';
       }
 
       try {

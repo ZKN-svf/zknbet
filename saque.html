@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
+  <link rel="stylesheet" href="assets/events.css">
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -139,13 +140,13 @@
         status.style.display = 'block';
         status.style.background = 'rgba(0, 214, 127, 0.1)';
         status.style.color = 'var(--green)';
-        status.innerHTML = '✅ Rollover cumprido! Você pode sacar.';
+        status.innerHTML = '<span class="ico ico-check"></span> Rollover cumprido! Você pode sacar.';
         document.getElementById('rolloverFill').style.background = 'var(--grad-green)';
       } else {
         status.style.display = 'block';
         status.style.background = 'rgba(245, 190, 60, 0.1)';
         status.style.color = 'var(--gold)';
-        status.innerHTML = '⏳ Falta apostar <strong>' + ZKN.formatBRL(r.remaining) + '</strong> para liberar o saque.';
+        status.innerHTML = '<span class="ico ico-clock"></span> Falta apostar <strong>' + ZKN.formatBRL(r.remaining) + '</strong> para liberar o saque.';
       }
     }
 
@@ -154,7 +155,7 @@
     document.getElementById('btnSaque').onclick = async () => {
       const _u = ZKNAuth.getUser();
       if (_u && !_u.emailVerified) {
-        return setStatus('error', '&#9888;&#65039; Verifique seu email antes de sacar. (olhe a caixa de spam) <a href="#" onclick="ZKN.reenviarEmail(this);return false;" style="color:var(--gold);">Reenviar link</a>');
+        return setStatus('error', '<span class="ico ico-warning"></span> Verifique seu email antes de sacar. (olhe a caixa de spam) <a href="#" onclick="ZKN.reenviarEmail(this);return false;" style="color:var(--gold);">Reenviar link</a>');
       }
       const btn = document.getElementById('btnSaque');
       const valor = parseFloat(document.getElementById('valorSaque').value);
@@ -201,7 +202,7 @@
         ]);
 
         if (res && res.sucesso) {
-          setStatus('success', `✅ Saque de ${ZKN.formatBRL(valor)} solicitado!<br>Status: ${ZKN.escapeHtml(res.status || 'PENDENTE')}.`);
+          setStatus('success', `<span class="ico ico-check"></span> Saque de ${ZKN.formatBRL(valor)} solicitado!<br>Status: ${ZKN.escapeHtml(res.status || 'PENDENTE')}.`);
           ZKN.ZKN_USER.balance = ZKN.ZKN_USER.balance - valor;
           ZKN.toast('Saque solicitado!', `${ZKN.formatBRL(valor)} em processamento.`);
           document.getElementById('valorSaque').value = '';

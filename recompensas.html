@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
+  <link rel="stylesheet" href="assets/events.css">
   <style>
     /* ============================================================ */
     /* RECOMPENSAS                                                  */
@@ -71,7 +72,7 @@
     }
 
     .reward-card {
-      background: linear-gradient(135deg, #111827 0%, #0a0f1a 100%);
+      background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-0) 100%);
       border: 1px solid var(--border-gold);
       border-radius: 20px;
       padding: 24px;
@@ -155,7 +156,7 @@
       width: 80px;
       height: 80px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #1a2332 0%, #0a0f1a 100%);
+      background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-0) 100%);
       border: 4px solid var(--gold);
       display: flex;
       align-items: center;
@@ -217,8 +218,8 @@
     .reward-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
 
     .reward-btn.gold {
-      background: linear-gradient(135deg, #f5be3c 0%, #ffd76e 100%);
-      color: #0a0f1a;
+      background: var(--grad-gold);
+      color: var(--gold-dark, #0a0a00);
       box-shadow: 0 4px 20px rgba(245, 190, 60, 0.4);
     }
     .reward-btn.gold:hover:not(:disabled) {
@@ -227,7 +228,7 @@
     }
 
     .reward-btn.green {
-      background: linear-gradient(135deg, #00d67f 0%, #00b96d 100%);
+      background: var(--grad-green);
       color: #fff;
       box-shadow: 0 4px 20px rgba(0, 214, 127, 0.4);
     }
@@ -343,7 +344,7 @@
     .rewards-popup-backdrop.open { opacity: 1; pointer-events: auto; }
 
     .rewards-popup {
-      background: linear-gradient(135deg, #1a2332 0%, #0a0f1a 100%);
+      background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-0) 100%);
       border: 2px solid var(--gold);
       border-radius: 24px;
       padding: 32px 28px;
@@ -408,8 +409,8 @@
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .rewards-popup-btn.primary {
-      background: linear-gradient(135deg, #f5be3c 0%, #ffd76e 100%);
-      color: #0a0f1a;
+      background: var(--grad-gold);
+      color: var(--gold-dark, #0a0a00);
       box-shadow: 0 4px 20px rgba(245, 190, 60, 0.4);
     }
     .rewards-popup-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(245, 190, 60, 0.6); }
@@ -603,11 +604,11 @@
     // Os valores e as cores ficam num único lugar: a roda é montada por aqui.
     // ============================================================
     const SETORES = [
-      { v: 0.10, c: '#e74c3c', label: '🎁' },
-      { v: 0.20, c: '#3498db', label: '🎁' },
-      { v: 0.30, c: '#2ecc71', label: '🎁' },
-      { v: 0.50, c: '#f39c12', label: '🎁' },
-      { v: 0.75, c: '#9b59b6', label: '🎁' },
+      { v: 0.10, c: '#e74c3c', label: 'R$ 0,10' },
+      { v: 0.20, c: '#3498db', label: 'R$ 0,20' },
+      { v: 0.30, c: '#2ecc71', label: 'R$ 0,30' },
+      { v: 0.50, c: '#f39c12', label: 'R$ 0,50' },
+      { v: 0.75, c: '#9b59b6', label: 'R$ 0,75' },
       { v: 1.00, c: '#1abc9c', label: 'R\$ 1' },
       { v: 2.00, c: '#e67e22', label: 'R\$ 2' },
       { v: 3.00, c: '#c0392b', label: 'R\$ 3' },

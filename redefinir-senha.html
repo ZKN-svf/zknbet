@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
+  <link rel="stylesheet" href="assets/events.css">
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -59,7 +60,7 @@
           const data = await res.json().catch(() => ({}));
           if (res.ok) {
             box.className = 'status-box active success';
-            box.innerHTML = '✅ Senha alterada com sucesso! Você já pode fazer login.';
+            box.innerHTML = '<span class="ico ico-check"></span> Senha alterada com sucesso! Você já pode fazer login.';
             document.getElementById('nova').value = '';
             document.getElementById('nova2').value = '';
             setTimeout(() => location.href = 'login.html', 3000);

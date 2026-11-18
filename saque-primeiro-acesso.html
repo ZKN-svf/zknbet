@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
+  <link rel="stylesheet" href="assets/events.css">
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -74,7 +75,7 @@
     pixEl.addEventListener('input', () => {
       if (pixEl.value.includes('@')) {
         const t = window.ZKNVal.identificarTipo(pixEl.value);
-        hintEl.innerHTML = t.tipo === 'email' ? '<span class="ico ico-check"></span> E-mail válido' : '⚠ E-mail inválido';
+        hintEl.innerHTML = t.tipo === 'email' ? '<span class="ico ico-check"></span> E-mail válido' : '<span class="ico ico-warning"></span> E-mail inválido';
         hintEl.style.color = t.tipo === 'email' ? 'var(--green)' : 'var(--red)';
         return;
       }
@@ -90,7 +91,7 @@
         const t = window.ZKNVal.identificarTipo(pixEl.value);
         hintEl.innerHTML = t.tipo === 'cpf'
           ? '<span class="ico ico-check"></span> CPF válido'
-          : (t.tipo === 'phone' ? '<span class="ico ico-check"></span> Celular válido' : '⚠ Número inválido');
+          : (t.tipo === 'phone' ? '<span class="ico ico-check"></span> Celular válido' : '<span class="ico ico-warning"></span> Número inválido');
         hintEl.style.color = t.tipo === 'unknown' ? 'var(--red)' : 'var(--green)';
       } else {
         hintEl.textContent = 'Digite 11 dígitos (CPF ou celular), e-mail ou chave aleatória.';

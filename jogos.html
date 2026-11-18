@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
+  <link rel="stylesheet" href="assets/events.css">
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
@@ -30,7 +31,7 @@
     <div class="catalog-controls">
       <div class="search-box-wrapper" style="margin-bottom:0;">
         <input type="text" id="busca" class="search-box-input" placeholder="Buscar jogo ou provedora..." aria-label="Buscar jogo">
-        <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;">&#128269;</span>
+        <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
       </div>
       <select id="sortSelect" class="sort-select" aria-label="Ordenar jogos">
         <option value="az">Ordem alfabética (A–Z)</option>
@@ -46,7 +47,13 @@
       <button type="button" class="cat-pill" data-cat="mesa">Mesa &amp; Cassino</button>
     </div>
 
+    <div class="provider-pills" id="providerPillsJogos" role="tablist" aria-label="Filtrar por provedora" style="display:none;"></div>
+
     <div class="games-carousel" id="grid"></div>
+    <div class="games-disclosure" id="gamesDisclosureJogos" style="display:none;">
+      <p class="games-disclosure-count" id="gamesDisclosureCountJogos"></p>
+      <button type="button" class="games-disclosure-btn" id="gamesDisclosureBtnJogos">Carregar mais</button>
+    </div>
   </section>
 
   <section class="section" id="provedorasSectionJogos" style="padding-top:0;">
@@ -149,7 +156,44 @@
       filtro = '';
       document.getElementById('busca').value = '';
       document.getElementById('filtroProviderChip').style.display = 'none';
+      document.querySelectorAll('#providerPillsJogos .provider-pill').forEach(b => {
+        b.classList.toggle('active', b.dataset.provider === '');
+      });
       renderGrid();
+    }
+
+    function renderProviderPillsJogos() {
+      const wrap = document.getElementById('providerPillsJogos');
+      if (!wrap) return;
+      const contagem = {};
+      ALL_GAMES.forEach(g => {
+        const p = (g.provider_name || '').trim();
+        if (p) contagem[p] = (contagem[p] || 0) + 1;
+      });
+      const nomes = Object.keys(contagem).sort((a, b) => contagem[b] - contagem[a] || a.localeCompare(b));
+      if (!nomes.length) { wrap.style.display = 'none'; return; }
+
+      wrap.style.display = 'flex';
+      const activeProv = _providerFiltro.trim().toLowerCase();
+      wrap.innerHTML = [''].concat(nomes).map(p => {
+        const isAct = p === '' ? activeProv === '' : p.toLowerCase() === activeProv;
+        const label = p === '' ? 'Todas provedoras' : escapeHtml(p);
+        return '<button type="button" class="provider-pill' + (isAct ? ' active' : '') + '" data-provider="' + escapeHtml(p) + '">' + label + '</button>';
+      }).join('');
+
+      wrap.querySelectorAll('.provider-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          wrap.querySelectorAll('.provider-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          _providerFiltro = btn.dataset.provider || '';
+          const url = new URL(location.href);
+          if (_providerFiltro) url.searchParams.set('provider', _providerFiltro);
+          else url.searchParams.delete('provider');
+          history.replaceState(null, '', url.toString());
+          atualizarChipFiltro();
+          renderGrid();
+        });
+      });
     }
 
     function renderProvidersStripJogos() {
@@ -194,6 +238,7 @@
       if (ZKNAuth.isLoggedIn() && window.ZKNGamesLib) {
         await ZKNGamesLib.carregarFavoritos();
       }
+      renderProviderPillsJogos();
       renderGrid();
       renderProvidersStripJogos();
     }

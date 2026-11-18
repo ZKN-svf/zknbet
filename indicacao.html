@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -11,14 +11,15 @@
   <link rel="preconnect" href="https://zknbet-api.gabrielrobin63.workers.dev" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/icons.css">
+  <link rel="stylesheet" href="assets/events.css">
 </head>
 <body>
   <header class="zkn-header"><div class="zkn-header-inner"></div></header>
 
   <div class="ref-container">
     <div class="ref-hero">
-      <h1>Indique amigos e ganhe <span style="color:var(--gold);">15% de comissão</span></h1>
-      <p>Compartilhe seu link único, convide amigos para a ZKNbet e receba comissão automática sobre os depósitos confirmados dos seus indicados.</p>
+      <h1>Indique amigos e ganhe <span style="color:var(--gold);">até 25% de comissão</span></h1>
+      <p>Compartilhe seu link único, convide amigos para a ZKNbet e aumente sua porcentagem de comissão conforme seus indicados ativos depositam.</p>
 
       <label style="font-size:12px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:block;">Seu link de indicação</label>
       <div class="ref-link-box">
@@ -39,6 +40,41 @@
       <div class="ref-stat"><div class="ref-stat-label">Indicados ativos</div><div class="ref-stat-value green" id="statAtivos">0</div></div>
       <div class="ref-stat"><div class="ref-stat-label">Comissão acumulada</div><div class="ref-stat-value gold" id="statComissao">R$ 0,00</div></div>
       <div class="ref-stat"><div class="ref-stat-label">Comissão a receber</div><div class="ref-stat-value green" id="statReceber">R$ 0,00</div></div>
+    </div>
+
+    <div class="card" id="refTierCard" style="max-width:none;width:100%;margin-bottom:24px;padding:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+        <div>
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;">Seu nível de comissão atual</div>
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-top:2px;">
+            <span class="ico ico-crown" style="color:var(--gold);margin-right:6px;"></span>
+            <span id="tierCurrentLabel">Nível 1</span>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Taxa atual</div>
+          <div id="tierCurrentRate" style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--gold);">--%</div>
+        </div>
+      </div>
+
+      <div id="tierProgressWrap" style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:6px;">
+          <span id="tierProgressText">Carregando progresso...</span>
+          <span id="tierNextPct" style="color:var(--gold);font-weight:700;"></span>
+        </div>
+        <div class="progress-bar" style="height:8px;">
+          <div class="progress-bar-fill" id="tierProgressFill" style="width:0%;background:var(--grad-gold);"></div>
+        </div>
+      </div>
+
+      <div class="ref-table-wrap" style="margin-bottom:0;">
+        <table class="ref-table" aria-label="Faixas de comissão por indicação">
+          <thead>
+            <tr><th>Nível</th><th>Indicados ativos</th><th>Comissão</th><th>Status</th></tr>
+          </thead>
+          <tbody id="refTiersBody"></tbody>
+        </table>
+      </div>
     </div>
 
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -83,11 +119,11 @@
       ZKN.copiarTexto(refURL, 'Link copiado!', 'Compartilhe com seus amigos.');
     }
     function compartilharWhatsApp() {
-      const msg = encodeURIComponent(`🏆 Entre na ZKNbet pelo meu link!\n${refURL}`);
+      const msg = encodeURIComponent(`Entre na ZKNbet pelo meu link!\n${refURL}`);
       window.open(`https://wa.me/?text=${msg}`, '_blank', 'noopener');
     }
     function compartilharTelegram() {
-      const msg = encodeURIComponent(`🏆 Entre na ZKNbet pelo meu link!\n${refURL}`);
+      const msg = encodeURIComponent(`Entre na ZKNbet pelo meu link!\n${refURL}`);
       window.open(`https://t.me/share/url?url=${encodeURIComponent(refURL)}&text=${msg}`, '_blank', 'noopener');
     }
     function compartilharNativo() {
@@ -109,12 +145,64 @@
       `);
     }
 
+    const REFERRAL_TIERS = [
+      { level: 1, min: 0, max: 10, rate: 0.05 },
+      { level: 2, min: 11, max: 30, rate: 0.10 },
+      { level: 3, min: 31, max: 50, rate: 0.15 },
+      { level: 4, min: 51, max: 100, rate: 0.20 },
+      { level: 5, min: 101, max: null, rate: 0.25 },
+    ];
+
+    function renderTiers(ativos, currentRate) {
+      const rateNum = Number(currentRate);
+      let activeTier = REFERRAL_TIERS.find(t => ativos >= t.min && (t.max === null || ativos <= t.max)) || REFERRAL_TIERS[0];
+      const displayRate = Number.isFinite(rateNum) && rateNum > 0 ? rateNum : activeTier.rate;
+
+      document.getElementById('tierCurrentLabel').textContent = 'Nível ' + activeTier.level;
+      document.getElementById('tierCurrentRate').textContent = Math.round(displayRate * 100) + '%';
+
+      const nextTier = REFERRAL_TIERS.find(t => t.min > ativos);
+      const progText = document.getElementById('tierProgressText');
+      const nextPctEl = document.getElementById('tierNextPct');
+      const progFill = document.getElementById('tierProgressFill');
+
+      if (nextTier) {
+        const faltam = nextTier.min - ativos;
+        const base = activeTier.min;
+        const pct = Math.max(0, Math.min(100, Math.round(((ativos - base) / (nextTier.min - base)) * 100)));
+        progText.textContent = 'Faltam ' + faltam + ' indicado' + (faltam === 1 ? '' : 's') + ' ativo' + (faltam === 1 ? '' : 's') + ' para o Nível ' + nextTier.level;
+        nextPctEl.textContent = 'Meta: ' + Math.round(nextTier.rate * 100) + '%';
+        progFill.style.width = pct + '%';
+      } else {
+        progText.textContent = 'Você atingiu o nível máximo de comissão!';
+        nextPctEl.textContent = 'Máximo';
+        progFill.style.width = '100%';
+      }
+
+      document.getElementById('refTiersBody').innerHTML = REFERRAL_TIERS.map(t => {
+        const isCurrent = t.level === activeTier.level;
+        const isUnlocked = ativos >= t.min;
+        const rangeLabel = t.max === null ? (t.min + '+') : (t.min + ' – ' + t.max);
+        const statusPill = isCurrent
+          ? '<span class="status-pill active">Atual</span>'
+          : (isUnlocked ? '<span class="status-pill processing">Concluído</span>' : '<span class="status-pill pending">Bloqueado</span>');
+        return '<tr' + (isCurrent ? ' style="background:rgba(244,232,58,0.06);"' : '') + '>' +
+          '<td><strong>Nível ' + t.level + '</strong></td>' +
+          '<td style="color:var(--text-muted);">' + rangeLabel + '</td>' +
+          '<td style="font-weight:800;color:var(--gold);">' + Math.round(t.rate * 100) + '%</td>' +
+          '<td>' + statusPill + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
     async function carregar() {
       const { referrals, stats } = await ZKNAuth.getIndicacoes();
+      const ativos = stats.ativos ?? referrals.filter(r => r.status === 'active').length;
       document.getElementById('statIndicados').textContent = stats.total ?? referrals.length;
-      document.getElementById('statAtivos').textContent = stats.ativos ?? referrals.filter(r => r.status === 'active').length;
+      document.getElementById('statAtivos').textContent = ativos;
       document.getElementById('statComissao').textContent = ZKN.formatBRL(stats.comissaoTotal ?? 0);
       document.getElementById('statReceber').textContent = ZKN.formatBRL(stats.aReceber ?? 0);
+      renderTiers(ativos, stats.currentRate);
 
       const tbody = document.getElementById('refTableBody');
       if (!referrals.length) {
