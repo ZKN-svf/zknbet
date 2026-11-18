@@ -165,7 +165,30 @@ async function getResumo() {
 // ---------- Indicação ----------
 async function getIndicacoes() {
   const { ok, data } = await api('/referrals');
-  return ok ? { referrals: data.referrals || [], stats: data.stats || {} } : { referrals: [], stats: {} };
+  return ok
+    ? {
+        referrals: data.referrals || [],
+        stats: data.stats || {},
+        chests: data.chests || [],
+        claimedIds: data.claimedIds || [],
+        chestRules: data.chestRules || {},
+        validChestReferrals: data.validChestReferrals ?? 0,
+      }
+    : { referrals: [], stats: {}, chests: [], claimedIds: [], chestRules: {}, validChestReferrals: 0 };
+}
+
+async function claimReferralChest(chestId) {
+  const { ok, data } = await api('/referrals/chests/claim', {
+    method: 'POST',
+    body: { chestId },
+  });
+  if (!ok) return { sucesso: false, mensagem: data.message || 'Erro ao resgatar baú.' };
+  const u = getUser();
+  if (u && data.newBalance !== undefined) {
+    u.balance = data.newBalance;
+    setUser(u);
+  }
+  return { sucesso: true, reward: data.reward, chestId: data.chestId, newBalance: data.newBalance };
 }
 
 
@@ -230,6 +253,6 @@ window.ZKNAuth = {
   getFavoritos, addFavorito, removerFavorito, getRollover,
   getRecentes, addRecente,
   salvarPinSaque, verificarPinSaque, temPinSaque, getDadosSaque,
-  getTransacoes, getApostas, getResumo, getIndicacoes,
+  getTransacoes, getApostas, getResumo, getIndicacoes, claimReferralChest,
   loginGoogle, reenviarVerificacao, definirSenha,
 };

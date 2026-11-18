@@ -610,6 +610,46 @@
             </table>
           </div>
         </div>
+
+        <div class="admin-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+            <div>
+              <h3 style="font-family:var(--font-display);font-size:18px;font-weight:800;">Baús de Indicação (Convidar)</h3>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Total pago em baús: <strong id="chestsAdminPaid" style="color:var(--green);">R$ 0,00</strong> (<span id="chestsAdminCount">0</span> resgates)</p>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button type="button" class="admin-btn secondary" onclick="addChestAdminRow()">+ Adicionar baú</button>
+              <button type="button" id="btnSaveChestsAdmin" class="admin-btn" onclick="salvarBausAdmin()">Salvar baús</button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">
+            <div>
+              <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px;">Depósito mín. do indicado (R$)</label>
+              <input type="number" min="0" step="1" id="chestRuleMinDep" class="admin-input" value="10">
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px;">Giro mín. do indicado (R$, 0 = desativado)</label>
+              <input type="number" min="0" step="10" id="chestRuleMinWager" class="admin-input" value="0">
+            </div>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Meta (Indicados Válidos)</th>
+                  <th>Prêmio (R$)</th>
+                  <th>Ativo</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="chestsAdminBody">
+                <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- RAPIDVERSE -->
@@ -969,13 +1009,86 @@
       renderCommTiersEditor();
     }
 
+    let _chestsAdminDraft = [];
+
+    function renderChestsAdminEditor() {
+      const tb = document.getElementById('chestsAdminBody');
+      if (!tb) return;
+      if (!_chestsAdminDraft.length) {
+        tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Nenhum baú configurado.</td></tr>';
+        return;
+      }
+      tb.innerHTML = _chestsAdminDraft.map((c, idx) => `
+        <tr>
+          <td data-label="Meta"><input type="number" min="1" step="1" class="admin-input" data-chest-idx="${idx}" data-chest-field="target_referrals" value="${Number(c.target_referrals || 1)}" style="max-width:120px;"></td>
+          <td data-label="Prêmio (R$)"><input type="number" min="0.5" step="0.5" class="admin-input" data-chest-idx="${idx}" data-chest-field="reward_amount" value="${Number(c.reward_amount || 0)}" style="max-width:130px;"></td>
+          <td data-label="Ativo"><input type="checkbox" data-chest-idx="${idx}" data-chest-field="active" ${Number(c.active ?? 1) === 1 ? 'checked' : ''} style="width:18px;height:18px;"></td>
+          <td><button type="button" class="admin-btn danger" style="padding:6px 10px;font-size:11px;" onclick="removeChestAdminRow(${idx})">Remover</button></td>
+        </tr>
+      `).join('');
+
+      tb.querySelectorAll('input[data-chest-idx]').forEach(inp => {
+        inp.addEventListener('input', function() {
+          const i = Number(this.dataset.chestIdx);
+          const f = this.dataset.chestField;
+          if (!_chestsAdminDraft[i]) return;
+          if (f === 'active') _chestsAdminDraft[i].active = this.checked ? 1 : 0;
+          else _chestsAdminDraft[i][f] = parseFloat(this.value) || 0;
+        });
+      });
+    }
+
+    function addChestAdminRow() {
+      const last = _chestsAdminDraft[_chestsAdminDraft.length - 1];
+      _chestsAdminDraft.push({
+        target_referrals: last ? Number(last.target_referrals || 0) + 10 : 1,
+        reward_amount: last ? Number(last.reward_amount || 0) + 10 : 5,
+        active: 1,
+      });
+      renderChestsAdminEditor();
+    }
+
+    function removeChestAdminRow(idx) {
+      _chestsAdminDraft.splice(idx, 1);
+      renderChestsAdminEditor();
+    }
+
+    async function salvarBausAdmin() {
+      if (!_chestsAdminDraft.length) return toast('Erro', 'Adicione pelo menos 1 baú.', 'error');
+      const btn = document.getElementById('btnSaveChestsAdmin');
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+      try {
+        await api('/admin/referral-chests', {
+          method: 'PUT',
+          body: JSON.stringify({
+            chests: _chestsAdminDraft.map(c => ({
+              target_referrals: Math.trunc(Number(c.target_referrals || 1)),
+              reward_amount: Number(c.reward_amount || 0),
+              active: Number(c.active ?? 1) === 1 ? 1 : 0,
+            })),
+            min_deposit: Number(document.getElementById('chestRuleMinDep').value || 0),
+            min_wager: Number(document.getElementById('chestRuleMinWager').value || 0),
+          }),
+        });
+        toast('Baús salvos!', 'Configuração de baús atualizada.', 'success');
+        await carregarComissoesAdmin();
+      } catch (e) {
+        toast('Erro ao salvar baús', e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Salvar baús';
+      }
+    }
+
     async function carregarComissoesAdmin() {
       const alertBox = document.getElementById('commAlertMsg');
       if (alertBox) alertBox.style.display = 'none';
       try {
-        const [tiersRes, statsRes] = await Promise.all([
+        const [tiersRes, statsRes, chestsRes] = await Promise.all([
           api('/admin/commission-tiers'),
           api('/admin/commission-stats'),
+          api('/admin/referral-chests').catch(() => ({ chests: [], rules: { minDeposit: 10, minWager: 0 }, stats: {} })),
         ]);
         const msg = tiersRes.message || statsRes.message;
         if (msg && alertBox) {
@@ -1015,6 +1128,21 @@
               <td data-label="Comissão Total" style="font-weight:800;color:var(--green);">${fmtBRL(r.total_commission || 0)}</td>
             </tr>`).join('')
           : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Nenhuma comissão paga ainda.</td></tr>';
+
+        _chestsAdminDraft = (chestsRes.chests || []).map(c => ({
+          target_referrals: Number(c.target_referrals),
+          reward_amount: Number(c.reward_amount),
+          active: Number(c.active ?? 1),
+        }));
+        const depEl = document.getElementById('chestRuleMinDep');
+        const wagEl = document.getElementById('chestRuleMinWager');
+        if (depEl) depEl.value = Number(chestsRes.rules?.minDeposit ?? 10);
+        if (wagEl) wagEl.value = Number(chestsRes.rules?.minWager ?? 0);
+        const paidEl = document.getElementById('chestsAdminPaid');
+        const cntEl = document.getElementById('chestsAdminCount');
+        if (paidEl) paidEl.textContent = fmtBRL(chestsRes.stats?.total_paid || 0);
+        if (cntEl) cntEl.textContent = Number(chestsRes.stats?.total_claims || 0);
+        renderChestsAdminEditor();
       } catch (e) {
         toast('Erro ao carregar comissões', e.message, 'error');
       }
