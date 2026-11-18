@@ -243,9 +243,11 @@
       renderProvidersStripJogos();
     }
 
+    let _buscaTimer = null;
     document.getElementById('busca').addEventListener('input', (e) => {
       filtro = e.target.value;
-      renderGrid();
+      clearTimeout(_buscaTimer);
+      _buscaTimer = setTimeout(renderGrid, 120);
     });
     document.getElementById('sortSelect').addEventListener('change', (e) => {
       sortAtivo = e.target.value;

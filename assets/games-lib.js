@@ -157,16 +157,17 @@ function _onCoverError(img) {
 }
 
 // ---------- Render: card individual (portrait 3:4, provider tag overlay) ----------
-function renderGameCard(j) {
+function renderGameCard(j, idx) {
   var capa = j.image_url || '';
   var fallback = j.fallback_image_url || '';
   var inicial = (j.name || '?').charAt(0).toUpperCase();
   var nomeSafe = _esc(j.name);
   var providerSafe = _esc(j.provider_name || '');
+  var loadMode = (typeof idx === 'number' && idx < 8) ? 'eager' : 'lazy';
 
   var coverHtml;
   if (capa) {
-    coverHtml = '<img src="' + _esc(capa) + '" alt="' + nomeSafe + '" loading="lazy" decoding="async" ' +
+    coverHtml = '<img src="' + _esc(capa) + '" alt="' + nomeSafe + '" loading="' + loadMode + '" decoding="async" ' +
       'data-fb="' + _esc(fallback) + '" data-inicial="' + _esc(inicial) + '" ' +
       'onerror="ZKNGamesLib._onCoverError(this)">';
   } else {
@@ -259,7 +260,7 @@ function renderGameSection(containerEl, jogos, opts) {
   var total = jogos.length;
   var shown = showAll ? total : Math.min(perPage, total);
 
-  containerEl.innerHTML = jogos.slice(0, shown).map(function(j) { return renderGameCard(j); }).join('');
+  containerEl.innerHTML = jogos.slice(0, shown).map(function(j, idx) { return renderGameCard(j, idx); }).join('');
 
   if (staticDisclosure) {
     staticDisclosure.style.display = '';

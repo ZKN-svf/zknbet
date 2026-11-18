@@ -10,7 +10,7 @@
 
   // Pastas de capas locais respeitando o casing exato do repositorio (Linux/Pages e case-sensitive)
   var LOCAL_COVER_DIRS = {
-    pgsoft: 'img/PGsoft'
+    pgsoft: 'PGsoft'
   };
 
   var _lista = null;      // jogos normalizados
@@ -41,24 +41,30 @@
   }
 
   function capaLocalDe(vendor, vgc) {
-    if (!vendor || !vgc) return '';
+    if (!vendor || !vgc) return { thumb: '', png: '' };
     var dir = LOCAL_COVER_DIRS[String(vendor).toLowerCase()];
-    return dir ? dir + '/' + vgc + '.png' : '';
+    if (!dir) return { thumb: '', png: '' };
+    return {
+      thumb: 'img/thumbs/' + dir + '/' + vgc + '.webp',
+      png: 'img/' + dir + '/' + vgc + '.png'
+    };
   }
 
   function normalizar(j) {
     var vendor = j.vendor_code || '';
-    var localCover = capaLocalDe(vendor, j.vendor_game_code);
+    var local = capaLocalDe(vendor, j.vendor_game_code);
     var customCover = j.image_url || '';
+    var primary = customCover || local.thumb || local.png;
+    var fallback = customCover ? (local.thumb || local.png) : local.png;
     return {
       game_code: j.game_code,
       name: j.name || '',
       vendor_code: vendor,
       vendor_game_code: j.vendor_game_code,
       provider_name: j.provider_name || nomeProvider(vendor),
-      // Prioriza image_url cadastrada no admin/R2; usa capa local como principal ou fallback
-      image_url: customCover || localCover,
-      fallback_image_url: customCover && localCover && customCover !== localCover ? localCover : '',
+      // Prioriza image_url cadastrada no admin/R2 ou miniatura WebP leve; PNG original como fallback
+      image_url: primary,
+      fallback_image_url: fallback && fallback !== primary ? fallback : '',
       game_type: j.game_type || '',
       rtp: j.rtp
     };

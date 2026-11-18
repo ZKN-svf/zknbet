@@ -322,9 +322,11 @@
       }
     }
 
+    let _buscaTimer = null;
     document.getElementById('busca').addEventListener('input', (e) => {
       filtro = e.target.value;
-      renderFeatured();
+      clearTimeout(_buscaTimer);
+      _buscaTimer = setTimeout(renderFeatured, 120);
     });
     document.getElementById('sortSelect').addEventListener('change', (e) => {
       sortAtivo = e.target.value;

@@ -608,3 +608,12 @@ body.theme-newyear .section-title::before {
       0 4px 25px rgba(255, 215, 0, 0.5);
   }
 }
+
+/* Mobile compositor protection: keep full theme look & dots without 60fps fullscreen background-position repaints */
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+  body.theme-christmas::before,
+  body.theme-newyear::before {
+    animation: none !important;
+    transform: translateZ(0);
+  }
+}
