@@ -268,4 +268,14 @@
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && gameModal) fechar();
   });
+
+  window.addEventListener('message', function(e) {
+    if (e.origin !== window.location.origin) return;
+    if (e.data && e.data.type === 'zkn:balance' && typeof e.data.balance === 'number') {
+      if (window.ZKN && window.ZKN.ZKN_USER) {
+        window.ZKN.ZKN_USER.balance = e.data.balance;
+      }
+      _atualizarSaldoOverlay();
+    }
+  });
 })();

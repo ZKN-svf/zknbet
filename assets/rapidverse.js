@@ -10,7 +10,8 @@
 
   // Pastas de capas locais respeitando o casing exato do repositorio (Linux/Pages e case-sensitive)
   var LOCAL_COVER_DIRS = {
-    pgsoft: 'PGsoft'
+    pgsoft: 'PGsoft',
+    zknoriginals: 'originals'
   };
 
   var _lista = null;      // jogos normalizados
@@ -73,7 +74,7 @@
   // Jogos mais famosos: aparecem primeiro, nessa ordem (o resto fica em ordem alfabetica).
   // Para mudar a ordem ou incluir jogos, edite so esta lista (nome igual ao do catalogo).
   var FAMOSOS = [
-    'Fortune Tiger', 'Gates of Olympus', 'Fortune Ox', 'Sweet Bonanza', 'Fortune Rabbit',
+    'ZKN Fortune 777', 'Fortune Tiger', 'Gates of Olympus', 'Fortune Ox', 'Sweet Bonanza', 'Fortune Rabbit',
     'Sugar Rush', 'Fortune Mouse', 'Fortune Dragon', 'Big Bass Bonanza', 'Big Bass Splash',
     'Fortune Snake', 'Fortune Horse', 'Starlight Princess', 'Ganesha Gold', 'Bikini Paradise',
     'The Dog House', 'Double Fortune', 'Dragon Tiger Luck', 'Midas Fortune', 'Mahjong Ways',
