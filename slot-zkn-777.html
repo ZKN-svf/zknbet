@@ -7,25 +7,22 @@
   <title>ZKN Fortune 777 — ZKN Originals</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&family=Sora:wght@700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Sora:wght@800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-0: #060a10;
-      --bg-1: #0c141d;
-      --bg-2: #121c27;
       --gold: #f4e83a;
       --gold-2: #f5c518;
-      --gold-deep: #9e6b03;
       --emerald: #10b981;
-      --teal: #28e5b8;
-      --ruby: #dc2626;
       --text: #f3f5f8;
-      --muted: #94a3b8;
+      --muted: #a1a9b8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body {
       height: 100%;
-      background: radial-gradient(circle at 50% 18%, #0f2922 0%, #070c12 58%, #040609 100%);
+      background-color: #060a0e;
+      background-image: linear-gradient(180deg, rgba(4, 8, 12, 0.35) 0%, rgba(4, 8, 12, 0.72) 100%), url('img/originals/slot777/bg.webp');
+      background-size: cover;
+      background-position: center;
       color: var(--text);
       font-family: 'Inter', -apple-system, sans-serif;
       overflow-x: hidden;
@@ -33,14 +30,14 @@
     }
 
     .slot-shell {
-      max-width: 460px;
+      max-width: 440px;
       min-height: 100dvh;
       margin: 0 auto;
-      padding: 10px 12px 16px;
+      padding: 10px 10px 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
     }
 
     /* TOP BAR */
@@ -49,56 +46,44 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      background: rgba(14, 22, 30, 0.88);
-      border: 1px solid rgba(244, 232, 58, 0.22);
-      border-radius: 14px;
+      background: rgba(10, 15, 20, 0.88);
+      border: 1px solid rgba(244, 232, 58, 0.28);
+      border-radius: 12px;
       padding: 8px 12px;
     }
     .slot-brand {
       display: flex;
-      flex-direction: column;
-      gap: 2px;
+      align-items: center;
+      gap: 8px;
     }
     .slot-brand-title {
       font-family: 'Sora', sans-serif;
       font-size: 15px;
       font-weight: 900;
-      letter-spacing: -0.3px;
-      background: linear-gradient(135deg, #fff59d, #f5c518);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.2px;
+      color: var(--gold);
     }
-    .slot-mode-badge {
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
+    .slot-demo-tag {
+      display: none;
       font-size: 9.5px;
       font-weight: 800;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
       padding: 2px 7px;
       border-radius: 999px;
-      background: rgba(244, 232, 58, 0.14);
+      background: rgba(244, 232, 58, 0.16);
       color: var(--gold);
-      border: 1px solid rgba(244, 232, 58, 0.3);
+      border: 1px solid rgba(244, 232, 58, 0.35);
     }
-    .slot-mode-badge.real {
-      background: rgba(16, 185, 129, 0.16);
-      color: var(--emerald);
-      border-color: rgba(16, 185, 129, 0.35);
-    }
-    .slot-top-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .slot-demo-tag.show { display: inline-block; }
+
+    .slot-top-actions { display: flex; align-items: center; gap: 6px; }
     .slot-icon-btn {
       width: 34px;
       height: 34px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       color: var(--text);
       display: inline-flex;
       align-items: center;
@@ -108,126 +93,140 @@
     .slot-icon-btn.active { border-color: var(--gold); color: var(--gold); }
     .slot-icon-btn svg { width: 16px; height: 16px; }
 
-    /* CABINET / REELS */
-    .slot-cabinet {
-      position: relative;
-      background: linear-gradient(180deg, #1b2834 0%, #0d141c 100%);
-      border: 2px solid #d49b12;
-      border-radius: 20px;
-      padding: 12px 10px;
-      box-shadow:
-        0 16px 40px rgba(0, 0, 0, 0.7),
-        0 0 28px rgba(244, 232, 58, 0.12),
-        inset 0 1px 0 rgba(255, 244, 170, 0.4);
+    /* BONUS FREE SPINS HUD */
+    .bonus-hud {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: rgba(120, 20, 20, 0.92);
+      border: 1.5px solid #f5c518;
+      border-radius: 12px;
+      padding: 8px 12px;
+    }
+    .bonus-hud.show { display: flex; }
+    .bonus-hud-left { display: flex; align-items: center; gap: 8px; }
+    .bonus-hud-pill {
+      background: var(--gold);
+      color: #090f1f;
+      font-family: 'Sora', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .bonus-hud-spins { font-size: 12px; font-weight: 800; color: #fff; }
+    .bonus-hud-win {
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
     }
 
-    .slot-promo-strip {
+    /* CABINET / REELS */
+    .slot-cabinet {
+      background: rgba(11, 17, 23, 0.90);
+      border: 2px solid #d49b12;
+      border-radius: 18px;
+      padding: 10px 8px;
+      contain: layout style;
+    }
+
+    .slot-info-strip {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 800;
-      letter-spacing: 0.4px;
       text-transform: uppercase;
+      letter-spacing: 0.4px;
       color: #ffe885;
-      background: linear-gradient(90deg, rgba(180, 120, 4, 0.25), rgba(220, 38, 38, 0.25), rgba(180, 120, 4, 0.25));
+      background: rgba(160, 100, 5, 0.22);
       border: 1px solid rgba(244, 232, 58, 0.25);
       border-radius: 999px;
       padding: 4px 12px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .reels-frame {
       position: relative;
-      background: radial-gradient(circle at 50% 50%, #101b24 0%, #070b10 100%);
+      background: #070b10;
       border: 1.5px solid rgba(244, 232, 58, 0.35);
-      border-radius: 14px;
-      padding: 8px;
+      border-radius: 12px;
+      padding: 6px;
       overflow: hidden;
     }
 
     .reels-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 7px;
+      gap: 6px;
       position: relative;
       z-index: 1;
     }
 
     .reel-col {
-      height: 252px;
+      height: 240px;
       overflow: hidden;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      position: relative;
+      border-radius: 8px;
+      background: #0d141c;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      contain: strict;
     }
 
     .reel-strip {
       display: flex;
       flex-direction: column;
+      transform: translate3d(0, 0, 0);
+    }
+    .reel-strip.spinning {
       will-change: transform;
     }
 
     .reel-cell {
-      height: 84px;
+      height: 80px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 8px;
-      position: relative;
+      padding: 6px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-      transition: transform 0.2s ease, filter 0.2s ease;
     }
 
-    .reel-cell svg {
-      width: 62px;
-      height: 62px;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.65));
+    .reel-cell img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
     }
 
     .reel-cell.win-cell {
-      background: radial-gradient(circle, rgba(244, 232, 58, 0.22) 0%, transparent 72%);
-      animation: cellWinPulse 0.8s ease-in-out infinite;
+      background: radial-gradient(circle, rgba(244, 232, 58, 0.28) 0%, transparent 72%);
     }
     .reel-cell.dim-cell {
-      opacity: 0.42;
-      filter: grayscale(0.25);
+      opacity: 0.4;
     }
 
-    @keyframes cellWinPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-    }
-
-    /* Win Lines Overlay */
     .win-lines-svg {
       position: absolute;
-      inset: 8px;
-      width: calc(100% - 16px);
-      height: calc(100% - 16px);
+      inset: 6px;
+      width: calc(100% - 12px);
+      height: calc(100% - 12px);
       pointer-events: none;
       z-index: 3;
     }
     .win-line-path {
       fill: none;
       stroke: #f4e83a;
-      stroke-width: 4;
+      stroke-width: 3.5;
       stroke-linecap: round;
-      filter: drop-shadow(0 0 6px rgba(244, 232, 58, 0.9));
-      stroke-dasharray: 420;
-      stroke-dashoffset: 420;
-      animation: drawWinLine 0.45s ease forwards;
-    }
-    @keyframes drawWinLine {
-      to { stroke-dashoffset: 0; }
     }
 
-    /* Full Board / Big Win Banner */
     .big-win-banner {
       position: absolute;
       inset: 0;
-      background: rgba(5, 8, 14, 0.78);
+      background: rgba(5, 8, 12, 0.84);
       z-index: 6;
       display: none;
       flex-direction: column;
@@ -235,46 +234,41 @@
       justify-content: center;
       text-align: center;
       padding: 16px;
-      border-radius: 14px;
+      border-radius: 12px;
     }
-    .big-win-banner.show { display: flex; animation: fadePop 0.28s ease-out; }
+    .big-win-banner.show { display: flex; }
     .big-win-tag {
       font-family: 'Sora', sans-serif;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 900;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
       color: #090f1f;
-      background: linear-gradient(135deg, #fff59d, #f4c41c);
+      background: var(--gold);
       padding: 4px 14px;
       border-radius: 999px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .big-win-amount {
       font-family: 'Sora', sans-serif;
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 900;
       color: var(--emerald);
-      text-shadow: 0 2px 16px rgba(16, 185, 129, 0.5);
       font-variant-numeric: tabular-nums;
     }
-    @keyframes fadePop {
-      from { opacity: 0; transform: scale(0.92); }
-      to { opacity: 1; transform: scale(1); }
-    }
 
-    /* STATUS BAR (Saldo / Ganho) */
+    /* METERS */
     .slot-meters {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 10px;
+      gap: 6px;
+      margin-top: 8px;
     }
     .meter-box {
-      background: #0a1016;
+      background: #090e14;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 8px 10px;
+      border-radius: 9px;
+      padding: 7px 10px;
       text-align: center;
     }
     .meter-label {
@@ -282,11 +276,10 @@
       color: var(--muted);
       text-transform: uppercase;
       font-weight: 700;
-      letter-spacing: 0.4px;
     }
     .meter-val {
       font-family: 'Sora', sans-serif;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       color: var(--gold);
       margin-top: 2px;
@@ -296,31 +289,31 @@
 
     /* CONTROLS */
     .slot-controls {
-      background: rgba(14, 22, 30, 0.92);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 12px;
+      background: rgba(10, 15, 20, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .bet-quick-row {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       overflow-x: auto;
       scrollbar-width: none;
     }
     .bet-quick-row::-webkit-scrollbar { display: none; }
     .bet-chip {
       flex: 1;
-      min-width: 54px;
-      padding: 7px 6px;
+      min-width: 50px;
+      padding: 7px 4px;
       border-radius: 8px;
-      background: #17212c;
+      background: #151e28;
       border: 1px solid rgba(255, 255, 255, 0.08);
       color: var(--muted);
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
@@ -332,24 +325,47 @@
       color: var(--gold);
     }
 
+    .buy-bonus-btn {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+      border: 1.5px solid #f5c518;
+      color: #fff;
+      font-family: 'Sora', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .buy-bonus-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .buy-bonus-price {
+      background: var(--gold);
+      color: #090f1f;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
     .spin-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
     }
-
     .side-ctrl-btn {
       flex: 1;
-      height: 48px;
-      border-radius: 12px;
-      background: #17212c;
+      height: 46px;
+      border-radius: 10px;
+      background: #151e28;
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: var(--text);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -359,44 +375,36 @@
     }
     .side-ctrl-btn.active {
       background: rgba(40, 229, 184, 0.14);
-      border-color: var(--teal);
-      color: var(--teal);
+      border-color: #28e5b8;
+      color: #28e5b8;
     }
-    .side-ctrl-btn svg { width: 16px; height: 16px; }
+    .side-ctrl-btn svg { width: 15px; height: 15px; }
 
     .spin-main-btn {
       width: 96px;
-      height: 64px;
+      height: 58px;
       flex-shrink: 0;
       border-radius: 999px;
       border: 2px solid #fff3b0;
-      background: radial-gradient(circle at 30% 25%, #fff59e 0%, #f4e83a 45%, #c98a04 100%);
+      background: linear-gradient(180deg, #fff3a1 0%, #f4e83a 45%, #c98a04 100%);
       color: #090f1f;
       font-family: 'Sora', sans-serif;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 900;
-      letter-spacing: 0.4px;
       cursor: pointer;
-      box-shadow: 0 6px 24px rgba(244, 232, 58, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: transform 0.12s ease, opacity 0.12s ease;
     }
-    .spin-main-btn:active:not(:disabled) { transform: scale(0.95); }
-    .spin-main-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+    .spin-main-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .slot-msg {
       text-align: center;
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--muted);
-      min-height: 16px;
+      min-height: 15px;
       font-weight: 600;
     }
 
-    /* PAYTABLE MODAL */
-    .pay-backdrop {
+    /* MODALS (Paytable & Confirm Buy Bonus) */
+    .slot-backdrop {
       position: fixed;
       inset: 0;
       background: rgba(4, 6, 10, 0.85);
@@ -406,27 +414,27 @@
       justify-content: center;
       padding: 16px;
     }
-    .pay-backdrop.open { display: flex; }
-    .pay-modal {
-      background: #121a23;
+    .slot-backdrop.open { display: flex; }
+    .slot-modal {
+      background: #111821;
       border: 1px solid rgba(244, 232, 58, 0.3);
       border-radius: 16px;
       padding: 18px;
-      max-width: 400px;
+      max-width: 390px;
       width: 100%;
       max-height: 85dvh;
       overflow-y: auto;
     }
-    .pay-head {
+    .modal-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 12px;
     }
-    .pay-head h2 { font-family: 'Sora', sans-serif; font-size: 16px; color: var(--gold); }
-    .pay-close {
+    .modal-head h2 { font-family: 'Sora', sans-serif; font-size: 16px; color: var(--gold); }
+    .modal-close {
       background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
       color: var(--text);
       width: 30px;
       height: 30px;
@@ -445,90 +453,31 @@
       align-items: center;
       gap: 8px;
       background: #0b1117;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 10px;
-      padding: 8px;
+      padding: 7px;
     }
-    .pay-item svg { width: 34px; height: 34px; flex-shrink: 0; }
+    .pay-item img { width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; }
     .pay-item-name { font-size: 11px; color: var(--muted); font-weight: 700; }
     .pay-item-mult { font-family: 'Sora', sans-serif; font-size: 13px; color: var(--gold); font-weight: 800; }
     .pay-note { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+    .buy-actions { display: flex; gap: 8px; margin-top: 14px; }
+    .buy-actions button { flex: 1; padding: 11px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; border: none; }
+    .buy-cancel { background: #1e293b; color: #fff; }
+    .buy-confirm { background: var(--gold); color: #090f1f; }
   </style>
 </head>
 <body>
-  <!-- SVG SYMBOLS SPRITE (Zero Emoji, 3D Casino Vector Art) -->
-  <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
-    <defs>
-      <linearGradient id="sgGold" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#fff8b0"/><stop offset="45%" stop-color="#f5c518"/><stop offset="100%" stop-color="#9e6200"/>
-      </linearGradient>
-      <linearGradient id="sgEmerald" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#6ee7b7"/><stop offset="50%" stop-color="#10b981"/><stop offset="100%" stop-color="#047857"/>
-      </linearGradient>
-      <linearGradient id="sgRuby" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#fca5a5"/><stop offset="45%" stop-color="#ef4444"/><stop offset="100%" stop-color="#7f1d1d"/>
-      </linearGradient>
-
-      <symbol id="sym-clover" viewBox="0 0 64 64">
-        <circle cx="24" cy="23" r="11" fill="url(#sgEmerald)" stroke="#fde047" stroke-width="1.6"/>
-        <circle cx="40" cy="23" r="11" fill="url(#sgEmerald)" stroke="#fde047" stroke-width="1.6"/>
-        <circle cx="24" cy="39" r="11" fill="url(#sgEmerald)" stroke="#fde047" stroke-width="1.6"/>
-        <circle cx="40" cy="39" r="11" fill="url(#sgEmerald)" stroke="#fde047" stroke-width="1.6"/>
-        <path d="M32 39 Q34 52 29 58" fill="none" stroke="#10b981" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="32" cy="31" r="4" fill="#fff7cc"/>
-      </symbol>
-
-      <symbol id="sym-coin" viewBox="0 0 64 64">
-        <circle cx="32" cy="32" r="24" fill="url(#sgGold)" stroke="#7c4a00" stroke-width="2"/>
-        <circle cx="32" cy="32" r="18" fill="none" stroke="#fff7c2" stroke-width="1.6" stroke-dasharray="4 3"/>
-        <rect x="26" y="26" width="12" height="12" rx="2" fill="#8a5200" stroke="#fff299" stroke-width="1.5"/>
-      </symbol>
-
-      <symbol id="sym-ruby" viewBox="0 0 64 64">
-        <polygon points="18,12 46,12 56,26 32,54 8,26" fill="url(#sgRuby)" stroke="#ffd54f" stroke-width="2"/>
-        <polygon points="18,12 46,12 40,26 24,26" fill="rgba(255,255,255,0.28)"/>
-        <polygon points="24,26 40,26 32,54" fill="rgba(0,0,0,0.22)"/>
-        <line x1="8" y1="26" x2="56" y2="26" stroke="rgba(255,255,255,0.45)" stroke-width="1.4"/>
-      </symbol>
-
-      <symbol id="sym-bell" viewBox="0 0 64 64">
-        <path d="M32 8 C20 8 15 18 15 32 L10 44 L54 44 L49 32 C49 18 44 8 32 8 Z" fill="url(#sgGold)" stroke="#783f00" stroke-width="2"/>
-        <rect x="8" y="42" width="48" height="7" rx="3.5" fill="url(#sgGold)" stroke="#783f00" stroke-width="1.6"/>
-        <circle cx="32" cy="52" r="5" fill="#dc2626" stroke="#fde047" stroke-width="1.5"/>
-        <path d="M22 18 Q25 13 30 13" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
-      </symbol>
-
-      <symbol id="sym-seven" viewBox="0 0 64 64">
-        <rect x="6" y="10" width="52" height="44" rx="10" fill="#181207" stroke="url(#sgGold)" stroke-width="2"/>
-        <text x="32" y="43" text-anchor="middle" font-family="Sora, sans-serif" font-weight="900" font-size="26" fill="url(#sgGold)" stroke="#fff7c2" stroke-width="0.7">777</text>
-      </symbol>
-
-      <symbol id="sym-crown" viewBox="0 0 64 64">
-        <path d="M8 46 L12 18 L24 31 L32 14 L40 31 L52 18 L56 46 Z" fill="url(#sgGold)" stroke="#7c4700" stroke-width="2" stroke-linejoin="round"/>
-        <rect x="8" y="45" width="48" height="8" rx="3" fill="url(#sgRuby)" stroke="#ffd54f" stroke-width="1.6"/>
-        <circle cx="32" cy="13" r="3.5" fill="#fff7c2"/>
-        <circle cx="12" cy="17" r="3" fill="#fff7c2"/>
-        <circle cx="52" cy="17" r="3" fill="#fff7c2"/>
-      </symbol>
-
-      <symbol id="sym-wild" viewBox="0 0 64 64">
-        <polygon points="32,4 58,18 52,50 32,60 12,50 6,18" fill="url(#sgRuby)" stroke="url(#sgGold)" stroke-width="3"/>
-        <polygon points="32,10 51,21 47,46 32,54 17,46 13,21" fill="none" stroke="rgba(255,248,176,0.5)" stroke-width="1.2"/>
-        <text x="32" y="38" text-anchor="middle" font-family="Sora, sans-serif" font-weight="900" font-size="14" fill="url(#sgGold)" letter-spacing="0.8">WILD</text>
-      </symbol>
-    </defs>
-  </svg>
-
   <main class="slot-shell">
     <!-- TOP BAR -->
     <div class="slot-topbar">
       <div class="slot-brand">
         <div class="slot-brand-title">ZKN FORTUNE 777</div>
-        <span class="slot-mode-badge" id="modeBadge">Carregando...</span>
+        <span class="slot-demo-tag" id="demoTag">DEMO</span>
       </div>
       <div class="slot-top-actions">
         <button type="button" class="slot-icon-btn active" id="soundBtn" onclick="toggleSound()" title="Som" aria-label="Alternar som">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
         </button>
         <button type="button" class="slot-icon-btn" onclick="openPaytable()" title="Tabela de Pagamentos" aria-label="Tabela de pagamentos">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
@@ -536,12 +485,21 @@
       </div>
     </div>
 
+    <!-- BONUS FREE SPINS HUD -->
+    <div class="bonus-hud" id="bonusHud">
+      <div class="bonus-hud-left">
+        <span class="bonus-hud-pill" id="bonusMultPill">4x</span>
+        <span class="bonus-hud-spins" id="bonusSpinsLeft">10 rodadas grátis</span>
+      </div>
+      <div class="bonus-hud-win" id="bonusTotalWin">R$ 0,00</div>
+    </div>
+
     <!-- CABINET -->
     <section class="slot-cabinet">
-      <div class="slot-promo-strip">
-        <span>5 Linhas</span>
+      <div class="slot-info-strip">
+        <span>3 Wilds = 10 Giros</span>
+        <span id="rtpBadge">RTP 95%</span>
         <span>Tela Cheia 5x</span>
-        <span>RTP 95,4%</span>
       </div>
 
       <div class="reels-frame">
@@ -550,7 +508,7 @@
           <div class="reel-col"><div class="reel-strip" id="strip1"></div></div>
           <div class="reel-col"><div class="reel-strip" id="strip2"></div></div>
         </div>
-        <svg class="win-lines-svg" id="winLinesSvg" viewBox="0 0 300 252" preserveAspectRatio="none"></svg>
+        <svg class="win-lines-svg" id="winLinesSvg" viewBox="0 0 300 240" preserveAspectRatio="none"></svg>
         <div class="big-win-banner" id="bigWinBanner">
           <div class="big-win-tag" id="bigWinTag">GANHO</div>
           <div class="big-win-amount" id="bigWinAmount">R$ 0,00</div>
@@ -563,7 +521,7 @@
           <div class="meter-val" id="balanceVal">R$ 0,00</div>
         </div>
         <div class="meter-box">
-          <div class="meter-label">Último ganho</div>
+          <div class="meter-label">Ganho</div>
           <div class="meter-val win" id="winVal">R$ 0,00</div>
         </div>
       </div>
@@ -572,6 +530,11 @@
     <!-- CONTROLS -->
     <section class="slot-controls">
       <div class="bet-quick-row" id="betChips"></div>
+
+      <button type="button" class="buy-bonus-btn" id="buyBonusBtn" onclick="abrirModalCompraBonus()">
+        <span>COMPRAR BÔNUS (10 GIROS)</span>
+        <span class="buy-bonus-price" id="buyBonusPrice">R$ 15,00</span>
+      </button>
 
       <div class="spin-row">
         <button type="button" class="side-ctrl-btn" id="turboBtn" onclick="toggleTurbo()">
@@ -587,22 +550,43 @@
         </button>
       </div>
 
-      <div class="slot-msg" id="slotMsg">Toque em GIRAR ou pressione Espaço.</div>
+      <div class="slot-msg" id="slotMsg">3 WILD no painel ativam 10 rodadas grátis com multiplicador!</div>
     </section>
   </main>
 
   <!-- PAYTABLE MODAL -->
-  <div class="pay-backdrop" id="payBackdrop" onclick="if(event.target===this)closePaytable()">
-    <div class="pay-modal" role="dialog" aria-modal="true" aria-label="Tabela de Pagamentos">
-      <div class="pay-head">
+  <div class="slot-backdrop" id="payBackdrop" onclick="if(event.target===this)closePaytable()">
+    <div class="slot-modal" role="dialog" aria-modal="true" aria-label="Tabela de Pagamentos">
+      <div class="modal-head">
         <h2>Tabela de Pagamentos</h2>
-        <button type="button" class="pay-close" onclick="closePaytable()">&times;</button>
+        <button type="button" class="modal-close" onclick="closePaytable()">&times;</button>
       </div>
       <div class="pay-grid" id="payGrid"></div>
       <p class="pay-note">
-        <strong>5 Linhas de Pagamento:</strong> 3 horizontais e 2 diagonais. Combine 3 símbolos iguais na linha (ou com <strong>WILD</strong> substituindo qualquer símbolo).<br>
-        <strong>Bônus Tela Cheia 5x:</strong> Preencha todos os 9 espaços com o mesmo símbolo (incluindo WILD) para multiplicar o prêmio total por <strong>5x</strong>!
+        <strong>3 WILDs = Bônus:</strong> Ao cair 3 ou mais símbolos WILD, você ganha <strong id="payFsCount">10</strong> rodadas grátis com multiplicador de <strong id="payFsMult">4x</strong> em todos os prêmios (3 WILDs no bônus somam +5 giros).<br>
+        <strong>Tela Cheia 5x:</strong> Todos os 9 espaços com o mesmo símbolo (contando WILD) multiplicam o ganho total por <strong>5x</strong>!
       </p>
+    </div>
+  </div>
+
+  <!-- CONFIRM BUY BONUS MODAL -->
+  <div class="slot-backdrop" id="buyBackdrop" onclick="if(event.target===this)fecharModalCompraBonus()">
+    <div class="slot-modal" role="dialog" aria-modal="true" aria-label="Comprar Funcionalidade de Bônus">
+      <div class="modal-head">
+        <h2>Comprar Bônus</h2>
+        <button type="button" class="modal-close" onclick="fecharModalCompraBonus()">&times;</button>
+      </div>
+      <p class="pay-note" style="font-size:13px;color:#e2e8f0;">
+        Ative imediatamente <strong id="buyModalSpins">10 rodadas grátis</strong> com multiplicador <strong id="buyModalMult">4x</strong> baseadas na aposta de <strong id="buyModalBet">R$ 0,50</strong>.
+      </p>
+      <div style="margin-top:12px;padding:12px;background:#0b1117;border:1px solid rgba(244,232,58,0.28);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:12px;color:var(--muted);font-weight:700;">Valor da compra</span>
+        <strong id="buyModalCost" style="font-family:'Sora',sans-serif;font-size:20px;color:var(--gold);">R$ 15,00</strong>
+      </div>
+      <div class="buy-actions">
+        <button type="button" class="buy-cancel" onclick="fecharModalCompraBonus()">Cancelar</button>
+        <button type="button" class="buy-confirm" id="confirmBuyBtn" onclick="confirmarCompraBonus()">Comprar Agora</button>
+      </div>
     </div>
   </div>
 
@@ -615,12 +599,20 @@
 
     const SYM_ORDER = ['clover', 'coin', 'ruby', 'bell', 'seven', 'crown', 'wild'];
     const DEFAULT_BETS = [0.5, 1, 2, 5, 10, 25, 50];
-    const CELL_H = 84;
+    const CELL_H = 80;
+    const ICON_BASE = 'img/originals/slot777/';
+
+    // Pre-carrega todas as 7 imagens 1 unica vez em cache para scroll zero-engasgo
+    SYM_ORDER.forEach(id => { const im = new Image(); im.src = ICON_BASE + id + '.webp'; });
 
     let currentMode = 'demo';
     let currentBalance = 1000;
-    let currentBet = 2;
+    let currentBet = 0.5;
     let allowedBets = DEFAULT_BETS.slice();
+    let bonusBuyMult = 30;
+    let freeSpinsCount = 10;
+    let freeSpinsMult = 4;
+    let activeBonus = null;
     let isSpinning = false;
     let isTurbo = false;
     let soundOn = true;
@@ -641,7 +633,7 @@
         const gain = audioCtx.createGain();
         osc.type = type || 'triangle';
         osc.frequency.value = freq;
-        gain.gain.setValueAtTime(vol || 0.08, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol || 0.07, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
@@ -653,18 +645,19 @@
     function playWinSound(big) {
       if (!soundOn) return;
       const notes = big ? [523, 659, 784, 1046, 1318] : [523, 659, 784];
-      notes.forEach((f, idx) => setTimeout(() => playTone(f, 0.16, 'sine', 0.1), idx * 75));
+      notes.forEach((f, idx) => setTimeout(() => playTone(f, 0.14, 'sine', 0.09), idx * 70));
     }
 
     function symHtml(id, extraClass) {
-      return '<div class="reel-cell ' + (extraClass || '') + '"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#sym-' + id + '"/></svg></div>';
+      return '<div class="reel-cell ' + (extraClass || '') + '"><img src="' + ICON_BASE + id + '.webp" alt="' + id + '" decoding="async"></div>';
     }
 
     function renderStaticGrid(grid, winCellSet) {
       for (let col = 0; col < 3; col++) {
         const strip = document.getElementById('strip' + col);
+        strip.classList.remove('spinning');
         strip.style.transition = 'none';
-        strip.style.transform = 'translateY(0px)';
+        strip.style.transform = 'translate3d(0,0,0)';
         const colCells = [col, col + 3, col + 6];
         strip.innerHTML = colCells.map(idx => {
           let cls = '';
@@ -678,20 +671,41 @@
 
     function renderWinLines(winLines) {
       const svg = document.getElementById('winLinesSvg');
-      if (!winLines || !winLines.length) {
-        svg.innerHTML = '';
-        return;
-      }
+      if (!winLines || !winLines.length) { svg.innerHTML = ''; return; }
       const centers = [
-        [50, 42],  [150, 42],  [250, 42],
-        [50, 126], [150, 126], [250, 126],
-        [50, 210], [150, 210], [250, 210]
+        [50, 40],  [150, 40],  [250, 40],
+        [50, 120], [150, 120], [250, 120],
+        [50, 200], [150, 200], [250, 200]
       ];
       svg.innerHTML = winLines.map(wl => {
         const [a, b, c] = wl.cells;
         const p1 = centers[a], p2 = centers[b], p3 = centers[c];
         return '<path class="win-line-path" d="M ' + p1[0] + ' ' + p1[1] + ' L ' + p2[0] + ' ' + p2[1] + ' L ' + p3[0] + ' ' + p3[1] + '"/>';
       }).join('');
+    }
+
+    function syncBonusUI() {
+      const hud = document.getElementById('bonusHud');
+      const buyBtn = document.getElementById('buyBonusBtn');
+      const spinBtn = document.getElementById('spinBtn');
+      const chips = document.querySelectorAll('.bet-chip');
+      const buyCost = Math.round(currentBet * bonusBuyMult * 100) / 100;
+      document.getElementById('buyBonusPrice').textContent = fmtBRL(buyCost);
+
+      if (activeBonus && activeBonus.spinsLeft > 0) {
+        hud.classList.add('show');
+        document.getElementById('bonusMultPill').textContent = activeBonus.multiplier + 'x';
+        document.getElementById('bonusSpinsLeft').textContent = activeBonus.spinsLeft + (activeBonus.spinsLeft === 1 ? ' rodada grátis' : ' rodadas grátis');
+        document.getElementById('bonusTotalWin').textContent = fmtBRL(activeBonus.totalWin || 0);
+        buyBtn.disabled = true;
+        spinBtn.textContent = 'GRÁTIS (' + activeBonus.spinsLeft + ')';
+        chips.forEach(c => { c.disabled = true; });
+      } else {
+        hud.classList.remove('show');
+        buyBtn.disabled = isSpinning;
+        spinBtn.textContent = 'GIRAR';
+        chips.forEach(c => { c.disabled = false; });
+      }
     }
 
     function renderBetChips() {
@@ -701,10 +715,11 @@
           fmtBRL(v).replace(',00', '') +
         '</button>'
       ).join('');
+      syncBonusUI();
     }
 
     function setBet(val) {
-      if (isSpinning) return;
+      if (isSpinning || (activeBonus && activeBonus.spinsLeft > 0)) return;
       currentBet = val;
       renderBetChips();
     }
@@ -746,28 +761,29 @@
 
     function animateReels(targetGrid, durationBase) {
       return new Promise(resolve => {
-        const stopCount = [12, 16, 20];
+        const stopCount = isTurbo ? [6, 8, 10] : [10, 13, 16];
         let done = 0;
         for (let col = 0; col < 3; col++) {
           const strip = document.getElementById('strip' + col);
           const steps = stopCount[col];
           let html = symHtml(currentGrid[col]) + symHtml(currentGrid[col + 3]) + symHtml(currentGrid[col + 6]);
           for (let k = 0; k < steps - 3; k++) {
-            const randSym = SYM_ORDER[Math.floor(Math.random() * SYM_ORDER.length)];
-            html += symHtml(randSym);
+            html += symHtml(SYM_ORDER[Math.floor(Math.random() * SYM_ORDER.length)]);
           }
           html += symHtml(targetGrid[col]) + symHtml(targetGrid[col + 3]) + symHtml(targetGrid[col + 6]);
+
+          strip.classList.add('spinning');
           strip.style.transition = 'none';
-          strip.style.transform = 'translateY(0px)';
+          strip.style.transform = 'translate3d(0,0,0)';
           strip.innerHTML = html;
           void strip.offsetWidth;
 
-          const dur = durationBase + col * (isTurbo ? 110 : 240);
-          strip.style.transition = 'transform ' + dur + 'ms cubic-bezier(0.16, 0.85, 0.22, 1)';
-          strip.style.transform = 'translateY(-' + (steps * CELL_H) + 'px)';
+          const dur = durationBase + col * (isTurbo ? 90 : 200);
+          strip.style.transition = 'transform ' + dur + 'ms cubic-bezier(0.18, 0.86, 0.25, 1)';
+          strip.style.transform = 'translate3d(0, -' + (steps * CELL_H) + 'px, 0)';
 
           setTimeout(() => {
-            playTone(180 + col * 55, 0.07, 'triangle', 0.08);
+            playTone(180 + col * 55, 0.06, 'triangle', 0.07);
             done++;
             if (done === 3) resolve();
           }, dur + 20);
@@ -775,11 +791,88 @@
       });
     }
 
+    async function executarResultadoGiro(d, paidCost) {
+      if (d.mode === 'real' && typeof d.balance === 'number') {
+        updateBalanceUI(Math.max(0, d.balance - Number(d.win || 0)));
+      }
+
+      await animateReels(d.grid, isTurbo ? 280 : 620);
+      currentGrid = d.grid;
+
+      const winCellSet = new Set();
+      (d.winLines || []).forEach(wl => wl.cells.forEach(c => winCellSet.add(c)));
+      renderStaticGrid(d.grid, winCellSet);
+      renderWinLines(d.winLines);
+
+      const winAmt = Number(d.win || 0);
+      if (d.mode === 'real' && typeof d.balance === 'number') {
+        updateBalanceUI(d.balance);
+      } else {
+        updateBalanceUI(currentBalance + winAmt);
+      }
+
+      if (d.freeSpins) {
+        activeBonus = d.freeSpins.spinsLeft > 0 ? d.freeSpins : null;
+      } else if (d.isFreeSpin) {
+        activeBonus = null;
+      }
+
+      const msgEl = document.getElementById('slotMsg');
+      const winEl = document.getElementById('winVal');
+      const banner = document.getElementById('bigWinBanner');
+
+      if (d.bonusTriggered) {
+        winEl.textContent = fmtBRL(winAmt);
+        msgEl.textContent = '3 WILDs! BÔNUS ATIVADO: ' + freeSpinsCount + ' rodadas grátis ' + freeSpinsMult + 'x!';
+        playWinSound(true);
+        document.getElementById('bigWinTag').textContent = '3 WILDS! BÔNUS ' + freeSpinsMult + 'x';
+        document.getElementById('bigWinAmount').textContent = freeSpinsCount + ' GIROS GRÁTIS';
+        banner.classList.add('show');
+        setTimeout(() => banner.classList.remove('show'), 2100);
+      } else if (d.retriggered) {
+        winEl.textContent = fmtBRL(winAmt);
+        msgEl.textContent = '+5 RODADAS GRÁTIS EXTRAS! Ganho: ' + fmtBRL(winAmt);
+        playWinSound(true);
+      } else if (winAmt > 0) {
+        winEl.textContent = fmtBRL(winAmt);
+        msgEl.textContent = d.isFullBoard
+          ? 'TELA CHEIA 5x! Prêmio: ' + fmtBRL(winAmt)
+          : 'Você ganhou ' + fmtBRL(winAmt) + '!';
+        playWinSound(d.isFullBoard || winAmt >= (d.bet || currentBet) * 8);
+        if (d.isFullBoard || winAmt >= (d.bet || currentBet) * 5) {
+          document.getElementById('bigWinTag').textContent = d.isFullBoard ? 'TELA CHEIA 5x' : 'GRANDE GANHO';
+          document.getElementById('bigWinAmount').textContent = fmtBRL(winAmt);
+          banner.classList.add('show');
+          setTimeout(() => banner.classList.remove('show'), 1700);
+        }
+      } else {
+        msgEl.textContent = (activeBonus && activeBonus.spinsLeft > 0)
+          ? 'Modo Bônus ' + activeBonus.multiplier + 'x: ' + activeBonus.spinsLeft + ' giros restantes!'
+          : 'Tente novamente!';
+      }
+
+      if (d.isFreeSpin && (!activeBonus || activeBonus.spinsLeft === 0)) {
+        const totalBonusWin = d.freeSpins ? Number(d.freeSpins.totalWin || 0) : winAmt;
+        msgEl.textContent = 'Fim do Bônus! Total ganho nas rodadas grátis: ' + fmtBRL(totalBonusWin);
+        if (totalBonusWin > 0) {
+          document.getElementById('bigWinTag').textContent = 'TOTAL DO BÔNUS';
+          document.getElementById('bigWinAmount').textContent = fmtBRL(totalBonusWin);
+          banner.classList.add('show');
+          setTimeout(() => banner.classList.remove('show'), 2200);
+        }
+      }
+
+      syncBonusUI();
+    }
+
     async function girar() {
       if (isSpinning) return;
-      if (currentBalance + 0.0001 < currentBet) {
+      const inBonus = !!(activeBonus && activeBonus.spinsLeft > 0);
+      const debitBet = inBonus ? 0 : currentBet;
+
+      if (debitBet > 0 && currentBalance + 0.0001 < debitBet) {
         document.getElementById('slotMsg').textContent = currentMode === 'demo'
-          ? 'Saldo demo insuficiente. Recarregando R$ 1.000,00...'
+          ? 'Banca demo recarregada para R$ 1.000,00.'
           : 'Saldo insuficiente para apostar ' + fmtBRL(currentBet) + '.';
         if (currentMode === 'demo') {
           updateBalanceUI(1000);
@@ -792,21 +885,16 @@
       }
 
       isSpinning = true;
-      const spinBtn = document.getElementById('spinBtn');
-      const winEl = document.getElementById('winVal');
-      const msgEl = document.getElementById('slotMsg');
-      const banner = document.getElementById('bigWinBanner');
-
-      spinBtn.disabled = true;
-      banner.classList.remove('show');
+      document.getElementById('spinBtn').disabled = true;
+      document.getElementById('buyBonusBtn').disabled = true;
+      document.getElementById('bigWinBanner').classList.remove('show');
       document.getElementById('winLinesSvg').innerHTML = '';
-      winEl.textContent = fmtBRL(0);
-      msgEl.textContent = 'Girando...';
-      playTone(300, 0.08, 'sine', 0.06);
+      document.getElementById('winVal').textContent = fmtBRL(0);
+      document.getElementById('slotMsg').textContent = inBonus ? 'Rodada grátis em andamento...' : 'Girando...';
+      playTone(300, 0.07, 'sine', 0.05);
 
-      // Desconto visual otimista em demo; em real aguarda resposta atomica do servidor
-      if (currentMode === 'demo') {
-        updateBalanceUI(currentBalance - currentBet);
+      if (currentMode === 'demo' && debitBet > 0) {
+        updateBalanceUI(currentBalance - debitBet);
       }
 
       try {
@@ -816,81 +904,94 @@
         });
 
         if (!res.ok || !res.data || !res.data.ok) {
-          msgEl.textContent = (res.data && res.data.message) || 'Erro ao girar.';
+          document.getElementById('slotMsg').textContent = (res.data && res.data.message) || 'Erro ao girar.';
           autoRemaining = 0;
           document.getElementById('autoBtn').classList.remove('active');
           document.getElementById('autoLabel').textContent = 'Auto';
-          if (currentMode === 'demo') updateBalanceUI(currentBalance + currentBet);
-          isSpinning = false;
-          spinBtn.disabled = false;
+          if (currentMode === 'demo' && debitBet > 0) updateBalanceUI(currentBalance + debitBet);
           return;
         }
-
-        const d = res.data;
-        if (d.mode === 'real' && typeof d.balance === 'number') {
-          // Mostra saldo deduzido enquanto gira e atualiza para final apos parar
-          updateBalanceUI(Math.max(0, d.balance - Number(d.win || 0)));
-        }
-
-        await animateReels(d.grid, isTurbo ? 340 : 720);
-        currentGrid = d.grid;
-
-        const winCellSet = new Set();
-        (d.winLines || []).forEach(wl => wl.cells.forEach(c => winCellSet.add(c)));
-        renderStaticGrid(d.grid, winCellSet);
-        renderWinLines(d.winLines);
-
-        const winAmt = Number(d.win || 0);
-        if (d.mode === 'real' && typeof d.balance === 'number') {
-          updateBalanceUI(d.balance);
-        } else {
-          updateBalanceUI(currentBalance + winAmt);
-        }
-
-        if (winAmt > 0) {
-          winEl.textContent = fmtBRL(winAmt);
-          msgEl.textContent = d.isFullBoard
-            ? 'TELA CHEIA 5x! Prêmio: ' + fmtBRL(winAmt)
-            : 'Você ganhou ' + fmtBRL(winAmt) + '!';
-          playWinSound(d.isFullBoard || winAmt >= currentBet * 8);
-
-          if (d.isFullBoard || winAmt >= currentBet * 5) {
-            document.getElementById('bigWinTag').textContent = d.isFullBoard ? 'TELA CHEIA 5x' : 'GRANDE GANHO';
-            document.getElementById('bigWinAmount').textContent = fmtBRL(winAmt);
-            banner.classList.add('show');
-            setTimeout(() => banner.classList.remove('show'), 1800);
-          }
-        } else {
-          msgEl.textContent = 'Tente novamente!';
-        }
+        await executarResultadoGiro(res.data, debitBet);
       } catch (e) {
-        msgEl.textContent = 'Erro de conexão.';
+        document.getElementById('slotMsg').textContent = 'Erro de conexão.';
       } finally {
         isSpinning = false;
-        spinBtn.disabled = false;
+        document.getElementById('spinBtn').disabled = false;
+        syncBonusUI();
         if (autoRemaining > 0) {
           autoRemaining--;
           document.getElementById('autoLabel').textContent = autoRemaining > 0 ? ('Auto (' + autoRemaining + ')') : 'Auto';
           if (autoRemaining === 0) document.getElementById('autoBtn').classList.remove('active');
-          setTimeout(() => { if (!isSpinning) girar(); }, isTurbo ? 260 : 520);
+          setTimeout(() => { if (!isSpinning) girar(); }, isTurbo ? 240 : 480);
         }
       }
     }
 
-    function openPaytable() {
-      document.getElementById('payBackdrop').classList.add('open');
-    }
-    function closePaytable() {
-      document.getElementById('payBackdrop').classList.remove('open');
+    function abrirModalCompraBonus() {
+      if (isSpinning || (activeBonus && activeBonus.spinsLeft > 0)) return;
+      const buyCost = Math.round(currentBet * bonusBuyMult * 100) / 100;
+      document.getElementById('buyModalSpins').textContent = freeSpinsCount + ' rodadas grátis';
+      document.getElementById('buyModalMult').textContent = freeSpinsMult + 'x';
+      document.getElementById('buyModalBet').textContent = fmtBRL(currentBet);
+      document.getElementById('buyModalCost').textContent = fmtBRL(buyCost);
+      document.getElementById('buyBackdrop').classList.add('open');
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' && !document.getElementById('payBackdrop').classList.contains('open')) {
-        e.preventDefault();
-        girar();
-      } else if (e.key === 'Escape') {
-        closePaytable();
+    function fecharModalCompraBonus() {
+      document.getElementById('buyBackdrop').classList.remove('open');
+    }
+
+    async function confirmarCompraBonus() {
+      if (isSpinning) return;
+      const buyCost = Math.round(currentBet * bonusBuyMult * 100) / 100;
+      if (currentBalance + 0.0001 < buyCost) {
+        if (currentMode === 'demo') {
+          updateBalanceUI(1000);
+        } else {
+          fecharModalCompraBonus();
+          document.getElementById('slotMsg').textContent = 'Saldo insuficiente para comprar bônus (' + fmtBRL(buyCost) + ').';
+          return;
+        }
       }
+
+      fecharModalCompraBonus();
+      isSpinning = true;
+      document.getElementById('spinBtn').disabled = true;
+      document.getElementById('buyBonusBtn').disabled = true;
+      document.getElementById('winLinesSvg').innerHTML = '';
+      document.getElementById('slotMsg').textContent = 'Ativando Bônus de ' + freeSpinsCount + ' rodadas...';
+
+      if (currentMode === 'demo') {
+        updateBalanceUI(currentBalance - buyCost);
+      }
+
+      try {
+        const res = await ZKNAuth.api('/originals/slot777/buy-bonus', {
+          method: 'POST',
+          body: { bet: currentBet }
+        });
+        if (!res.ok || !res.data || !res.data.ok) {
+          document.getElementById('slotMsg').textContent = (res.data && res.data.message) || 'Erro ao comprar bônus.';
+          if (currentMode === 'demo') updateBalanceUI(currentBalance + buyCost);
+          return;
+        }
+        await executarResultadoGiro(res.data, buyCost);
+      } catch (e) {
+        document.getElementById('slotMsg').textContent = 'Erro de conexão.';
+      } finally {
+        isSpinning = false;
+        document.getElementById('spinBtn').disabled = false;
+        syncBonusUI();
+      }
+    }
+
+    function openPaytable() { document.getElementById('payBackdrop').classList.add('open'); }
+    function closePaytable() { document.getElementById('payBackdrop').classList.remove('open'); }
+
+    document.addEventListener('keydown', (e) => {
+      const hasModal = document.getElementById('payBackdrop').classList.contains('open') || document.getElementById('buyBackdrop').classList.contains('open');
+      if (e.code === 'Space' && !hasModal) { e.preventDefault(); girar(); }
+      else if (e.key === 'Escape') { closePaytable(); fecharModalCompraBonus(); }
     });
 
     (async function init() {
@@ -903,17 +1004,26 @@
         currentMode = d.mode === 'real' ? 'real' : 'demo';
         allowedBets = Array.isArray(d.allowedBets) && d.allowedBets.length ? d.allowedBets : DEFAULT_BETS;
         if (!allowedBets.includes(currentBet)) currentBet = allowedBets[0];
-        renderBetChips();
+        bonusBuyMult = Number(d.bonusBuyMult || 30);
+        freeSpinsCount = Number(d.freeSpinsCount || 10);
+        freeSpinsMult = Number(d.freeSpinsMult || 4);
+        activeBonus = d.activeBonus || null;
+        if (activeBonus && activeBonus.bet) currentBet = activeBonus.bet;
 
-        const badge = document.getElementById('modeBadge');
-        badge.textContent = currentMode === 'real' ? 'Saldo Real' : 'Modo Demo';
-        badge.classList.toggle('real', currentMode === 'real');
+        // Mostra tag DEMO apenas no modo demonstracao
+        document.getElementById('demoTag').classList.toggle('show', currentMode !== 'real');
+        document.getElementById('rtpBadge').textContent = 'RTP ' + Number(d.targetRtp || 95).toFixed(1).replace('.0', '') + '%';
+        document.getElementById('payFsCount').textContent = freeSpinsCount;
+        document.getElementById('payFsMult').textContent = freeSpinsMult + 'x';
+        document.getElementById('buyBonusBtn').querySelector('span').textContent = 'COMPRAR BÔNUS (' + freeSpinsCount + ' GIROS)';
+
         updateBalanceUI(currentMode === 'real' ? d.balance : 1000);
+        renderBetChips();
 
         const payGrid = document.getElementById('payGrid');
         payGrid.innerHTML = (d.symbols || []).slice().reverse().map(s =>
           '<div class="pay-item">' +
-            '<svg viewBox="0 0 64 64"><use href="#sym-' + s.id + '"/></svg>' +
+            '<img src="' + ICON_BASE + s.id + '.webp" alt="' + s.name + '">' +
             '<div><div class="pay-item-name">' + s.name + '</div><div class="pay-item-mult">' + s.mult + 'x</div></div>' +
           '</div>'
         ).join('');

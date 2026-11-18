@@ -686,6 +686,28 @@
           <button id="btnRvTest" class="admin-btn secondary" onclick="testarLaunchRapidverse()">Testar lançamento</button>
           <div id="rvTestResult" style="margin-top:12px;font-size:12px;word-break:break-all;color:var(--text-muted);"></div>
         </div>
+
+        <h3 style="font-family:var(--font-display);font-size:18px;font-weight:800;margin:24px 0 12px;">ZKN Originals — RTP &amp; Bônus Configuráveis</h3>
+        <div class="admin-card" style="padding:16px;">
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Ajuste em tempo real o RTP (%), multiplicador do Comprar Bônus (ex.: 30x = R$ 0,50 cobra R$ 15,00), quantidade de rodadas grátis e multiplicador do bônus.</p>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Jogo</th>
+                  <th>RTP (%)</th>
+                  <th>Comprar Bônus (x)</th>
+                  <th>Rodadas Grátis</th>
+                  <th>Mult. Bônus (x)</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="originalsConfigBody">
+                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- CATALOGO: JOGOS E PROVEDORAS -->
@@ -1722,6 +1744,57 @@
         const d = await api('/admin/settings/rapidverse-mode');
         pintarModoRapidverse(d.mode);
       } catch (e) { toast('Erro', e.message, 'error'); }
+      carregarOriginalsAdmin();
+    }
+
+    async function carregarOriginalsAdmin() {
+      const tb = document.getElementById('originalsConfigBody');
+      if (!tb) return;
+      try {
+        const res = await api('/admin/originals/config');
+        const list = res.configs || [];
+        if (!list.length) {
+          tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Nenhum jogo próprio configurado.</td></tr>';
+          return;
+        }
+        tb.innerHTML = list.map(c => `
+          <tr data-orig-code="${esc(c.game_code)}">
+            <td data-label="Jogo"><strong>${esc(c.game_name || c.game_code)}</strong><br><small style="color:var(--text-muted);">${esc(c.game_code)}</small></td>
+            <td data-label="RTP (%)"><input type="number" min="50" max="98" step="0.5" class="admin-input orig-rtp" value="${Number(c.target_rtp ?? 95)}" style="max-width:95px;"></td>
+            <td data-label="Compra Bônus (x)"><input type="number" min="5" max="200" step="1" class="admin-input orig-buy" value="${Number(c.bonus_buy_mult ?? 30)}" style="max-width:95px;"></td>
+            <td data-label="Rodadas Grátis"><input type="number" min="1" max="50" step="1" class="admin-input orig-fs-count" value="${Number(c.free_spins_count ?? 10)}" style="max-width:90px;"></td>
+            <td data-label="Mult. Bônus (x)"><input type="number" min="1" max="20" step="0.5" class="admin-input orig-fs-mult" value="${Number(c.free_spins_mult ?? 4)}" style="max-width:90px;"></td>
+            <td><button type="button" class="admin-btn" style="padding:7px 12px;font-size:12px;" onclick="salvarOriginalConfig(this, '${esc(c.game_code)}')">Salvar</button></td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--red);">' + esc(e.message) + '</td></tr>';
+      }
+    }
+
+    async function salvarOriginalConfig(btn, gameCode) {
+      const tr = btn.closest('tr');
+      if (!tr) return;
+      const target_rtp = Number(tr.querySelector('.orig-rtp')?.value || 95);
+      const bonus_buy_mult = Number(tr.querySelector('.orig-buy')?.value || 30);
+      const free_spins_count = Math.trunc(Number(tr.querySelector('.orig-fs-count')?.value || 10));
+      const free_spins_mult = Number(tr.querySelector('.orig-fs-mult')?.value || 4);
+
+      btn.disabled = true;
+      btn.textContent = '...';
+      try {
+        await api('/admin/originals/config/' + encodeURIComponent(gameCode), {
+          method: 'PUT',
+          body: JSON.stringify({ target_rtp, bonus_buy_mult, free_spins_count, free_spins_mult }),
+        });
+        toast('Salvo!', 'RTP ' + target_rtp + '% e bônus atualizados.', 'success');
+        await carregarOriginalsAdmin();
+      } catch (e) {
+        toast('Erro ao salvar', e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Salvar';
+      }
     }
 
     async function definirModoRapidverse(mode) {
