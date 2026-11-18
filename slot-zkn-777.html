@@ -46,137 +46,399 @@
     }
 
     /* ============================================================
-       PRELOADER / TELA DE CARREGAMENTO ESTÚDIO
+       PRELOADER DE CASSINO PROFISSIONAL COM SLIDES DE SÍMBOLOS
        ============================================================ */
     .loader-screen {
       position: fixed;
       inset: 0;
       z-index: 1000;
       background:
-        radial-gradient(circle at 50% 38%, rgba(16, 185, 129, 0.22) 0%, transparent 60%),
-        radial-gradient(circle at 50% 70%, rgba(244, 232, 58, 0.16) 0%, transparent 55%),
-        linear-gradient(180deg, #070e14 0%, #030609 100%);
+        radial-gradient(circle at 50% 25%, rgba(16, 185, 129, 0.22) 0%, transparent 60%),
+        radial-gradient(circle at 50% 75%, rgba(244, 232, 58, 0.16) 0%, transparent 55%),
+        linear-gradient(180deg, #060b10 0%, #030608 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 24px 20px;
+      justify-content: space-between;
+      padding: 24px 16px 28px;
       text-align: center;
-      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), transform 0.45s ease, visibility 0.45s ease;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s ease, visibility 0.4s ease;
       will-change: opacity, transform;
+      overflow-y: auto;
     }
     .loader-screen.done {
       opacity: 0;
-      transform: scale(1.05);
+      transform: scale(1.04);
       visibility: hidden;
       pointer-events: none;
+    }
+
+    .loader-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
     }
     .loader-brand {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 14px;
+      padding: 3px 12px;
       border-radius: 999px;
       background: rgba(16, 185, 129, 0.14);
       border: 1px solid rgba(16, 185, 129, 0.35);
       color: #34d399;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 800;
       letter-spacing: 2px;
       text-transform: uppercase;
-      margin-bottom: 16px;
     }
-    .loader-mascot-wrap {
+    .loader-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      color: var(--gold);
+      text-shadow: 0 4px 18px rgba(244, 232, 58, 0.35);
+    }
+
+    /* CAROUSEL / SLIDES DE SÍMBOLOS E MULTIPLICADORES */
+    .loader-carousel-wrap {
+      width: 100%;
+      max-width: 360px;
+      background: rgba(11, 17, 24, 0.85);
+      border: 1.5px solid rgba(244, 232, 58, 0.28);
+      border-radius: 16px;
+      padding: 14px 12px 10px;
       position: relative;
-      width: 180px;
-      height: 180px;
-      margin-bottom: 16px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      margin: auto 0;
+    }
+    .loader-slides-container {
+      position: relative;
+      height: 195px;
+      overflow: hidden;
+    }
+    .loader-slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translate3d(24px, 0, 0);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      pointer-events: none;
+    }
+    .loader-slide.active {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+      pointer-events: auto;
+    }
+
+    .slide-badge {
+      font-family: 'Sora', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(244, 232, 58, 0.16);
+      border: 1px solid rgba(244, 232, 58, 0.4);
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .slide-badge.gold {
+      background: rgba(245, 197, 24, 0.2);
+      border-color: #f5c518;
+      color: #fff3a1;
+    }
+    .slide-badge.emerald {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    .slide-symbols-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .slide-sym-card {
+      flex: 1;
+      max-width: 98px;
+      background: #090e14;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 8px 4px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      position: relative;
+    }
+    .slide-sym-card.highlight {
+      border-color: var(--gold);
+      background: radial-gradient(circle at 50% 20%, rgba(244, 232, 58, 0.18) 0%, #090e14 75%);
+      box-shadow: 0 0 14px rgba(244, 232, 58, 0.25);
+    }
+    .slide-sym-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+    }
+    .slide-sym-name {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .slide-sym-mult {
+      font-family: 'Sora', sans-serif;
+      font-size: 13.5px;
+      font-weight: 900;
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Card com 4 símbolos menores */
+    .slide-symbols-row.four-col .slide-sym-card {
+      max-width: 76px;
+      padding: 6px 2px 5px;
+    }
+    .slide-symbols-row.four-col .slide-sym-img {
+      width: 38px;
+      height: 38px;
+    }
+    .slide-symbols-row.four-col .slide-sym-name {
+      font-size: 8.5px;
+    }
+    .slide-symbols-row.four-col .slide-sym-mult {
+      font-size: 12px;
+    }
+
+    /* Caixas de Feature (Bônus e Tela Cheia) */
+    .slide-feature-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .slide-wilds-trio {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .slide-mini-wild {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(244, 232, 58, 0.6));
+      animation: pulseAura 2s ease-in-out infinite;
+    }
+    .slide-fullboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      padding: 4px;
+      background: #090e14;
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(244, 232, 58, 0.3);
+    }
+    .slide-fullboard-grid span {
+      font-family: 'Sora', sans-serif;
+      font-size: 10px;
+      font-weight: 900;
+      color: var(--gold);
+      background: rgba(244, 232, 58, 0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .slide-feature-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .slide-feature-highlight {
+      font-family: 'Sora', sans-serif;
+      font-size: 14.5px;
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 10px rgba(244, 232, 58, 0.5);
+    }
+    .slide-desc {
+      font-size: 10.5px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* DOTS DE NAVEGAÇÃO */
+    .loader-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .loader-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .loader-dot.active {
+      background: var(--gold);
+      transform: scale(1.3);
+      box-shadow: 0 0 8px rgba(244, 232, 58, 0.7);
+    }
+
+    /* SEÇÃO INFERIOR / ANIMAÇÃO DE CARREGAMENTO */
+    .loader-bottom-section {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 14px;
+    }
+    .loader-anim-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: opacity 0.25s ease;
+    }
+    .loader-anim-wrap.hide {
+      display: none;
+    }
+
+    /* Spinner de energia de cassino */
+    .loader-casino-spinner {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .loader-mascot-aura {
+    .loader-spinner-ring {
       position: absolute;
-      inset: -12px;
+      inset: 0;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(244, 232, 58, 0.38) 0%, rgba(16, 185, 129, 0.15) 50%, transparent 75%);
-      animation: pulseAura 2.2s ease-in-out infinite;
-      will-change: transform, opacity;
+      border: 2.5px solid rgba(244, 232, 58, 0.2);
+      border-top-color: var(--gold);
+      border-right-color: #10b981;
+      animation: spinRing 0.9s linear infinite;
     }
-    .loader-mascot-halo {
-      position: absolute;
-      inset: 8px;
+    .loader-spinner-core {
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      border: 2px dashed rgba(244, 232, 58, 0.45);
-      animation: spinHalo 18s linear infinite;
+      background: linear-gradient(135deg, #f4e83a 0%, #c98a04 100%);
+      box-shadow: 0 0 14px rgba(244, 232, 58, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .loader-mascot-img {
-      position: relative;
-      width: 160px;
-      height: 160px;
-      object-fit: contain;
-      filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.7));
-      animation: floatMascot 2.8s ease-in-out infinite;
-      will-change: transform;
-    }
-    .loader-title {
+    .loader-spinner-core span {
       font-family: 'Sora', sans-serif;
-      font-size: 28px;
+      font-size: 11px;
       font-weight: 900;
-      letter-spacing: -0.5px;
-      color: var(--gold);
-      text-shadow: 0 4px 20px rgba(244, 232, 58, 0.35);
-      margin-bottom: 22px;
+      color: #090f1f;
     }
+
+    /* Barra de progresso com shimmer de neon */
     .loader-bar-wrap {
       width: 100%;
-      max-width: 270px;
       height: 10px;
       background: rgba(255, 255, 255, 0.08);
-      border: 1.5px solid rgba(244, 232, 58, 0.32);
+      border: 1.5px solid rgba(244, 232, 58, 0.35);
       border-radius: 999px;
       overflow: hidden;
-      margin-bottom: 10px;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+      margin-bottom: 8px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 8px rgba(244, 232, 58, 0.2);
+      position: relative;
     }
     .loader-bar-fill {
       width: 0%;
       height: 100%;
       background: linear-gradient(90deg, #10b981 0%, #f4e83a 100%);
       border-radius: 999px;
-      box-shadow: 0 0 12px rgba(244, 232, 58, 0.7);
-      transition: width 0.25s ease-out;
-      will-change: width;
+      box-shadow: 0 0 14px rgba(244, 232, 58, 0.85);
+      transition: width 0.2s ease-out;
+      position: relative;
+      overflow: hidden;
     }
+    .loader-bar-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 60px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+      animation: shimmerBeam 1.2s infinite;
+    }
+    @keyframes shimmerBeam {
+      0% { transform: translateX(-60px); }
+      100% { transform: translateX(280px); }
+    }
+    @keyframes spinRing {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
     .loader-status {
       font-size: 12px;
       color: var(--muted);
       font-weight: 700;
       min-height: 18px;
-      margin-bottom: 18px;
       font-variant-numeric: tabular-nums;
     }
+
+    /* BOTÃO JOGAR */
     .loader-enter-btn {
       display: none;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      padding: 15px 44px;
+      padding: 16px 54px;
       border-radius: 999px;
       border: 2px solid #fff5c0;
       background: linear-gradient(180deg, #fff7ad 0%, #f4e83a 48%, #c68903 100%);
       color: #080d1a;
       font-family: 'Sora', sans-serif;
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 900;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
       cursor: pointer;
-      box-shadow: 0 8px 30px rgba(244, 232, 58, 0.5), 0 0 15px rgba(255, 255, 255, 0.5);
-      animation: pulseButton 1.5s ease-in-out infinite;
+      box-shadow: 0 8px 32px rgba(244, 232, 58, 0.55), 0 0 16px rgba(255, 255, 255, 0.4);
+      animation: pulseButton 1.4s ease-in-out infinite;
       will-change: transform, box-shadow;
     }
-    .loader-enter-btn.show { display: inline-flex; }
-    .loader-enter-btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .loader-enter-btn.show {
+      display: inline-flex;
+    }
+    .loader-enter-btn svg {
+      width: 19px;
+      height: 19px;
+      fill: currentColor;
+    }
 
     /* ============================================================
        GAME SHELL & RESPONSIVE LAYOUT
@@ -933,24 +1195,126 @@
 <body>
 
   <!-- ============================================================
-       TELA DE CARREGAMENTO DO JOGO (PRELOADER ESTÚDIO)
+       TELA DE CARREGAMENTO DO JOGO (PRELOADER ESTÚDIO CASSINO)
        ============================================================ -->
   <div class="loader-screen" id="loaderScreen">
-    <div class="loader-brand">ZKN ORIGINALS PRESENTS</div>
-    <div class="loader-mascot-wrap">
-      <div class="loader-mascot-aura"></div>
-      <div class="loader-mascot-halo"></div>
-      <img src="img/originals/slot777/mascot.webp" alt="Coelho ZKN" class="loader-mascot-img">
+    <div class="loader-header">
+      <div class="loader-brand">ZKN ORIGINALS PRESENTS</div>
+      <div class="loader-title">ZKN FORTUNE 777</div>
     </div>
-    <div class="loader-title">ZKN FORTUNE 777</div>
-    <div class="loader-bar-wrap">
-      <div class="loader-bar-fill" id="loaderFill"></div>
+
+    <!-- CAROUSEL / SLIDES DE SÍMBOLOS E MULTIPLICADORES -->
+    <div class="loader-carousel-wrap">
+      <div class="loader-slides-container" id="loaderSlidesContainer">
+        <!-- SLIDE 1: SÍMBOLOS SUPREMOS -->
+        <div class="loader-slide active" data-slide="0">
+          <div class="slide-badge gold">SÍMBOLOS SUPREMOS</div>
+          <div class="slide-symbols-row">
+            <div class="slide-sym-card highlight">
+              <img src="img/originals/slot777/wild.webp" alt="Wild" class="slide-sym-img">
+              <span class="slide-sym-name">ZKN WILD</span>
+              <span class="slide-sym-mult">42x</span>
+            </div>
+            <div class="slide-sym-card">
+              <img src="img/originals/slot777/crown.webp" alt="Coroa" class="slide-sym-img">
+              <span class="slide-sym-name">COROA</span>
+              <span class="slide-sym-mult">26x</span>
+            </div>
+            <div class="slide-sym-card">
+              <img src="img/originals/slot777/seven.webp" alt="777" class="slide-sym-img">
+              <span class="slide-sym-name">777 OURO</span>
+              <span class="slide-sym-mult">12.5x</span>
+            </div>
+          </div>
+          <div class="slide-desc">Substituição universal e maiores multiplicadores da ZKN</div>
+        </div>
+
+        <!-- SLIDE 2: FUNCIONALIDADE BÔNUS -->
+        <div class="loader-slide" data-slide="1">
+          <div class="slide-badge gold">FUNCIONALIDADE BÔNUS</div>
+          <div class="slide-feature-box">
+            <div class="slide-wilds-trio">
+              <img src="img/originals/slot777/wild.webp" alt="Wild" class="slide-mini-wild">
+              <img src="img/originals/slot777/wild.webp" alt="Wild" class="slide-mini-wild">
+              <img src="img/originals/slot777/wild.webp" alt="Wild" class="slide-mini-wild">
+            </div>
+            <div class="slide-feature-title">3 WILDS (1 EM CADA FILEIRA)</div>
+            <div class="slide-feature-highlight">10 RODADAS GRÁTIS COM 4X MULTIPLICADOR</div>
+          </div>
+          <div class="slide-desc">Ative naturalmente nos giros ou compre a funcionalidade</div>
+        </div>
+
+        <!-- SLIDE 3: TELA CHEIA 5X -->
+        <div class="loader-slide" data-slide="2">
+          <div class="slide-badge emerald">SUPER MULTIPLICADOR</div>
+          <div class="slide-feature-box">
+            <div class="slide-fullboard-grid">
+              <span>777</span><span>777</span><span>777</span>
+              <span>777</span><span>777</span><span>777</span>
+              <span>777</span><span>777</span><span>777</span>
+            </div>
+            <div class="slide-feature-title">TELA CHEIA COM MESMO SÍMBOLO</div>
+            <div class="slide-feature-highlight">MULTIPLICA O GANHO TOTAL POR 5X!</div>
+          </div>
+          <div class="slide-desc">Preencha todos os 9 espaços da grade para multiplicar tudo</div>
+        </div>
+
+        <!-- SLIDE 4: SÍMBOLOS DA SORTE -->
+        <div class="loader-slide" data-slide="3">
+          <div class="slide-badge">SÍMBOLOS DA SORTE</div>
+          <div class="slide-symbols-row four-col">
+            <div class="slide-sym-card">
+              <img src="img/originals/slot777/bell.webp" alt="Sino" class="slide-sym-img">
+              <span class="slide-sym-name">SINO</span>
+              <span class="slide-sym-mult">5.2x</span>
+            </div>
+            <div class="slide-sym-card">
+              <img src="img/originals/slot777/ruby.webp" alt="Rubi" class="slide-sym-img">
+              <span class="slide-sym-name">RUBI</span>
+              <span class="slide-sym-mult">2.6x</span>
+            </div>
+            <div class="slide-sym-card">
+              <img src="img/originals/slot777/coin.webp" alt="Moeda" class="slide-sym-img">
+              <span class="slide-sym-name">MOEDA</span>
+              <span class="slide-sym-mult">1.25x</span>
+            </div>
+            <div class="slide-sym-card">
+              <img src="img/originals/slot777/clover.webp" alt="Trevo" class="slide-sym-img">
+              <span class="slide-sym-name">TREVO</span>
+              <span class="slide-sym-mult">0.65x</span>
+            </div>
+          </div>
+          <div class="slide-desc">5 linhas de pagamento ativas com prêmios imediatos</div>
+        </div>
+      </div>
+
+      <!-- DOTS DO CAROUSEL -->
+      <div class="loader-dots">
+        <span class="loader-dot active" onclick="setLoaderSlide(0)"></span>
+        <span class="loader-dot" onclick="setLoaderSlide(1)"></span>
+        <span class="loader-dot" onclick="setLoaderSlide(2)"></span>
+        <span class="loader-dot" onclick="setLoaderSlide(3)"></span>
+      </div>
     </div>
-    <div class="loader-status" id="loaderStatus">Carregando símbolos... 0%</div>
-    <button type="button" class="loader-enter-btn" id="loaderEnterBtn" onclick="entrarNoJogo()">
-      <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      <span>JOGAR AGORA</span>
-    </button>
+
+    <!-- SEÇÃO INFERIOR / ANIMAÇÃO DE CARREGAMENTO & BOTÃO JOGAR -->
+    <div class="loader-bottom-section">
+      <div class="loader-anim-wrap" id="loaderAnimWrap">
+        <div class="loader-casino-spinner">
+          <div class="loader-spinner-ring"></div>
+          <div class="loader-spinner-core"><span>7</span></div>
+        </div>
+        <div class="loader-bar-wrap">
+          <div class="loader-bar-fill" id="loaderFill"></div>
+        </div>
+        <div class="loader-status" id="loaderStatus">Carregando símbolos... 0%</div>
+      </div>
+
+      <button type="button" class="loader-enter-btn" id="loaderEnterBtn" onclick="entrarNoJogo()">
+        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>JOGAR</span>
+      </button>
+    </div>
   </div>
 
   <!-- ============================================================
@@ -2029,7 +2393,30 @@
     function openPaytable() { document.getElementById('payBackdrop').classList.add('open'); }
     function closePaytable() { document.getElementById('payBackdrop').classList.remove('open'); }
 
+    let currentLoaderSlide = 0;
+    const totalLoaderSlides = 4;
+    let loaderSlideInterval = null;
+
+    function setLoaderSlide(idx) {
+      currentLoaderSlide = (idx + totalLoaderSlides) % totalLoaderSlides;
+      const slides = document.querySelectorAll('.loader-slide');
+      const dots = document.querySelectorAll('.loader-dot');
+      slides.forEach((s, i) => s.classList.toggle('active', i === currentLoaderSlide));
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentLoaderSlide));
+    }
+
+    function startLoaderCarousel() {
+      if (loaderSlideInterval) clearInterval(loaderSlideInterval);
+      loaderSlideInterval = setInterval(() => {
+        setLoaderSlide(currentLoaderSlide + 1);
+      }, 2600);
+    }
+
     function entrarNoJogo() {
+      if (loaderSlideInterval) {
+        clearInterval(loaderSlideInterval);
+        loaderSlideInterval = null;
+      }
       unlockAudio();
       playTone(587, 0.09, 'sine', 0.1);
       document.getElementById('loaderScreen').classList.add('done');
@@ -2062,9 +2449,12 @@
        PRELOADER ESTÚDIO: DECODIFICAÇÃO DE IMAGENS + API FETCH
        ============================================================ */
     (async function init() {
+      startLoaderCarousel();
+
       const fill = document.getElementById('loaderFill');
       const statusEl = document.getElementById('loaderStatus');
       const enterBtn = document.getElementById('loaderEnterBtn');
+      const animWrap = document.getElementById('loaderAnimWrap');
       let loadedSteps = 0;
       const totalSteps = ALL_ASSETS.length + 1;
 
@@ -2142,6 +2532,7 @@
         renderBetChips();
       }
 
+      if (animWrap) animWrap.classList.add('hide');
       enterBtn.classList.add('show');
     })();
   </script>
