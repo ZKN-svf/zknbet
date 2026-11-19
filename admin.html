@@ -1538,11 +1538,12 @@
       box.innerHTML = 'Testando conexão com o gateway ativo...';
       try {
         const d = await api('/admin/settings/gateway/test', { method: 'POST' });
-        const ok = !!d.ok;
-        box.innerHTML = '<div style="color:' + (ok ? 'var(--green)' : '#ff7a7a') + ';"><strong>' +
-          (ok ? 'Conexão OK' : 'Falha na conexão') + '</strong> · Gateway: ' + esc(d.gateway || '-') +
-          ' · HTTP ' + (d.status || '-') + '</div>' +
-          (d.mensagem ? '<div style="margin-top:6px;color:var(--text-muted);">' + esc(d.mensagem) + '</div>' : '');
+        const linha = (nome, r) => '<div style="margin-top:6px;color:' + (r && r.ok ? 'var(--green)' : '#ff7a7a') + ';">' +
+          '<strong>' + nome + ':</strong> ' + (r && r.ok ? 'OK' : 'Falha') +
+          ' · HTTP ' + ((r && r.status) || '-') +
+          (r && r.mensagem ? ' · ' + esc(r.mensagem) : '') + '</div>';
+        box.innerHTML = '<div><strong>Gateway ativo:</strong> ' + esc(d.gateway || '-') + '</div>' +
+          linha('SigiloPay', d.sigilo) + linha('NexasPay', d.nexas);
       } catch (e) {
         box.innerHTML = '<div style="color:#ff7a7a;">Erro: ' + esc(e.message) + '</div>';
       }
