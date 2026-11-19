@@ -850,6 +850,40 @@
 
         <div style="background:var(--bg-2); padding:24px; border-radius:12px; border:1px solid var(--border); max-width:680px; margin-top:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+            <h3 style="font-family:var(--font-display); font-size:18px;">Gateway de Pagamento</h3>
+            <span id="gatewayBadge" class="badge">Carregando...</span>
+          </div>
+          <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Escolha qual adquirente processa depósitos e saques PIX. A troca é imediata para novas transações.</p>
+
+          <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+            <label style="flex:1;min-width:220px;display:flex;gap:10px;align-items:center;padding:12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;">
+              <input type="radio" name="gatewayOption" value="sigilo" checked>
+              <span><strong>SigiloPay</strong><br><small style="color:var(--text-muted);" id="gatewaySigiloStatus">—</small></span>
+            </label>
+            <label style="flex:1;min-width:220px;display:flex;gap:10px;align-items:center;padding:12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;">
+              <input type="radio" name="gatewayOption" value="nexas">
+              <span><strong>NexasPay</strong><br><small style="color:var(--text-muted);" id="gatewayNexasStatus">—</small></span>
+            </label>
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:6px;">URL do Webhook NexasPay (cadastre no painel deles)</label>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <input type="text" id="gatewayNexasWebhook" class="admin-input" readonly style="flex:1; min-width:220px; font-family:monospace; font-size:12px;">
+              <button type="button" class="admin-btn secondary" id="btnCopiarWebhookNexas">Copiar URL</button>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="admin-btn secondary" id="btnTestarGateway">Testar Gateway</button>
+            <button type="button" class="admin-btn" id="btnSalvarGateway">Salvar Gateway</button>
+          </div>
+          <div id="gatewayDiagBox" style="display:none; margin-top:16px; padding:14px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.25); font-size:13px; line-height:1.6;"></div>
+          <p style="margin-top:14px;font-size:12px;color:var(--text-muted);line-height:1.6;">As credenciais da NexasPay ficam como secrets do Worker (<code>NEXASPAY_CLIENT_ID</code> / <code>NEXASPAY_CLIENT_SECRET</code>), nunca no navegador.</p>
+        </div>
+
+        <div style="background:var(--bg-2); padding:24px; border-radius:12px; border:1px solid var(--border); max-width:680px; margin-top:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
             <h3 style="font-family:var(--font-display); font-size:18px;">Gateway PIX (SigiloPay)</h3>
             <span id="sigiloSourceBadge" class="badge">Carregando...</span>
           </div>
@@ -1458,6 +1492,69 @@
     }
 
     // ============================================================
+    // CONFIGURAÇÕES (Gateway de Pagamento: SigiloPay / NexasPay)
+    // ============================================================
+    async function carregarGateway() {
+      const badge = document.getElementById('gatewayBadge');
+      try {
+        const d = await api('/admin/settings/gateway');
+        const radio = document.querySelector('input[name="gatewayOption"][value="' + d.gateway + '"]');
+        if (radio) radio.checked = true;
+        if (badge) {
+          badge.className = 'badge ' + (d.gateway === 'nexas' ? 'completed' : 'deposit');
+          badge.textContent = d.gateway === 'nexas' ? 'NexasPay ativo' : 'SigiloPay ativo';
+        }
+        const sig = (d.options || []).find(o => o.id === 'sigilo') || {};
+        const nx = (d.options || []).find(o => o.id === 'nexas') || {};
+        const sigEl = document.getElementById('gatewaySigiloStatus');
+        const nxEl = document.getElementById('gatewayNexasStatus');
+        if (sigEl) sigEl.textContent = sig.configured ? 'Credenciais OK' : 'Sem credenciais';
+        if (nxEl) nxEl.textContent = nx.configured ? 'Credenciais OK' : 'Sem credenciais (secrets do Worker)';
+        const wh = document.getElementById('gatewayNexasWebhook');
+        if (wh) wh.value = nx.webhook_url || (API + '/webhook/nexaspay');
+      } catch (e) {
+        if (badge) { badge.className = 'badge withdraw'; badge.textContent = 'Erro ao carregar'; }
+      }
+    }
+
+    document.getElementById('btnSalvarGateway').onclick = async function() {
+      const selecionado = document.querySelector('input[name="gatewayOption"]:checked');
+      if (!selecionado) return toast('Erro', 'Selecione um gateway.', 'error');
+      const gateway = selecionado.value;
+      if (!confirm('Alternar o gateway de pagamento para ' + (gateway === 'nexas' ? 'NexasPay' : 'SigiloPay') + '?')) return;
+      const btn = this; const original = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Salvando...';
+      try {
+        await api('/admin/settings/gateway', { method: 'PUT', body: JSON.stringify({ gateway }) });
+        toast('Sucesso', 'Gateway alterado!', 'success');
+        await carregarGateway();
+      } catch (e) { toast('Erro', e.message, 'error'); }
+      btn.disabled = false; btn.textContent = original;
+    };
+
+    document.getElementById('btnTestarGateway').onclick = async function() {
+      const box = document.getElementById('gatewayDiagBox');
+      box.style.display = 'block';
+      box.innerHTML = 'Testando conexão com o gateway ativo...';
+      try {
+        const d = await api('/admin/settings/gateway/test', { method: 'POST' });
+        const ok = !!d.ok;
+        box.innerHTML = '<div style="color:' + (ok ? 'var(--green)' : '#ff7a7a') + ';"><strong>' +
+          (ok ? 'Conexão OK' : 'Falha na conexão') + '</strong> · Gateway: ' + esc(d.gateway || '-') +
+          ' · HTTP ' + (d.status || '-') + '</div>' +
+          (d.mensagem ? '<div style="margin-top:6px;color:var(--text-muted);">' + esc(d.mensagem) + '</div>' : '');
+      } catch (e) {
+        box.innerHTML = '<div style="color:#ff7a7a;">Erro: ' + esc(e.message) + '</div>';
+      }
+    };
+
+    document.getElementById('btnCopiarWebhookNexas').onclick = async function() {
+      const val = document.getElementById('gatewayNexasWebhook').value;
+      try { await navigator.clipboard.writeText(val); toast('Copiado!', 'URL do webhook NexasPay copiada.', 'success'); }
+      catch (e) { toast('Erro', 'Não foi possível copiar.', 'error'); }
+    };
+
+    // ============================================================
     // CONFIGURAÇÕES (Gateway PIX / SigiloPay)
     // ============================================================
     async function carregarSigiloSettings() {
@@ -1613,7 +1710,7 @@
         if (tab === 'promo') carregarPromo();
         if (tab === 'marketing') carregarMarketing();
         if (tab === 'events') window.carregarTema();
-        if (tab === 'settings') { carregarTelegram(); carregarSigiloSettings(); }
+        if (tab === 'settings') { carregarTelegram(); carregarGateway(); carregarSigiloSettings(); }
       };
     });
 
