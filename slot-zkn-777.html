@@ -543,6 +543,38 @@
       color: #34d399;
       border-color: rgba(16, 185, 129, 0.45);
     }
+    .slot-jackpot-tag {
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      color: #fff;
+      background: linear-gradient(90deg, #7c3aed, #db2777, #f59e0b);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+      animation: jackpotIdle 2.4s ease-in-out infinite;
+      white-space: nowrap;
+    }
+    .slot-jackpot-tag.near-flash {
+      animation: jackpotNearFlash 0.9s ease-out;
+    }
+    .slot-jackpot-tag.pulse-hit {
+      animation: jackpotHit 1.4s ease-in-out infinite;
+    }
+    @keyframes jackpotIdle {
+      0%, 100% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.06); filter: brightness(1.25); }
+    }
+    @keyframes jackpotNearFlash {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.22); filter: brightness(2); }
+      100% { transform: scale(1); }
+    }
+    @keyframes jackpotHit {
+      0%, 100% { transform: scale(1.08) rotate(-1deg); }
+      50% { transform: scale(1.2) rotate(1deg); }
+    }
 
     .slot-top-actions { display: flex; align-items: center; gap: 6px; }
     .slot-login-link {
@@ -808,9 +840,38 @@
     .reel-cell.win-cell img {
       transform: scale(1.12);
       filter: drop-shadow(0 0 14px rgba(244, 232, 58, 0.85));
+      animation: winSymbolPop 0.85s cubic-bezier(0.34, 1.7, 0.64, 1) both;
+    }
+    .reel-cell.win-cell {
+      animation: winCellGlow 1.2s ease-in-out infinite alternate;
     }
     .reel-cell.dim-cell {
       opacity: 0.32;
+    }
+    @keyframes winSymbolPop {
+      0% { transform: scale(0.88) translateY(-6px); filter: brightness(1.8); }
+      55% { transform: scale(1.22); }
+      100% { transform: scale(1.12); }
+    }
+    @keyframes winCellGlow {
+      from { box-shadow: inset 0 0 0 rgba(244, 232, 58, 0); }
+      to { box-shadow: inset 0 0 22px rgba(244, 232, 58, 0.32); }
+    }
+    .slot-shell.win-shake { animation: winShake 0.5s ease-in-out; }
+    .slot-shell.jackpot-shake { animation: jackpotShake 0.75s ease-in-out; }
+    .slot-shell.jackpot-flash { filter: brightness(1.35) saturate(1.2); }
+    @keyframes winShake {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      25% { transform: translate3d(-3px, 1px, 0); }
+      50% { transform: translate3d(3px, -1px, 0); }
+      75% { transform: translate3d(-2px, 0, 0); }
+    }
+    @keyframes jackpotShake {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      20% { transform: translate3d(-6px, 2px, 0) scale(1.01); }
+      40% { transform: translate3d(6px, -2px, 0) scale(1.02); }
+      60% { transform: translate3d(-5px, 1px, 0) scale(1.01); }
+      80% { transform: translate3d(4px, -1px, 0) scale(1); }
     }
 
     .win-lines-svg {
@@ -1126,6 +1187,28 @@
       -webkit-text-fill-color: transparent;
       text-shadow: 0 0 32px rgba(244, 63, 94, 0.9);
     }
+    .win-overlay-modal.tier-jackpot {
+      background: radial-gradient(circle at 50% 40%, rgba(124, 58, 237, 0.55), rgba(219, 39, 119, 0.35) 45%, rgba(4, 7, 14, 0.94) 78%);
+      animation: jackpotOverlayPulse 0.9s ease-in-out infinite alternate;
+    }
+    .win-overlay-modal.tier-jackpot .win-tier-badge {
+      font-size: clamp(24px, 6vw, 54px);
+      color: #fff;
+      background: linear-gradient(120deg, #a855f7, #ec4899, #facc15, #a855f7);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 22px rgba(236, 72, 153, 0.9));
+      animation: jackpotBadgeFlow 1.6s linear infinite;
+    }
+    @keyframes jackpotOverlayPulse {
+      from { box-shadow: inset 0 0 60px rgba(168, 85, 247, 0.25); }
+      to { box-shadow: inset 0 0 130px rgba(236, 72, 153, 0.55); }
+    }
+    @keyframes jackpotBadgeFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
 
     .win-counter-box {
       margin: 12px 0 20px;
@@ -1154,6 +1237,16 @@
     .win-overlay-modal.tier-super .win-counter-num {
       color: #fef08a;
       text-shadow: 0 4px 30px rgba(251, 191, 36, 0.9);
+    }
+    .win-overlay-modal.tier-jackpot .win-counter-num {
+      font-size: clamp(44px, 11vw, 88px);
+      color: #fff;
+      text-shadow: 0 0 18px #a855f7, 0 0 44px #ec4899, 0 0 80px #facc15;
+      animation: jackpotNumPop 1.1s cubic-bezier(0.34, 1.7, 0.64, 1) infinite alternate;
+    }
+    @keyframes jackpotNumPop {
+      from { transform: scale(1); }
+      to { transform: scale(1.06); }
     }
 
     .win-collect-btn {
@@ -1445,6 +1538,7 @@
       <div class="slot-brand">
         <div class="slot-brand-title">ZKN FORTUNE 777</div>
         <span class="slot-mode-tag" id="modeTag">DEMO</span>
+        <span class="slot-jackpot-tag" id="jackpotTag" title="Jackpot surpresa de até 1000x o valor da aposta">JACKPOT 1000x</span>
       </div>
       <div class="slot-top-actions">
         <a href="login.html?back=slot-zkn-777.html" class="slot-login-link" id="guestLoginBtn" style="display:none;">ENTRAR</a>
@@ -1562,7 +1656,8 @@
       <div class="pay-grid" id="payGrid"></div>
       <p class="pay-note">
         <strong>3 WILDs = Bônus:</strong> Ao cair 3 símbolos WILD (1 em cada carretel/fileira), você ganha <strong id="payFsCount">10</strong> rodadas grátis com multiplicador de <strong id="payFsMult">4x</strong> em todos os prêmios!<br><br>
-        <strong>Tela Cheia 5x:</strong> Ao preencher todos os 9 espaços com o mesmo símbolo (contando WILD), o prêmio total da tela é multiplicado por <strong>5x</strong>!
+        <strong>Tela Cheia 5x:</strong> Ao preencher todos os 9 espaços com o mesmo símbolo (contando WILD), o prêmio total da tela é multiplicado por <strong>5x</strong>!<br><br>
+        <strong>Jackpot ZKN 1000x:</strong> Prêmio surpresa raríssimo — pode cair em qualquer giro normal, rodada grátis ou bônus comprado e paga até <strong>1000x</strong> o valor da aposta!
       </p>
     </div>
   </div>
@@ -1613,6 +1708,9 @@
       [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 4, 8], [6, 4, 2]
     ];
     const DEFAULT_BETS = [0.5, 1, 2, 5, 10, 25, 50];
+    const JACKPOT_MULT = 1000;
+    const JACKPOT_CHANCE = 0.00001;
+    const NEAR_JACKPOT_CHANCE = 0.02;
     const CELL_H = 74;
     const ICON_BASE = 'img/originals/slot777/';
     const ALL_ASSETS = [
@@ -1702,10 +1800,25 @@
       };
     }
 
+    function aplicarJackpotLocal(outcome, bet) {
+      const r = Math.random();
+      if (r < JACKPOT_CHANCE) {
+        return {
+          ...outcome,
+          jackpot: true,
+          jackpotMultiplier: JACKPOT_MULT,
+          nearJackpot: false,
+          winLines: [],
+          winAmount: Math.round(bet * JACKPOT_MULT * 100) / 100,
+        };
+      }
+      return { ...outcome, jackpot: false, nearJackpot: r < JACKPOT_CHANCE + NEAR_JACKPOT_CHANCE };
+    }
+
     function simularGiroLocal(bet, isFs, fsMult) {
       const grid = Array.from({ length: 9 }, () => localRandomSymbol(false));
       const mult = isFs ? (fsMult || freeSpinsMult) : 1;
-      const outcome = avaliarGridLocal(grid, bet, mult);
+      const outcome = aplicarJackpotLocal(avaliarGridLocal(grid, bet, mult), bet);
       return { ok: true, mode: 'demo', grid, outcome };
     }
 
@@ -1715,7 +1828,7 @@
       grid[0 + rows[0] * 3] = 'wild';
       grid[1 + rows[1] * 3] = 'wild';
       grid[2 + rows[2] * 3] = 'wild';
-      const outcome = avaliarGridLocal(grid, bet, 1);
+      const outcome = aplicarJackpotLocal(avaliarGridLocal(grid, bet, 1), bet);
       return { ok: true, mode: 'demo', grid, outcome };
     }
 
@@ -1889,6 +2002,7 @@
       if (tier === 'big') notes = [523, 659, 784, 1046, 1318];
       if (tier === 'mega') notes = [523, 659, 784, 1046, 1318, 1568];
       if (tier === 'super') notes = [392, 523, 659, 784, 1046, 1318, 1568, 2093];
+      if (tier === 'jackpot') notes = [261, 392, 523, 659, 784, 1046, 1318, 1568, 2093, 2637];
       notes.forEach((f, i) => setTimeout(() => playTone(f, 0.16, 'sine', 0.14), i * 70));
     }
 
@@ -2065,7 +2179,7 @@
     let _activeWinAmount = 0;
     let _winResolver = null;
 
-    function dispararCelebracaoWin(winAmount, betAmount, isFullBoard) {
+    function dispararCelebracaoWin(winAmount, betAmount, isFullBoard, jackpot) {
       return new Promise(resolve => {
         _winResolver = resolve;
         _activeWinAmount = winAmount;
@@ -2074,7 +2188,10 @@
         let tier = 'big';
         let badgeText = 'BIG WIN';
 
-        if (isFullBoard || mult >= 30) {
+        if (jackpot || mult >= 1000) {
+          tier = 'jackpot';
+          badgeText = 'JACKPOT ZKN 1000x!';
+        } else if (isFullBoard || mult >= 30) {
           tier = 'super';
           badgeText = isFullBoard ? 'TELA CHEIA 5X — SUPER MEGA WIN' : 'SUPER MEGA WIN';
         } else if (mult >= 15) {
@@ -2089,13 +2206,18 @@
         modal.className = 'win-overlay-modal show tier-' + tier;
         document.getElementById('winBadgeTitle').textContent = badgeText;
 
+        const shell = document.querySelector('.slot-shell');
+        if (shell) shell.classList.add(jackpot ? 'jackpot-shake' : 'win-shake');
+        const jackpotTag = document.getElementById('jackpotTag');
+        if (jackpot && jackpotTag) jackpotTag.classList.add('pulse-hit');
+
         setMascotState('win', badgeText + '!');
         playWinSound(tier);
-        startCoinsShower();
+        startCoinsShower(jackpot);
 
         // Animação rolante do contador de moedas de 0 até o valor final
         const numEl = document.getElementById('winCounterNum');
-        const duration = isTurbo ? 1200 : 2200;
+        const duration = jackpot ? (isTurbo ? 2200 : 3600) : (isTurbo ? 1200 : 2200);
         const startTime = performance.now();
 
         if (_winCounterAnim) cancelAnimationFrame(_winCounterAnim);
@@ -2114,7 +2236,7 @@
             numEl.textContent = fmtBRL(winAmount);
             _winCounterAnim = null;
             // Fecha automaticamente após celebração
-            _winAutoCloseTimer = setTimeout(coletarWinInstantaneo, isTurbo ? 1000 : 2000);
+            _winAutoCloseTimer = setTimeout(coletarWinInstantaneo, jackpot ? (isTurbo ? 2000 : 3200) : (isTurbo ? 1000 : 2000));
           }
         }
         _winCounterAnim = requestAnimationFrame(tick);
@@ -2134,6 +2256,10 @@
 
       const modal = document.getElementById('winModal');
       modal.classList.remove('show');
+      const shell = document.querySelector('.slot-shell');
+      if (shell) shell.classList.remove('jackpot-shake', 'win-shake');
+      const jackpotTag = document.getElementById('jackpotTag');
+      if (jackpotTag) jackpotTag.classList.remove('pulse-hit');
 
       if (_winResolver) {
         const r = _winResolver;
@@ -2146,23 +2272,25 @@
     let _coinsCanvasAnim = null;
     let _coins = [];
 
-    function startCoinsShower() {
+    function startCoinsShower(intenso) {
       const cvs = document.getElementById('coinsCanvas');
       cvs.width = window.innerWidth;
       cvs.height = window.innerHeight;
       const ctx = cvs.getContext('2d');
       _coins = [];
 
-      for (let i = 0; i < 45; i++) {
+      const total = intenso ? 130 : 45;
+      const cores = intenso ? ['#f4e83a', '#10b981', '#a855f7', '#ffffff', '#ff7ad9'] : ['#f4e83a', '#10b981'];
+      for (let i = 0; i < total; i++) {
         _coins.push({
           x: Math.random() * cvs.width,
           y: Math.random() * -cvs.height,
-          radius: 8 + Math.random() * 8,
-          speedY: 4 + Math.random() * 7,
+          radius: (intenso ? 10 : 8) + Math.random() * (intenso ? 12 : 8),
+          speedY: (intenso ? 7 : 4) + Math.random() * (intenso ? 11 : 7),
           speedX: -2 + Math.random() * 4,
           rot: Math.random() * Math.PI,
           rotSpeed: 0.05 + Math.random() * 0.1,
-          color: Math.random() > 0.3 ? '#f4e83a' : '#10b981'
+          color: cores[Math.floor(Math.random() * cores.length)]
         });
       }
 
@@ -2289,6 +2417,13 @@
     /* ============================================================
        PROCESSAMENTO DE RESULTADO E RODADA
        ============================================================ */
+    function piscarNearJackpot() {
+      const tag = document.getElementById('jackpotTag');
+      if (!tag) return;
+      tag.classList.add('near-flash');
+      setTimeout(() => tag.classList.remove('near-flash'), 900);
+    }
+
     async function concluirResultado(d) {
       if (d.mode === 'real' && typeof d.balance === 'number') {
         updateBalanceUI(Math.max(0, d.balance - Number(d.win || 0)));
@@ -2319,7 +2454,16 @@
       const winEl = document.getElementById('winVal');
       const betUsed = d.bet || currentBet;
 
-      if (d.bonusTriggered) {
+      if (d.jackpot) {
+        winEl.textContent = fmtBRL(winAmt);
+        msgEl.textContent = 'JACKPOT ZKN 1000x! PRÊMIO MÁXIMO!';
+        const shell = document.querySelector('.slot-shell');
+        if (shell) shell.classList.add('jackpot-flash');
+        setMascotState('win', 'JACKPOT 1000x!');
+        playTone(660, 0.35, 'sawtooth', 0.18);
+        await dispararCelebracaoWin(winAmt, betUsed, false, true);
+        if (shell) setTimeout(() => shell.classList.remove('jackpot-flash'), 600);
+      } else if (d.bonusTriggered) {
         winEl.textContent = fmtBRL(winAmt);
         msgEl.textContent = '3 WILDs Conectados! 10 Rodadas Grátis ' + freeSpinsMult + 'x!';
         await animarConexaoWilds(d.grid);
@@ -2344,12 +2488,17 @@
         }
       } else {
         setMascotState('idle');
-        msgEl.textContent = (activeBonus && activeBonus.spinsLeft > 0)
+        if (d.nearJackpot) {
+          piscarNearJackpot();
+          msgEl.textContent = 'QUASE! O jackpot 1000x passou pertinho...';
+        } else {
+          msgEl.textContent = (activeBonus && activeBonus.spinsLeft > 0)
           ? 'Modo Bônus ' + activeBonus.multiplier + 'x: ' + activeBonus.spinsLeft + ' giros restantes'
           : 'Tente novamente!';
+        }
       }
 
-      if (d.isFreeSpin && (!activeBonus || activeBonus.spinsLeft === 0)) {
+      if (!d.jackpot && d.isFreeSpin && (!activeBonus || activeBonus.spinsLeft === 0)) {
         const totalBonusWin = d.freeSpins ? Number(d.freeSpins.totalWin || 0) : winAmt;
         msgEl.textContent = 'Fim do Bônus! Total acumulado: ' + fmtBRL(totalBonusWin);
         if (totalBonusWin > 0) {
@@ -2424,6 +2573,9 @@
               win: sim.outcome.winAmount,
               winLines: sim.outcome.winLines,
               isFullBoard: sim.outcome.isFullBoard,
+              jackpot: !!sim.outcome.jackpot,
+              jackpotMultiplier: sim.outcome.jackpot ? sim.outcome.jackpotMultiplier : 0,
+              nearJackpot: !!sim.outcome.nearJackpot,
               freeSpins: { ...activeBonus }
             };
           } else {
@@ -2450,7 +2602,10 @@
               bet: currentBet,
               win: sim.outcome.winAmount,
               winLines: sim.outcome.winLines,
-              isFullBoard: sim.outcome.isFullBoard
+              isFullBoard: sim.outcome.isFullBoard,
+              jackpot: !!sim.outcome.jackpot,
+              jackpotMultiplier: sim.outcome.jackpot ? sim.outcome.jackpotMultiplier : 0,
+              nearJackpot: !!sim.outcome.nearJackpot
             };
           }
         } else {
@@ -2545,6 +2700,9 @@
             win: sim.outcome.winAmount,
             winLines: sim.outcome.winLines,
             isFullBoard: sim.outcome.isFullBoard,
+            jackpot: !!sim.outcome.jackpot,
+            jackpotMultiplier: sim.outcome.jackpot ? sim.outcome.jackpotMultiplier : 0,
+            nearJackpot: !!sim.outcome.nearJackpot,
             freeSpins: {
               spinsLeft: freeSpinsCount,
               totalSpins: freeSpinsCount,
@@ -2701,6 +2859,7 @@
         modeEl.textContent = currentMode.toUpperCase();
         modeEl.className = 'slot-mode-tag ' + currentMode;
 
+        document.getElementById('jackpotTag').textContent = 'JACKPOT ' + Number(d.jackpotMultiplier || 1000) + 'x';
         document.getElementById('rtpBadge').textContent = 'RTP ' + Number(d.targetRtp || 95).toFixed(1).replace('.0', '') + '%';
         document.getElementById('payFsCount').textContent = freeSpinsCount;
         document.getElementById('payFsMult').textContent = freeSpinsMult + 'x';
