@@ -1324,6 +1324,40 @@
     }
     .card-cine-card img { width: 66px; height: 66px; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.4)); }
     .card-cine.run .card-cine-card { animation: cardFlight 1.25s cubic-bezier(0.22,0.9,0.25,1) forwards; }
+
+    /* Ameaça: gesto curto, carta fica na mão e NUNCA chega ao centro */
+    .card-cine.threat .card-cine-rabbit { animation: cardRabbitTease 0.64s ease-in-out forwards !important; }
+    .card-cine.threat .card-cine-card { animation: cardTease 0.64s ease-in-out forwards !important; }
+    .card-cine.threat .card-cine-glow { animation-duration: 0.64s !important; opacity: 0.3; }
+    /* Soltura: voo curto e leve até o centro */
+    .card-cine.drop .card-cine-rabbit { animation: cardRabbitDrop 0.86s ease-in-out forwards !important; }
+    .card-cine.drop .card-cine-card { animation: cardFlightLight 0.86s cubic-bezier(0.22,0.9,0.25,1) forwards !important; }
+    .card-cine.drop.full .card-cine-card { filter: brightness(1.3) drop-shadow(0 0 12px #f5c542); }
+    @keyframes cardRabbitTease {
+      0% { opacity: 0; transform: translate(-30%, 14%) scale(0.86); }
+      25% { opacity: 1; transform: translate(-30%, 0%) scale(1.02) rotate(3deg); }
+      58% { transform: translate(-30%, -10%) scale(1.06) rotate(-3deg); }
+      100% { opacity: 1; transform: translate(-30%, 0%) scale(1) rotate(0); }
+    }
+    @keyframes cardTease {
+      0% { opacity: 0; left: 18%; bottom: 18%; transform: rotate(-14deg) scale(0.75); }
+      35% { opacity: 1; left: 21%; bottom: 24%; transform: rotate(-6deg) scale(0.9); }
+      62% { opacity: 1; left: 23%; bottom: 26%; transform: rotate(-10deg) scale(0.92); }
+      100% { opacity: 0; left: 18%; bottom: 18%; transform: rotate(-14deg) scale(0.78); }
+    }
+    @keyframes cardRabbitDrop {
+      0% { opacity: 0; transform: translate(-30%, 12%) scale(0.85); }
+      26% { opacity: 1; transform: translate(-30%, 0%) scale(1.05) rotate(3deg); }
+      55% { transform: translate(-30%, -8%) scale(1.1) rotate(-4deg); }
+      100% { opacity: 1; transform: translate(-30%, 0%) scale(1) rotate(0); }
+    }
+    @keyframes cardFlightLight {
+      0% { opacity: 0; left: 18%; bottom: 18%; transform: rotate(-14deg) scale(0.78); }
+      22% { opacity: 1; left: 28%; bottom: 30%; transform: rotate(-4deg) scale(0.92); }
+      58% { opacity: 1; left: 46%; bottom: 54%; transform: rotate(160deg) scale(1.06); }
+      86% { opacity: 1; left: 52%; bottom: 52%; transform: rotate(330deg) scale(1.12); }
+      100% { opacity: 0; left: 50%; bottom: 50%; transform: translate(50%, 50%) rotate(360deg) scale(1.25); }
+    }
     .card-cine-impact {
       position: absolute;
       left: 50%; top: 50%;
@@ -1482,10 +1516,15 @@
       animation: zoomInBounce 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .win-tier-badge {
-      font-family: 'Sora', sans-serif;
+      font-family: 'Cinzel', serif;
       font-size: 26px;
-      font-weight: 900;
-      letter-spacing: 1.5px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      padding: 6px 18px;
+      border-radius: 4px;
+      border: 1px solid rgba(245, 197, 66, 0.35);
+      background: linear-gradient(180deg, rgba(30,22,10,0.85), rgba(12,9,5,0.9));
+      box-shadow: inset 0 1px 0 rgba(255,225,150,0.2), 0 6px 18px rgba(0,0,0,0.55);
       text-transform: uppercase;
       margin-bottom: 8px;
       text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
@@ -1528,6 +1567,18 @@
       0% { background-position: 0% 50%; }
       100% { background-position: 300% 50%; }
     }
+
+    .win-overlay-modal.tier-mega .win-sunburst {
+      background: radial-gradient(circle, rgba(16,185,129,0.34) 0%, transparent 68%);
+    }
+    .win-overlay-modal.tier-super .win-sunburst {
+      background: radial-gradient(circle, rgba(244,63,94,0.36) 0%, transparent 68%);
+    }
+    .win-overlay-modal.tier-jackpot .win-sunburst {
+      background: radial-gradient(circle, rgba(168,85,247,0.42) 0%, transparent 70%);
+    }
+    .win-overlay-modal.tier-super .win-tier-badge { border-color: rgba(244,63,94,0.5); }
+    .win-overlay-modal.tier-mega .win-tier-badge { border-color: rgba(16,185,129,0.5); }
 
     .win-counter-box {
       margin: 12px 0 20px;
@@ -2623,7 +2674,8 @@
 
         setMascotState('win', badgeText + '!');
         playWinSound(tier);
-        startCoinsShower(jackpot);
+        const simbolosPremio = (Array.isArray(currentGrid) ? currentGrid.filter(s => s && s !== 'wild') : []);
+        startCoinsShower(jackpot, simbolosPremio);
 
         // Animação rolante do contador de moedas de 0 até o valor final
         const numEl = document.getElementById('winCounterNum');
@@ -2705,25 +2757,43 @@
     let _coinsCanvasAnim = null;
     let _coins = [];
 
-    function startCoinsShower(intenso) {
+    const _symbolImgCache = {};
+    function simObj(id) {
+      if (!_symbolImgCache[id]) {
+        const im = new Image();
+        im.src = ICON_BASE + id + '.webp';
+        _symbolImgCache[id] = im;
+      }
+      return _symbolImgCache[id];
+    }
+
+    // Em vez de confetes: os próprios símbolos do jogo caem na tela de vitória.
+    function startCoinsShower(intenso, simbolos) {
       const cvs = document.getElementById('coinsCanvas');
       cvs.width = window.innerWidth;
       cvs.height = window.innerHeight;
       const ctx = cvs.getContext('2d');
       _coins = [];
 
-      const total = intenso ? 130 : 45;
-      const cores = intenso ? ['#f4e83a', '#10b981', '#a855f7', '#ffffff', '#ff7ad9'] : ['#f4e83a', '#10b981'];
+      let pool = Array.isArray(simbolos) && simbolos.length ? simbolos.slice() : [];
+      if (!pool.length && Array.isArray(currentGrid)) {
+        pool = currentGrid.filter(s => s && pool.indexOf(s) === -1);
+      }
+      if (!pool.length) pool = SYM_ORDER.slice();
+
+      const total = intenso ? 90 : 38;
       for (let i = 0; i < total; i++) {
+        const id = pool[Math.floor(Math.random() * pool.length)];
+        simObj(id); // pré-carrega
         _coins.push({
           x: Math.random() * cvs.width,
           y: Math.random() * -cvs.height,
-          radius: (intenso ? 10 : 8) + Math.random() * (intenso ? 12 : 8),
-          speedY: (intenso ? 7 : 4) + Math.random() * (intenso ? 11 : 7),
-          speedX: -2 + Math.random() * 4,
+          size: (intenso ? 34 : 26) + Math.random() * (intenso ? 26 : 18),
+          speedY: (intenso ? 5 : 3.5) + Math.random() * (intenso ? 8 : 5),
+          speedX: -1.5 + Math.random() * 3,
           rot: Math.random() * Math.PI,
-          rotSpeed: 0.05 + Math.random() * 0.1,
-          color: cores[Math.floor(Math.random() * cores.length)]
+          rotSpeed: -0.04 + Math.random() * 0.08,
+          id
         });
       }
 
@@ -2733,21 +2803,24 @@
           c.y += c.speedY;
           c.x += c.speedX;
           c.rot += c.rotSpeed;
-          if (c.y > cvs.height + 20) {
-            c.y = -20;
+          if (c.y > cvs.height + 40) {
+            c.y = -40;
             c.x = Math.random() * cvs.width;
           }
 
+          const img = simObj(c.id);
           ctx.save();
           ctx.translate(c.x, c.y);
           ctx.rotate(c.rot);
-          ctx.fillStyle = c.color;
-          ctx.beginPath();
-          ctx.ellipse(0, 0, c.radius, c.radius * 0.45, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 1;
-          ctx.stroke();
+          if (img.complete && img.naturalWidth > 0) {
+            ctx.globalAlpha = 0.92;
+            ctx.drawImage(img, -c.size / 2, -c.size / 2, c.size, c.size);
+          } else {
+            ctx.fillStyle = '#f4e83a';
+            ctx.beginPath();
+            ctx.arc(0, 0, c.size / 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
           ctx.restore();
         });
         _coinsCanvasAnim = requestAnimationFrame(renderCoins);
@@ -2904,21 +2977,36 @@
        ============================================================ */
     async function animarCarta(d) {
       const cine = document.getElementById('cardCine');
-      if (!cine || REDUCE_MOTION) return;
+      const tipo = d && d.cardEvent;
+      if (!cine || REDUCE_MOTION || (tipo !== 'threat' && tipo !== 'drop')) return;
+
       const grid = Array.isArray(d.grid) ? d.grid : [];
-      const simbolo = grid.find(s => s && s !== 'wild') || grid[4] || 'seven';
+      const simbolo = d.cardSymbol || grid.find(s => s && s !== 'wild') || grid[4] || 'seven';
       const img = document.getElementById('cardCineImg');
       if (img) img.src = ICON_BASE + simbolo + '.webp';
-      cine.classList.remove('run');
+      const impacto = document.getElementById('cardImpact');
+      if (impacto) impacto.style.display = tipo === 'drop' ? '' : 'none';
+
+      cine.classList.remove('run', 'threat', 'drop', 'full');
       void cine.offsetWidth;
-      cine.classList.add('run');
+      cine.classList.add('run', tipo);
+      if (d.cardFullBoard) cine.classList.add('full');
+
       unlockAudio();
-      playTone(300, 0.09, 'triangle', 0.08);
-      setTimeout(() => playTone(520, 0.08, 'triangle', 0.08), 240);
-      setTimeout(() => playTone(880, 0.16, 'sine', 0.12), 640);
-      if (navigator.vibrate) navigator.vibrate(isTurbo ? 12 : 24);
-      await new Promise(r => setTimeout(r, isTurbo ? 620 : 1220));
-      cine.classList.remove('run');
+      if (tipo === 'threat') {
+        // Ameaça: gesto curto e contido, a carta NÃO vai ao centro.
+        playTone(240, 0.08, 'triangle', 0.07);
+        setTimeout(() => playTone(180, 0.1, 'sine', 0.06), 150);
+        if (navigator.vibrate) navigator.vibrate(10);
+        await new Promise(r => setTimeout(r, isTurbo ? 360 : 640));
+      } else {
+        // Soltura: voo curto até o centro (mais leve) + impacto se fechou o 3x3.
+        playTone(320, 0.08, 'triangle', 0.08);
+        setTimeout(() => playTone(660, 0.1, 'sine', 0.1), 180);
+        if (navigator.vibrate) navigator.vibrate(d.cardFullBoard ? 30 : 14);
+        await new Promise(r => setTimeout(r, isTurbo ? 480 : 860));
+      }
+      cine.classList.remove('run', 'threat', 'drop', 'full');
     }
 
     function piscarNearJackpot() {
@@ -2936,8 +3024,8 @@
       const winCellSet = new Set();
       (d.winLines || []).forEach(wl => wl.cells.forEach(c => winCellSet.add(c)));
 
-      // O coelho lança a carta: antecipação → voo com giro → impacto → revelação
-      await animarCarta(d);
+      // O coelho só aparece quando ameaça ou solta a carta (decisão do servidor).
+      if (d.cardEvent) await animarCarta(d);
 
       // Para os carretéis em cascata suave
       await stopReelsCascade(d.grid, winCellSet);
@@ -2987,7 +3075,9 @@
         playTone(980, 0.2, 'sine', 0.2);
       } else if (winAmt > 0) {
         winEl.textContent = fmtBRL(winAmt);
-        msgEl.textContent = d.isFullBoard ? 'TELA CHEIA 5x! Ganho: ' + fmtBRL(winAmt) : 'Você ganhou ' + fmtBRL(winAmt) + '!';
+        msgEl.textContent = d.cardFullBoard
+          ? '3x3 PERFEITO DO MESMO SÍMBOLO — 10x! Ganho: ' + fmtBRL(winAmt)
+          : d.isFullBoard ? 'TELA CHEIA 5x! Ganho: ' + fmtBRL(winAmt) : 'Você ganhou ' + fmtBRL(winAmt) + '!';
 
         // Verifica se qualifica para Big Win / Mega Win / Super Mega Win
         if (d.isFullBoard || winAmt >= betUsed * 5) {
@@ -3001,6 +3091,8 @@
         if (d.nearJackpot) {
           piscarNearJackpot();
           msgEl.textContent = 'QUASE! O jackpot 1000x passou pertinho...';
+        } else if (d.cardEvent === 'threat') {
+          msgEl.textContent = 'O coelho quase soltou a carta...';
         } else {
           msgEl.textContent = (activeBonus && activeBonus.spinsLeft > 0)
           ? 'Modo Bônus ' + activeBonus.multiplier + 'x: ' + activeBonus.spinsLeft + ' giros restantes'
