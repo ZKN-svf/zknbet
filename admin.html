@@ -853,17 +853,37 @@
             <h3 style="font-family:var(--font-display); font-size:18px;">Gateway de Pagamento</h3>
             <span id="gatewayBadge" class="badge">Carregando...</span>
           </div>
-          <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Escolha qual adquirente processa depósitos e saques PIX. A troca é imediata para novas transações.</p>
+          <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Depósitos e saques podem usar adquirentes diferentes. A troca é imediata para novas transações.</p>
 
-          <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
-            <label style="flex:1;min-width:220px;display:flex;gap:10px;align-items:center;padding:12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;">
-              <input type="radio" name="gatewayOption" value="sigilo" checked>
-              <span><strong>SigiloPay</strong><br><small style="color:var(--text-muted);" id="gatewaySigiloStatus">—</small></span>
-            </label>
-            <label style="flex:1;min-width:220px;display:flex;gap:10px;align-items:center;padding:12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;">
-              <input type="radio" name="gatewayOption" value="nexas">
-              <span><strong>NexasPay</strong><br><small style="color:var(--text-muted);" id="gatewayNexasStatus">—</small></span>
-            </label>
+          <div style="margin-bottom:16px;">
+            <div style="font-size:12px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Depósitos (cash-in)</div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+              <label style="flex:1;min-width:200px;display:flex;gap:10px;align-items:center;padding:12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;">
+                <input type="radio" name="depositGateway" value="sigilo" checked>
+                <span><strong>SigiloPay</strong></span>
+              </label>
+              <label style="flex:1;min-width:200px;display:flex;gap:10px;align-items:center;padding:12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;">
+                <input type="radio" name="depositGateway" value="nexas">
+                <span><strong>NexasPay</strong></span>
+              </label>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="font-size:12px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Saques (cash-out)</div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+              <label style="flex:1;min-width:200px;display:flex;gap:10px;align-items:center;padding:12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;">
+                <input type="radio" name="withdrawGateway" value="sigilo" checked>
+                <span><strong>SigiloPay</strong><br><small style="color:var(--text-muted);">IP já autorizado</small></span>
+              </label>
+              <label style="flex:1;min-width:200px;display:flex;gap:10px;align-items:center;padding:12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;">
+                <input type="radio" name="withdrawGateway" value="nexas">
+                <span><strong>NexasPay</strong><br><small style="color:var(--text-muted);">exige IP fixo</small></span>
+              </label>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">
+            <span id="gatewaySigiloStatus">—</span> · <span id="gatewayNexasStatus">—</span>
           </div>
 
           <div style="margin-bottom:14px;">
@@ -1498,18 +1518,22 @@
       const badge = document.getElementById('gatewayBadge');
       try {
         const d = await api('/admin/settings/gateway');
-        const radio = document.querySelector('input[name="gatewayOption"][value="' + d.gateway + '"]');
-        if (radio) radio.checked = true;
+        const dep = d.deposit || d.gateway || 'sigilo';
+        const wd = d.withdraw || d.gateway || 'sigilo';
+        const rDep = document.querySelector('input[name="depositGateway"][value="' + dep + '"]');
+        const rWd = document.querySelector('input[name="withdrawGateway"][value="' + wd + '"]');
+        if (rDep) rDep.checked = true;
+        if (rWd) rWd.checked = true;
         if (badge) {
-          badge.className = 'badge ' + (d.gateway === 'nexas' ? 'completed' : 'deposit');
-          badge.textContent = d.gateway === 'nexas' ? 'NexasPay ativo' : 'SigiloPay ativo';
+          badge.className = 'badge deposit';
+          badge.textContent = 'Dep: ' + (dep === 'nexas' ? 'Nexas' : 'Sigilo') + ' · Saque: ' + (wd === 'nexas' ? 'Nexas' : 'Sigilo');
         }
         const sig = (d.options || []).find(o => o.id === 'sigilo') || {};
         const nx = (d.options || []).find(o => o.id === 'nexas') || {};
         const sigEl = document.getElementById('gatewaySigiloStatus');
         const nxEl = document.getElementById('gatewayNexasStatus');
-        if (sigEl) sigEl.textContent = sig.configured ? 'Credenciais OK' : 'Sem credenciais';
-        if (nxEl) nxEl.textContent = nx.configured ? 'Credenciais OK' : 'Sem credenciais (secrets do Worker)';
+        if (sigEl) sigEl.textContent = 'SigiloPay: ' + (sig.configured ? 'credenciais OK' : 'sem credenciais');
+        if (nxEl) nxEl.textContent = 'NexasPay: ' + (nx.configured ? 'credenciais OK' : 'sem credenciais');
         const wh = document.getElementById('gatewayNexasWebhook');
         if (wh) wh.value = nx.webhook_url || (API + '/webhook/nexaspay');
       } catch (e) {
@@ -1518,15 +1542,17 @@
     }
 
     document.getElementById('btnSalvarGateway').onclick = async function() {
-      const selecionado = document.querySelector('input[name="gatewayOption"]:checked');
-      if (!selecionado) return toast('Erro', 'Selecione um gateway.', 'error');
-      const gateway = selecionado.value;
-      if (!confirm('Alternar o gateway de pagamento para ' + (gateway === 'nexas' ? 'NexasPay' : 'SigiloPay') + '?')) return;
+      const dep = document.querySelector('input[name="depositGateway"]:checked');
+      const wd = document.querySelector('input[name="withdrawGateway"]:checked');
+      if (!dep || !wd) return toast('Erro', 'Selecione os gateways.', 'error');
+      if (!confirm('Salvar gateways? Depósitos: ' + dep.value + ' · Saques: ' + wd.value)) return;
       const btn = this; const original = btn.textContent;
       btn.disabled = true; btn.textContent = 'Salvando...';
       try {
-        await api('/admin/settings/gateway', { method: 'PUT', body: JSON.stringify({ gateway }) });
-        toast('Sucesso', 'Gateway alterado!', 'success');
+        await api('/admin/settings/gateway', {
+          method: 'PUT', body: JSON.stringify({ deposit: dep.value, withdraw: wd.value }),
+        });
+        toast('Sucesso', 'Gateways salvos!', 'success');
         await carregarGateway();
       } catch (e) { toast('Erro', e.message, 'error'); }
       btn.disabled = false; btn.textContent = original;
