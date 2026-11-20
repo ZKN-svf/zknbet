@@ -1872,7 +1872,7 @@
               <img src="img/originals/slot777/wild.webp" alt="Wild" class="slide-mini-wild">
             </div>
             <div class="slide-feature-title">SORTE DO SÍMBOLO DO BÔNUS</div>
-            <div class="slide-feature-highlight">10 RODADAS GRÁTIS COM 4X MULTIPLICADOR</div>
+            <div class="slide-feature-highlight">CARTA DA SORTE · 10x NA GRADE COMPLETA</div>
           </div>
           <div class="slide-desc">Ative naturalmente nos giros ou compre a funcionalidade</div>
         </div>
@@ -3565,8 +3565,6 @@
 
         document.getElementById('jackpotTag').textContent = 'JACKPOT ' + Number(d.jackpotMultiplier || 1000) + 'x';
         document.getElementById('rtpBadge').textContent = 'RTP ' + Number(d.targetRtp || 95).toFixed(1).replace('.0', '') + '%';
-        document.getElementById('payFsCount').textContent = freeSpinsCount;
-        document.getElementById('payFsMult').textContent = freeSpinsMult + 'x';
         document.getElementById('buyBonusBtn').querySelector('span').textContent = 'COMPRAR CARTA';
 
         updateBalanceUI(currentMode === 'real' ? d.balance : 1000);
