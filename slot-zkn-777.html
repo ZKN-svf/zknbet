@@ -1326,8 +1326,15 @@
     .card-cine.run .card-cine-card { animation: cardFlight 1.25s cubic-bezier(0.22,0.9,0.25,1) forwards; }
 
     /* Ameaça: gesto curto, carta fica na mão e NUNCA chega ao centro */
-    .card-cine.threat .card-cine-rabbit { animation: cardRabbitTease 0.64s ease-in-out forwards !important; }
-    .card-cine.threat .card-cine-card { animation: cardTease 0.64s ease-in-out forwards !important; }
+    .card-cine.threat .card-cine-rabbit { animation: cardRabbitTease 0.95s ease-in-out forwards !important; }
+    .card-cine.threat .card-cine-card { animation: cardTeaseHope 0.95s cubic-bezier(0.3,0.9,0.3,1) forwards !important; }
+    @keyframes cardTeaseHope {
+      0% { opacity: 0; left: 18%; bottom: 18%; transform: rotate(-14deg) scale(0.75); filter: brightness(1); }
+      28% { opacity: 1; left: 23%; bottom: 27%; transform: rotate(-7deg) scale(0.95); filter: brightness(1.1); }
+      48% { opacity: 1; left: 26%; bottom: 30%; transform: rotate(-3deg) scale(1.0); filter: brightness(1.35) drop-shadow(0 0 12px rgba(245,197,66,0.9)); }
+      68% { opacity: 1; left: 26%; bottom: 30%; transform: rotate(-3deg) scale(1.02); filter: brightness(1.4) drop-shadow(0 0 16px rgba(245,197,66,1)); }
+      100% { opacity: 0; left: 18%; bottom: 18%; transform: rotate(-14deg) scale(0.78); filter: brightness(1); }
+    }
     .card-cine.threat .card-cine-glow { animation-duration: 0.64s !important; opacity: 0.3; }
     /* Soltura: voo curto e leve até o centro */
     .card-cine.drop .card-cine-rabbit { animation: cardRabbitDrop 0.86s ease-in-out forwards !important; }
@@ -1368,6 +1375,25 @@
       box-shadow: 0 0 40px 18px rgba(245,197,66,0.9);
     }
     .card-cine.run .card-cine-impact { animation: cardImpact 0.5s ease-out 1.05s forwards; }
+    .card-quase {
+      position: absolute;
+      left: 24%; bottom: 38%;
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #fff2c4;
+      text-shadow: 0 0 14px rgba(245,197,66,0.95), 0 3px 10px rgba(0,0,0,0.8);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .card-cine.threat .card-quase { animation: quaseText 0.95s ease-out forwards; }
+    @keyframes quaseText {
+      0% { opacity: 0; transform: scale(0.6) translateY(8px); }
+      45% { opacity: 1; transform: scale(1.12) translateY(-6px); }
+      75% { opacity: 1; transform: scale(1) translateY(-10px); }
+      100% { opacity: 0; transform: scale(1) translateY(-18px); }
+    }
     @keyframes cardGlowIn {
       0% { opacity: 0; transform: translate(-50%,-50%) scale(0.3); }
       60% { opacity: 0.7; transform: translate(-50%,-50%) scale(1); }
@@ -1837,7 +1863,7 @@
               <img src="img/originals/slot777/wild.webp" alt="Wild" class="slide-mini-wild">
               <img src="img/originals/slot777/wild.webp" alt="Wild" class="slide-mini-wild">
             </div>
-            <div class="slide-feature-title">3 WILDS (1 EM CADA FILEIRA)</div>
+            <div class="slide-feature-title">SORTE DO SÍMBOLO DO BÔNUS</div>
             <div class="slide-feature-highlight">10 RODADAS GRÁTIS COM 4X MULTIPLICADOR</div>
           </div>
           <div class="slide-desc">Ative naturalmente nos giros ou compre a funcionalidade</div>
@@ -1959,7 +1985,7 @@
     <!-- CABINET / CARRETÉIS -->
     <section class="slot-cabinet">
       <div class="slot-info-strip">
-        <span>3 Wilds = 10 Giros</span>
+        <span>Bônus na compra</span>
         <span id="rtpBadge">RTP 95%</span>
         <span>Tela Cheia 5x</span>
       </div>
@@ -1972,7 +1998,7 @@
         </div>
         <svg class="win-lines-svg" id="winLinesSvg" viewBox="0 0 300 222" preserveAspectRatio="none"></svg>
         <div class="wild-connect-banner" id="wildConnectBanner">
-          <span>3 WILDS CONECTADOS!</span>
+          <span>SÓ O SÍMBOLO DO BÔNUS</span>
         </div>
       </div>
 
@@ -2031,7 +2057,7 @@
         </div>
       </div>
 
-      <div class="slot-msg" id="slotMsg">3 WILDs (1 em cada carretel) ativam 10 rodadas grátis!</div>
+      <div class="slot-msg" id="slotMsg">O bônus é comprado — torça para o coelho soltar a carta do seu símbolo!</div>
     </section>
   </main>
 
@@ -2041,6 +2067,7 @@
     <img class="card-cine-rabbit" src="img/originals/slot777/mascot.webp" alt="">
     <div class="card-cine-card" id="cardCineCard"><img id="cardCineImg" src="img/originals/slot777/seven.webp" alt=""></div>
     <div class="card-cine-impact" id="cardImpact"></div>
+    <div class="card-quase" id="cardQuase">QUASE!</div>
   </div>
 
   <!-- CINEMÁTICA DE BÔNUS -->
@@ -2078,8 +2105,9 @@
       </div>
       <div class="pay-grid" id="payGrid"></div>
       <p class="pay-note">
-        <strong>3 WILDs = Bônus:</strong> Ao cair 3 símbolos WILD (1 em cada carretel/fileira), você ganha <strong id="payFsCount">10</strong> rodadas grátis com multiplicador de <strong id="payFsMult">4x</strong> em todos os prêmios!<br><br>
-        <strong>Tela Cheia 5x:</strong> Ao preencher todos os 9 espaços com o mesmo símbolo (contando WILD), o prêmio total da tela é multiplicado por <strong>5x</strong>!<br><br>
+        <strong>Bônus comprado:</strong> <strong id="payFsCount">10</strong> rodadas grátis com multiplicador de <strong id="payFsMult">3x</strong>. No início, a sorte define um símbolo — ele fica fixo durante todo o bônus e é o único que pode fechar a grade!<br><br>
+        <strong>Carta do coelho:</strong> ele só ameaça às vezes. Quando solta, se a carta completar os 9 espaços com o símbolo do bônus, você ganha <strong>10x</strong> o que conectou. Se não completar, ganha só o que conectou.<br><br>
+        <strong>Tela Cheia 5x:</strong> Fora do bônus, preencher os 9 espaços com o mesmo símbolo multiplica o prêmio por <strong>5x</strong>!<br><br>
         <strong>Jackpot ZKN 1000x:</strong> Prêmio surpresa raríssimo — pode cair em qualquer giro normal, rodada grátis ou bônus comprado e paga até <strong>1000x</strong> o valor da aposta!
       </p>
     </div>
@@ -2853,7 +2881,10 @@
       if (activeBonus && activeBonus.spinsLeft > 0) {
         hud.classList.add('show');
         document.getElementById('bonusMultPill').textContent = activeBonus.multiplier + 'x';
-        document.getElementById('bonusSpinsLeft').textContent = activeBonus.spinsLeft + (activeBonus.spinsLeft === 1 ? ' rodada grátis' : ' rodadas grátis');
+        const nomeSimbolo = activeBonus.symbol && SYM_MAP[activeBonus.symbol] ? SYM_MAP[activeBonus.symbol].name : '';
+        document.getElementById('bonusSpinsLeft').textContent =
+          activeBonus.spinsLeft + (activeBonus.spinsLeft === 1 ? ' rodada grátis' : ' rodadas grátis') +
+          (nomeSimbolo ? ' · ' + nomeSimbolo : '');
         document.getElementById('bonusTotalWin').textContent = fmtBRL(activeBonus.totalWin || 0);
         buyBtn.disabled = true;
         spinBtn.textContent = 'GRÁTIS (' + activeBonus.spinsLeft + ')';
@@ -2998,7 +3029,7 @@
         playTone(240, 0.08, 'triangle', 0.07);
         setTimeout(() => playTone(180, 0.1, 'sine', 0.06), 150);
         if (navigator.vibrate) navigator.vibrate(10);
-        await new Promise(r => setTimeout(r, isTurbo ? 360 : 640));
+        await new Promise(r => setTimeout(r, isTurbo ? 520 : 950));
       } else {
         // Soltura: voo curto até o centro (mais leve) + impacto se fechou o 3x3.
         playTone(320, 0.08, 'triangle', 0.08);
@@ -3062,8 +3093,10 @@
         await dispararCelebracaoWin(winAmt, betUsed, false, true);
         if (shell) setTimeout(() => shell.classList.remove('jackpot-flash'), 600);
       } else if (d.bonusTriggered) {
+        const simboloBônus = d.freeSpins && d.freeSpins.symbol && SYM_MAP[d.freeSpins.symbol]
+          ? SYM_MAP[d.freeSpins.symbol].name : 'surpresa';
         winEl.textContent = fmtBRL(winAmt);
-        msgEl.textContent = '3 WILDs Conectados! 10 Rodadas Grátis ' + freeSpinsMult + 'x!';
+        msgEl.textContent = 'Bônus ativado! Símbolo: ' + simboloBônus + ' · 10 giros ' + freeSpinsMult + 'x!';
         await animarConexaoWilds(d.grid);
         setMascotState('win', 'BÔNUS 10 GIROS!');
         await dispararCelebracaoWin(winAmt > 0 ? winAmt : betUsed * freeSpinsMult, betUsed, false);
