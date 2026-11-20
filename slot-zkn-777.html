@@ -2635,9 +2635,17 @@
         function tick(now) {
           const elapsed = now - startTime;
           const progress = Math.min(1, elapsed / duration);
-          // easeOutCubic: sobe rápido e desacelera no final, como um contador comercial.
-          const eased = 1 - Math.pow(1 - progress, 3);
-          const currentVal = winAmount * eased;
+          const multFinal = winAmount / (betAmount || 0.5);
+          const aposta = betAmount || 0.5;
+          // Contagem por etapas: BIG (até 15x) → MEGA (até 30x) → SUPER (valor final).
+          // Cada categoria ganha tempo próprio na tela; a classificação vem do valor real.
+          const m15 = Math.min(15, multFinal);
+          const m30 = Math.min(30, multFinal);
+          let multAtual;
+          if (progress < 0.30) multAtual = (progress / 0.30) * m15;
+          else if (progress < 0.60) multAtual = m15 + ((progress - 0.30) / 0.30) * (m30 - m15);
+          else multAtual = m30 + ((progress - 0.60) / 0.40) * (multFinal - m30);
+          const currentVal = Math.min(winAmount, multAtual * aposta);
           numEl.textContent = fmtBRL(currentVal);
 
           if (!jackpot) {
