@@ -35,9 +35,8 @@
       background-color: #060a0e;
       background-image: linear-gradient(180deg, rgba(4, 8, 12, 0.45) 0%, rgba(4, 8, 12, 0.85) 100%), url('img/originals/slot777/bg.webp');
       background-size: cover;
-      background-position: center;
+      background-position: center top;
       background-repeat: no-repeat;
-      background-attachment: fixed;
       color: var(--text);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow-x: hidden;
@@ -68,9 +67,8 @@
       position: absolute;
       inset: 0;
       background:
-        url('img/originals/slot777/bg.webp') center/cover no-repeat;
-      filter: blur(8px) brightness(0.4);
-      transform: scale(1.05);
+        radial-gradient(circle at 50% 30%, rgba(244, 232, 58, 0.12), transparent 46%),
+        linear-gradient(180deg, #0a1117 0%, #060b10 72%);
       z-index: -2;
     }
     .loader-screen::after {
@@ -92,6 +90,7 @@
       visibility: hidden;
       pointer-events: none;
     }
+    .loader-screen.done * { animation-play-state: paused !important; }
 
     .loader-header {
       display: flex;
@@ -515,9 +514,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      background: rgba(10, 16, 22, 0.92);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(10, 16, 22, 0.97);
       border: 1.5px solid rgba(244, 232, 58, 0.28);
       border-radius: 14px;
       padding: 7px 12px;
@@ -667,8 +664,7 @@
       position: absolute;
       top: 2px;
       right: 14px;
-      background: rgba(10, 16, 24, 0.94);
-      backdrop-filter: blur(4px);
+      background: rgba(10, 16, 24, 0.97);
       border: 1.5px solid var(--gold);
       color: #fff;
       font-size: 11px;
@@ -687,56 +683,13 @@
       transform: translate3d(0, 0, 0);
     }
 
-    /* BONUS HUD (RODADAS GRÁTIS) */
-    .bonus-hud {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      background: linear-gradient(90deg, rgba(153, 27, 27, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%);
-      border: 1.5px solid #f5c518;
-      border-radius: 12px;
-      padding: 7px 14px;
-      box-shadow: 0 4px 18px rgba(220, 38, 38, 0.45);
-      position: relative;
-      z-index: 6;
-      animation: pulseAura 1.8s ease-in-out infinite;
-    }
-    .bonus-hud.show { display: flex; }
-    .bonus-hud-left { display: flex; align-items: center; gap: 8px; }
-    .bonus-hud-pill {
-      background: var(--gold);
-      color: #090f1f;
-      font-family: 'Sora', sans-serif;
-      font-size: 12px;
-      font-weight: 900;
-      padding: 3px 8px;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-    .bonus-hud-spins {
-      font-size: 12.5px;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: 0.2px;
-    }
-    .bonus-hud-win {
-      font-family: 'Sora', sans-serif;
-      font-size: 14.5px;
-      font-weight: 900;
-      color: var(--gold);
-      font-variant-numeric: tabular-nums;
-    }
-
     /* ============================================================
        CABINET & CARRETÉIS (REELS ENGINE ULTRA-OTIMIZADO)
        ============================================================ */
     .slot-cabinet {
       position: relative;
       z-index: 4;
-      background: rgba(11, 17, 24, 0.94);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(11, 17, 24, 0.97);
       border: 2px solid #d49b12;
       border-radius: 18px;
       padding: 12px 8px 8px;
@@ -903,68 +856,24 @@
     @keyframes winLineDraw { to { stroke-dashoffset: 0; } }
     @keyframes winLinePulse { from { stroke-width: 3.2; opacity: 0.85; } to { stroke-width: 4.4; opacity: 1; } }
 
-    /* ANIMAÇÃO DE CONEXÃO DOS WILDS */
-    .reel-cell.wild-connect {
-      background: radial-gradient(circle, rgba(244, 232, 58, 0.55) 0%, rgba(16, 185, 129, 0.22) 65%, transparent 80%) !important;
-      box-shadow: inset 0 0 16px rgba(244, 232, 58, 0.85), 0 0 22px rgba(244, 232, 58, 0.75) !important;
-      border-radius: 8px;
-      z-index: 5;
+    /* BÔNUS DA CARTA: casas vazias e conexões */
+    .reel-cell.card-empty {
+      background: rgba(255, 255, 255, 0.015);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.045);
     }
-    .reel-cell.wild-connect img {
-      animation: wildConnectPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite alternate !important;
-      filter: drop-shadow(0 0 16px rgba(244, 232, 58, 1)) drop-shadow(0 0 26px rgba(16, 185, 129, 0.8)) !important;
+    .reel-cell.card-empty img {
+      opacity: 0;
+      visibility: hidden;
     }
-    @keyframes wildConnectPop {
-      0% { transform: scale(1.1) rotate(-4deg); }
-      100% { transform: scale(1.3) rotate(4deg); }
+    .reel-cell.card-landed {
+      background: radial-gradient(circle, rgba(244, 232, 58, 0.16) 0%, transparent 72%);
     }
-
-    .wild-laser-path {
-      fill: none;
-      stroke: #fff3a1;
-      stroke-width: 5.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      filter: drop-shadow(0 0 8px #f4e83a) drop-shadow(0 0 18px #10b981);
-      stroke-dasharray: 10 5;
-      animation: laserFlow 0.3s linear infinite;
+    .reel-cell.card-line {
+      background: radial-gradient(circle, rgba(244, 232, 58, 0.4) 0%, rgba(16, 185, 129, 0.12) 62%, transparent 82%);
+      box-shadow: inset 0 0 18px rgba(244, 232, 58, 0.8), 0 0 20px rgba(244, 232, 58, 0.4);
     }
-    @keyframes laserFlow {
-      from { stroke-dashoffset: 30; }
-      to { stroke-dashoffset: 0; }
-    }
-
-    .wild-connect-banner {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.6);
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(6, 78, 59, 0.95) 50%, rgba(244, 232, 58, 0.95) 100%);
-      border: 2px solid #fff5c0;
-      color: #fff;
-      font-family: 'Sora', sans-serif;
-      font-size: 13.5px;
-      font-weight: 900;
-      letter-spacing: 0.8px;
-      padding: 8px 20px;
-      border-radius: 999px;
-      box-shadow: 0 0 25px rgba(244, 232, 58, 0.85), 0 8px 20px rgba(0, 0, 0, 0.7);
-      z-index: 8;
-      display: none;
-      white-space: nowrap;
-      pointer-events: none;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.7);
-    }
-    .wild-connect-banner.show {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      animation: wildBannerZoom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-    @keyframes wildBannerZoom {
-      0% { transform: translate(-50%, -50%) scale(0.35); opacity: 0; }
-      70% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    .reel-cell.card-line img {
+      filter: drop-shadow(0 0 12px rgba(244, 232, 58, 0.9));
     }
 
     /* METERS */
@@ -1002,9 +911,7 @@
        CONTROLES DO JOGO
        ============================================================ */
     .slot-controls {
-      background: rgba(10, 15, 22, 0.94);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(10, 15, 22, 0.97);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 16px;
       padding: 9px;
@@ -1325,14 +1232,6 @@
     .card-cine-card img { width: 66px; height: 66px; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.4)); }
     .card-cine.run .card-cine-card { animation: cardFlight 1.25s cubic-bezier(0.22,0.9,0.25,1) forwards; }
 
-    .card-fall-overlay { position: fixed; inset: 0; z-index: 870; pointer-events: none; }
-    .falling-symbol {
-      position: absolute;
-      width: 58px; height: 58px;
-      object-fit: contain;
-      transform: translate(-50%, -50%);
-      filter: drop-shadow(0 0 12px rgba(245,197,66,.85)) drop-shadow(0 8px 12px rgba(0,0,0,.6));
-    }
     /* Ameaça: gesto curto, carta fica na mão e NUNCA chega ao centro */
     .card-cine.threat .card-cine-rabbit { animation: cardRabbitTease 0.95s ease-in-out forwards !important; }
     .card-cine.threat .card-cine-card { animation: cardTeaseHope 0.95s cubic-bezier(0.3,0.9,0.3,1) forwards !important; }
@@ -1514,9 +1413,7 @@
       position: fixed;
       inset: 0;
       z-index: 500;
-      background: rgba(3, 6, 10, 0.88);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(3, 6, 10, 0.95);
       display: none;
       flex-direction: column;
       align-items: center;
@@ -1815,8 +1712,13 @@
     /* Mobile: menos partículas e brilhos para preservar bateria/60fps */
     @media (max-width: 520px) {
       .bonus-cine .bonus-particles i:nth-child(n+14) { display: none; }
-      .win-sunburst { opacity: 0.5; }
-      .loader-screen::before { filter: blur(6px) brightness(0.38); }
+      .win-sunburst { opacity: 0.5; animation-duration: 24s; }
+      .win-line-spark { display: none; }
+      .mascot-speech { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); }
+    }
+    @media (hover: none) and (pointer: coarse) {
+      .win-overlay-modal { background: rgba(3, 6, 10, 0.97); }
+      .slot-topbar, .slot-cabinet, .slot-controls { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); }
     }
   </style>
 </head>
@@ -1981,15 +1883,6 @@
       <div class="mascot-speech" id="mascotSpeech">Boa sorte!</div>
     </div>
 
-    <!-- HUD DE RODADAS GRÁTIS (BÔNUS) -->
-    <div class="bonus-hud" id="bonusHud">
-      <div class="bonus-hud-left">
-        <span class="bonus-hud-pill" id="bonusMultPill">4x</span>
-        <span class="bonus-hud-spins" id="bonusSpinsLeft">10 rodadas grátis</span>
-      </div>
-      <div class="bonus-hud-win" id="bonusTotalWin">R$ 0,00</div>
-    </div>
-
     <!-- CABINET / CARRETÉIS -->
     <section class="slot-cabinet">
       <div class="slot-info-strip">
@@ -2005,9 +1898,6 @@
           <div class="reel-col"><div class="reel-strip" id="strip2"></div></div>
         </div>
         <svg class="win-lines-svg" id="winLinesSvg" viewBox="0 0 300 222" preserveAspectRatio="none"></svg>
-        <div class="wild-connect-banner" id="wildConnectBanner">
-          <span>SÓ O SÍMBOLO DO BÔNUS</span>
-        </div>
       </div>
 
       <div class="slot-meters">
@@ -2113,10 +2003,10 @@
       </div>
       <div class="pay-grid" id="payGrid"></div>
       <p class="pay-note">
-        <strong>Bônus comprado:</strong> <strong id="payFsCount">10</strong> rodadas grátis com multiplicador de <strong id="payFsMult">3x</strong>. No início, a sorte define um símbolo — ele fica fixo durante todo o bônus e é o único que pode fechar a grade!<br><br>
-        <strong>Carta do coelho:</strong> ele só ameaça às vezes. Quando solta, se a carta completar os 9 espaços com o símbolo do bônus, você ganha <strong>10x</strong> o que conectou. Se não completar, ganha só o que conectou.<br><br>
-        <strong>Tela Cheia 5x:</strong> Fora do bônus, preencher os 9 espaços com o mesmo símbolo multiplica o prêmio por <strong>5x</strong>!<br><br>
-        <strong>Jackpot ZKN 1000x:</strong> Prêmio surpresa raríssimo — pode cair em qualquer giro normal, rodada grátis ou bônus comprado e paga até <strong>1000x</strong> o valor da aposta!
+        <strong>Bônus da carta:</strong> ao comprar, a carta revela um símbolo — o wild também pode sair. A grade começa vazia e <strong>apenas esse símbolo</strong> pode cair, em ondas de 3. Se os 3 formarem uma linha, descem mais 3; se a segunda onda também conectar, a terceira fecha a grade. Grade completa paga <strong>10x</strong>. Se não completar, você recebe só o que conectou.<br><br>
+        <strong>Ameaça do coelho:</strong> às vezes ele quase solta a carta no giro normal, mas isso é só efeito visual e não muda o resultado.<br><br>
+        <strong>Tela Cheia 5x:</strong> preencher os 9 espaços com o mesmo símbolo no giro normal multiplica o prêmio por <strong>5x</strong>!<br><br>
+        <strong>Jackpot ZKN 1000x:</strong> prêmio surpresa raríssimo — pode cair em qualquer giro normal e paga até <strong>1000x</strong> o valor da aposta!
       </p>
     </div>
   </div>
@@ -2131,7 +2021,7 @@
         <button type="button" class="modal-close" onclick="fecharModalCompraBonus()">&times;</button>
       </div>
       <p class="pay-note" style="font-size:13px;color:#e2e8f0;">
-        Uma carta será revelada e os símbolos dela cairão na grade, um a um. Se os 9 espaços forem preenchidos, você ganha <strong>10x</strong> o que conectou. Aposta: <strong id="buyModalBet">R$ 0,50</strong>.
+        A carta revela um símbolo e a grade começa vazia. Só caem símbolos iguais ao da carta, em ondas de 3: se os 3 conectarem numa linha, descem mais 3. Completou os 9 espaços? <strong>10x</strong> o que conectou. Aposta: <strong id="buyModalBet">R$ 0,50</strong>.
       </p>
       <div style="margin-top:12px;padding:12px;background:#0b1117;border:1px solid rgba(244,232,58,0.28);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
         <span style="font-size:12px;color:var(--muted);font-weight:700;">Valor da compra</span>
@@ -2166,6 +2056,16 @@
     const SLOT_LINES = [
       [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 4, 8], [6, 4, 2]
     ];
+    // Bônus da carta: mesmas 8 linhas do servidor (3 horizontais, 3 verticais, 2 diagonais).
+    const CARD_LINES = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+    const CARD_VALUES_DEFAULT = { clover: 2.6, coin: 2.7, ruby: 2.8, bell: 2.9, seven: 3.0, crown: 3.1, wild: 3.2 };
+    const CARD_CONNECT_WAVE1 = 0.70;
+    const CARD_CONNECT_WAVE2 = 0.09;
+    const CARD_FULL_MULT_DEFAULT = 10;
     const DEFAULT_BETS = [0.5, 1, 2, 5, 10, 20, 25, 50, 100, 200, 500];
     const JACKPOT_MULT = 1000;
     const JACKPOT_CHANCE = 0.00001;
@@ -2185,9 +2085,8 @@
     let currentBet = 0.5;
     let allowedBets = DEFAULT_BETS.slice();
     let bonusBuyMult = 30;
-    let freeSpinsCount = 10;
-    let freeSpinsMult = 4;
-    let activeBonus = null;
+    let cardBonusValues = { ...CARD_VALUES_DEFAULT };
+    let cardFullMultiplier = CARD_FULL_MULT_DEFAULT;
     let isSpinning = false;
     let isTurbo = false;
     let soundOn = true;
@@ -2212,11 +2111,6 @@
       let totalMult = 0;
       let wildCount = 0;
       for (const id of grid) { if (id === 'wild') wildCount++; }
-
-      const hasWildCol0 = (grid[0] === 'wild' || grid[3] === 'wild' || grid[6] === 'wild');
-      const hasWildCol1 = (grid[1] === 'wild' || grid[4] === 'wild' || grid[7] === 'wild');
-      const hasWildCol2 = (grid[2] === 'wild' || grid[5] === 'wild' || grid[8] === 'wild');
-      const isBonusTrigger = hasWildCol0 && hasWildCol1 && hasWildCol2;
 
       for (let lineIndex = 0; lineIndex < SLOT_LINES.length; lineIndex++) {
         const [a, b, c] = SLOT_LINES[lineIndex];
@@ -2251,7 +2145,7 @@
       return {
         winLines,
         wildCount,
-        isBonusTrigger,
+        isBonusTrigger: false,
         isFullBoard,
         boardMultiplier: isFullBoard ? fullBoardMult : 1,
         bonusMultiplier: extraMult,
@@ -2275,29 +2169,150 @@
       return { ...outcome, jackpot: false, nearJackpot: r < JACKPOT_CHANCE + NEAR_JACKPOT_CHANCE };
     }
 
-    function simularGiroLocal(bet, isFs, fsMult) {
+    function simularGiroLocal(bet) {
       const grid = Array.from({ length: 9 }, () => localRandomSymbol(false));
-      const mult = isFs ? (fsMult || freeSpinsMult) : 1;
-      const outcome = aplicarJackpotLocal(avaliarGridLocal(grid, bet, mult), bet);
-      return { ok: true, mode: 'demo', grid, outcome };
+      const outcome = aplicarJackpotLocal(avaliarGridLocal(grid, bet, 1), bet);
+      let cardEvent = null;
+      let cardSymbol = null;
+      // Ameaça visual: mesmo comportamento do servidor, sem alterar o resultado.
+      if (!outcome.jackpot && Math.random() < 0.10) {
+        const contagem = {};
+        for (const id of grid) {
+          if (id && id !== 'wild') contagem[id] = (contagem[id] || 0) + 1;
+        }
+        cardSymbol = Object.entries(contagem).sort((a, b) => b[1] - a[1])[0]?.[0] || 'seven';
+        cardEvent = 'threat';
+      }
+      return { ok: true, mode: 'demo', grid, outcome, cardEvent, cardSymbol, cardFullBoard: false };
+    }
+
+    /* BÔNUS DA CARTA — espelho local da lógica do servidor.
+       Grade vazia, ondas de 3 do MESMO símbolo, conexão por linha e 10x na grade cheia. */
+    function cartaSortearSimbolo() {
+      const total = SYM_ORDER.reduce((s, id) => s + SYM_MAP[id].weight, 0);
+      let r = Math.random() * total;
+      for (const id of SYM_ORDER) {
+        const w = SYM_MAP[id].weight;
+        if (r < w) return id;
+        r -= w;
+      }
+      return SYM_ORDER[0];
+    }
+
+    function cartaCombinarTriplas(cells) {
+      const out = [];
+      for (let a = 0; a < cells.length; a++) {
+        for (let b = a + 1; b < cells.length; b++) {
+          for (let c = b + 1; c < cells.length; c++) {
+            out.push([cells[a], cells[b], cells[c]]);
+          }
+        }
+      }
+      return out;
+    }
+
+    function cartaLinhasNovas(antes, depois) {
+      return CARD_LINES.filter(line =>
+        !line.every(i => antes.has(i)) && line.every(i => depois.has(i))
+      );
+    }
+
+    function cartaGerarOndas() {
+      const preenchidas = new Set();
+      const ondas = [];
+
+      // 1ª onda: 70% já conecta numa linha; senão cai em 3 casas que não formam linha.
+      let posicoes;
+      let linha = null;
+      if (Math.random() < CARD_CONNECT_WAVE1) {
+        linha = CARD_LINES[Math.floor(Math.random() * CARD_LINES.length)].slice();
+        posicoes = linha.slice();
+      } else {
+        const naoLinhas = [];
+        for (let a = 0; a < 9; a++) {
+          for (let b = a + 1; b < 9; b++) {
+            for (let c = b + 1; c < 9; c++) {
+              if (!CARD_LINES.some(l => l[0] === a && l[1] === b && l[2] === c)) naoLinhas.push([a, b, c]);
+            }
+          }
+        }
+        posicoes = naoLinhas[Math.floor(Math.random() * naoLinhas.length)].slice();
+      }
+      posicoes.forEach(p => preenchidas.add(p));
+      ondas.push({ positions: posicoes.slice().sort((a, b) => a - b), connected: !!linha, line: linha });
+
+      if (!linha) return ondas;
+
+      // 2ª onda: só desce +3 se completar alguma linha.
+      const vazias = [0, 1, 2, 3, 4, 5, 6, 7, 8].filter(i => !preenchidas.has(i));
+      const triplas = cartaCombinarTriplas(vazias);
+      const antes = new Set(preenchidas);
+      const conectam = [];
+      const naoConectam = [];
+      for (const t of triplas) {
+        const depois = new Set(antes);
+        t.forEach(p => depois.add(p));
+        const novas = cartaLinhasNovas(antes, depois);
+        if (novas.length) conectam.push({ positions: t, line: novas[Math.floor(Math.random() * novas.length)].slice() });
+        else naoConectam.push(t);
+      }
+
+      let escolhida = null;
+      let conectou = false;
+      let linha2 = null;
+      if (Math.random() < CARD_CONNECT_WAVE2 && conectam.length) {
+        const c = conectam[Math.floor(Math.random() * conectam.length)];
+        escolhida = c.positions; conectou = true; linha2 = c.line;
+      } else if (naoConectam.length) {
+        escolhida = naoConectam[Math.floor(Math.random() * naoConectam.length)];
+      } else if (conectam.length) {
+        const c = conectam[Math.floor(Math.random() * conectam.length)];
+        escolhida = c.positions; conectou = true; linha2 = c.line;
+      } else {
+        escolhida = triplas[Math.floor(Math.random() * triplas.length)];
+      }
+
+      escolhida.forEach(p => preenchidas.add(p));
+      ondas.push({ positions: escolhida.slice().sort((a, b) => a - b), connected: conectou, line: linha2 });
+
+      if (conectou) {
+        const restantes = [0, 1, 2, 3, 4, 5, 6, 7, 8].filter(i => !preenchidas.has(i));
+        restantes.forEach(p => preenchidas.add(p));
+        ondas.push({ positions: restantes, connected: true, line: null, full: true });
+      }
+      return ondas;
     }
 
     function simularCompraBonusLocal(bet) {
-      const ids = SYM_ORDER.slice();
-      const simbolo = ids[Math.floor(Math.random() * ids.length)];
-      const base = Array.from({ length: 9 }, () => localRandomSymbol(true));
-      const r = Math.random();
-      const qtd = r < 0.35 ? 3 : r < 0.60 ? 4 : r < 0.78 ? 5 : r < 0.90 ? 6 : r < 0.96 ? 7 : r < 0.99 ? 8 : 9;
-      const posicoes = Array.from({ length: 9 }, (_, i) => i)
-        .sort(() => Math.random() - 0.5).slice(0, qtd).sort((a, b) => a - b);
-      const grid = base.slice();
+      const simbolo = cartaSortearSimbolo();
+      const ondas = cartaGerarOndas();
+      const posicoes = ondas.flatMap(o => o.positions);
+      const grid = Array(9).fill(null);
       for (const p of posicoes) grid[p] = simbolo;
-      const full = qtd === 9;
-      const outcome = avaliarGridLocal(grid, bet, 1, full ? 10 : 5);
+
+      const count = posicoes.length;
+      const full = count === 9;
+      const perSymbol = cardBonusValues[simbolo] || CARD_VALUES_DEFAULT[simbolo] || 2.6;
+      const mult = Math.round(count * perSymbol * (full ? cardFullMultiplier : 1) * 100) / 100;
+      const win = Math.min(500000, Math.round(bet * mult * 100) / 100);
+
       return {
-        ok: true, mode: 'demo', grid, outcome,
-        cardBonus: true, cardEvent: 'drop', cardSymbol: simbolo, cardFullBoard: full,
-        cardDrop: { symbol: simbolo, positions: posicoes, count: qtd, full },
+        ok: true,
+        mode: 'demo',
+        cardBonus: true,
+        cardEvent: 'drop',
+        cardSymbol: simbolo,
+        cardFullBoard: full,
+        cardDrop: { symbol: simbolo, waves: ondas, count, full, perSymbol, fullMultiplier: cardFullMultiplier },
+        grid,
+        bet,
+        win,
+        winLines: [],
+        isFullBoard: full,
+        boardMultiplier: full ? cardFullMultiplier : 1,
+        totalMultiplier: mult,
+        jackpot: false,
+        nearJackpot: false,
       };
     }
 
@@ -2475,15 +2490,6 @@
       notes.forEach((f, i) => setTimeout(() => playTone(f, 0.16, 'sine', 0.14), i * 70));
     }
 
-    function playWildConnectSound() {
-      if (!soundOn || !audioCtx) return;
-      const notes = [523.25, 659.25, 783.99, 1046.50];
-      notes.forEach((f, i) => {
-        setTimeout(() => playTone(f, 0.25, 'triangle', 0.16), i * 55);
-      });
-      setTimeout(() => playTone(1318.51, 0.45, 'sine', 0.18), 240);
-    }
-
     /* ============================================================
        MASCOTE REATIVO (ESTILO FORTUNE RABBIT PG)
        ============================================================ */
@@ -2509,61 +2515,26 @@
     function clearCellHighlights() {
       for (let col = 0; col < 3; col++) {
         for (let row = 0; row < 7; row++) {
-          stripCells[col][row].classList.remove('win-cell', 'dim-cell', 'wild-connect');
+          stripCells[col][row].classList.remove('win-cell', 'dim-cell', 'card-empty', 'card-landed', 'card-line');
         }
       }
-      const banner = document.getElementById('wildConnectBanner');
-      if (banner) banner.classList.remove('show');
     }
 
-    function animarConexaoWilds(grid) {
-      return new Promise(resolve => {
-        const wildIndices = [];
-        for (let col = 0; col < 3; col++) {
-          for (let row = 0; row < 3; row++) {
-            const idx = col + row * 3;
-            if (grid[idx] === 'wild') {
-              wildIndices.push({ col, row, idx });
-              break;
-            }
-          }
+    function prepararGradeCarta() {
+      clearCellHighlights();
+      for (let col = 0; col < 3; col++) {
+        const strip = document.getElementById('strip' + col);
+        if (strip) strip.className = 'reel-strip';
+        for (let row = 0; row < 3; row++) {
+          const cell = stripCells[col][row];
+          const img = stripImgs[col][row];
+          if (!cell || !img) continue;
+          cell.classList.add('card-empty');
+          img.removeAttribute('style');
         }
-
-        if (wildIndices.length < 3) {
-          resolve();
-          return;
-        }
-
-        // 1) Adiciona classe visual conectada aos 3 Wilds
-        wildIndices.forEach(w => {
-          stripCells[w.col][w.row].classList.add('wild-connect');
-        });
-
-        // 2) Desenha raio laser elétrico conectando os 3 Wilds
-        const centers = [
-          [50, 37],  [150, 37],  [250, 37],
-          [50, 111], [150, 111], [250, 111],
-          [50, 185], [150, 185], [250, 185]
-        ];
-        const p1 = centers[wildIndices[0].idx];
-        const p2 = centers[wildIndices[1].idx];
-        const p3 = centers[wildIndices[2].idx];
-        const svg = document.getElementById('winLinesSvg');
-        svg.innerHTML = '<path class="wild-laser-path" d="M ' + p1[0] + ' ' + p1[1] + ' L ' + p2[0] + ' ' + p2[1] + ' L ' + p3[0] + ' ' + p3[1] + '"/>';
-
-        // 3) Banner flutuante "3 WILDS CONECTADOS!"
-        const banner = document.getElementById('wildConnectBanner');
-        if (banner) banner.classList.add('show');
-
-        // 4) Som elétrico e Mascote celebrando
-        playWildConnectSound();
-        setMascotState('win', '3 WILDS CONECTADOS!');
-
-        setTimeout(() => {
-          if (banner) banner.classList.remove('show');
-          resolve();
-        }, isTurbo ? 950 : 1600);
-      });
+      }
+      document.getElementById('winLinesSvg').innerHTML = '';
+      currentGrid = Array(9).fill(null);
     }
 
     function startInstantReelLoops() {
@@ -2591,13 +2562,10 @@
               const gridIdx = col + row * 3;
               stripImgs[col][row].src = ICON_BASE + targetGrid[gridIdx] + '.webp';
               const cell = stripCells[col][row];
-              cell.classList.remove('win-cell', 'dim-cell', 'wild-connect');
+              cell.classList.remove('win-cell', 'dim-cell', 'card-empty', 'card-landed', 'card-line');
               if (winCellSet && winCellSet.size > 0) {
                 const isWin = winCellSet.has(gridIdx);
                 cell.classList.add(isWin ? 'win-cell' : 'dim-cell');
-                if (isWin && targetGrid[gridIdx] === 'wild') {
-                  cell.classList.add('wild-connect');
-                }
               }
             }
 
@@ -2620,7 +2588,7 @@
         strip.className = 'reel-strip';
         for (let row = 0; row < 3; row++) {
           stripImgs[col][row].src = ICON_BASE + currentGrid[col + row * 3] + '.webp';
-          stripCells[col][row].classList.remove('win-cell', 'dim-cell');
+          stripCells[col][row].classList.remove('win-cell', 'dim-cell', 'card-empty', 'card-landed', 'card-line');
         }
       }
     }
@@ -3011,42 +2979,89 @@
     /* ============================================================
        PROCESSAMENTO DE RESULTADO E RODADA
        ============================================================ */
-    async function animarQuedaCarta(d) {
-      const queda = d && d.cardDrop;
-      if (!queda || REDUCE_MOTION) return;
-      const overlay = document.createElement('div');
-      overlay.className = 'card-fall-overlay';
-      document.body.appendChild(overlay);
+    function celulaDaPosicao(pos) {
+      return { col: pos % 3, row: Math.floor(pos / 3) };
+    }
 
-      for (const pos of queda.positions) {
-        const col = pos % 3;
-        const row = Math.floor(pos / 3);
-        const cell = stripCells[col] && stripCells[col][row];
-        if (!cell) continue;
-        const r = cell.getBoundingClientRect();
-        const img = document.createElement('img');
-        img.className = 'falling-symbol';
-        img.src = ICON_BASE + queda.symbol + '.webp';
-        img.style.left = (r.left + r.width / 2) + 'px';
-        img.style.top = '0px';
-        overlay.appendChild(img);
-        const destinoY = r.top + r.height / 2;
-        try {
-          await img.animate([
-            { transform: 'translate(-50%, -40px) scale(0.65) rotate(-22deg)', opacity: 0 },
-            { transform: 'translate(-50%, ' + (destinoY - 70) + 'px) scale(1.12) rotate(8deg)', opacity: 1, offset: 0.75 },
-            { transform: 'translate(-50%, ' + destinoY + 'px) scale(1) rotate(0deg)', opacity: 1 },
+    async function animarOndasCarta(d) {
+      const queda = d && d.cardDrop;
+      const ondas = queda && Array.isArray(queda.waves) ? queda.waves : [];
+      if (!queda || !ondas.length) return;
+
+      // Garante que a grade esteja realmente vazia antes da primeira onda.
+      prepararGradeCarta();
+      const simbolo = queda.symbol;
+
+      for (let wi = 0; wi < ondas.length; wi++) {
+        const onda = ondas[wi];
+        const posicoes = Array.isArray(onda.positions) ? onda.positions : [];
+        const jobs = posicoes.map((pos, i) => {
+          const { col, row } = celulaDaPosicao(pos);
+          const cell = stripCells[col] && stripCells[col][row];
+          const img = stripImgs[col] && stripImgs[col][row];
+          if (!cell || !img) return Promise.resolve();
+
+          cell.classList.remove('card-empty', 'card-line');
+          cell.classList.add('card-landed');
+          img.src = ICON_BASE + simbolo + '.webp';
+
+          if (REDUCE_MOTION) return Promise.resolve();
+          const fromY = -CELL_H * (row + 1) - 14;
+          const anim = img.animate([
+            { transform: 'translate3d(0,' + fromY + 'px,0) scale(0.6) rotate(-16deg)', opacity: 0, offset: 0 },
+            { transform: 'translate3d(0,6px,0) scale(1.14) rotate(2deg)', opacity: 1, offset: 0.72 },
+            { transform: 'translate3d(0,0,0) scale(1) rotate(0deg)', opacity: 1, offset: 1 },
           ], {
-            duration: isTurbo ? 280 : 440,
-            easing: 'cubic-bezier(0.2, 0.9, 0.25, 1)',
-            fill: 'forwards',
-          }).finished;
-        } catch (e) {}
-        img.style.top = destinoY + 'px';
-        img.style.transform = 'translate(-50%, -50%)';
+            duration: (isTurbo ? 210 : 340) + i * (isTurbo ? 20 : 40),
+            delay: i * (isTurbo ? 15 : 35),
+            easing: 'cubic-bezier(0.2, 0.85, 0.25, 1)',
+            fill: 'backwards',
+          });
+          return anim.finished.catch(() => {});
+        });
+
+        playTone(300 + wi * 70, 0.07, 'triangle', 0.08);
+        await Promise.all(jobs);
+        playReelStopSound(1 + wi);
+
+        if (onda.connected) {
+          const linha = Array.isArray(onda.line) && onda.line.length ? onda.line : posicoes;
+          linha.forEach(pos => {
+            const { col, row } = celulaDaPosicao(pos);
+            const cell = stripCells[col] && stripCells[col][row];
+            if (cell) cell.classList.add('card-line');
+          });
+          playTone(660, 0.1, 'sine', 0.1);
+          setTimeout(() => playTone(880, 0.12, 'sine', 0.1), 90);
+          await new Promise(r => setTimeout(r, isTurbo ? 220 : 420));
+        } else {
+          await new Promise(r => setTimeout(r, isTurbo ? 90 : 160));
+        }
       }
-      await new Promise(r => setTimeout(r, isTurbo ? 160 : 260));
-      overlay.remove();
+
+      await new Promise(r => setTimeout(r, isTurbo ? 80 : 140));
+    }
+
+    function finalizarGradeCarta(d) {
+      const grid = Array.isArray(d.grid) ? d.grid : [];
+      for (let i = 0; i < 9; i++) {
+        const { col, row } = celulaDaPosicao(i);
+        const cell = stripCells[col] && stripCells[col][row];
+        const img = stripImgs[col] && stripImgs[col][row];
+        if (!cell || !img) continue;
+        const id = grid[i];
+        cell.classList.remove('win-cell', 'dim-cell', 'card-line');
+        if (id) {
+          img.src = ICON_BASE + id + '.webp';
+          cell.classList.remove('card-empty');
+          cell.classList.add('card-landed', 'win-cell');
+          if (d.cardFullBoard) cell.classList.add('card-line');
+        } else {
+          cell.classList.add('card-empty');
+          cell.classList.remove('card-landed');
+        }
+      }
+      currentGrid = grid.slice();
     }
 
     async function animarCarta(d) {
@@ -3091,21 +3106,58 @@
     }
 
     async function concluirResultado(d) {
+      const winAmt = Number(d.win || 0);
+      const betUsed = Number(d.bet || currentBet);
+      const msgEl = document.getElementById('slotMsg');
+      const winEl = document.getElementById('winVal');
+
+      // ===== BÔNUS DA CARTA =====
+      // Caminho próprio: NÃO passa por stopReelsCascade, para as casas vazias
+      // continuarem vazias e só o símbolo sorteado aparecer.
+      if (d.cardBonus) {
+        finalizarGradeCarta(d);
+        winEl.textContent = fmtBRL(winAmt);
+
+        if (d.mode === 'real' && typeof d.balance === 'number') {
+          updateBalanceUI(d.balance);
+        } else {
+          updateBalanceUI(currentBalance + winAmt);
+        }
+
+        const nomeSimbolo = (SYM_MAP[d.cardSymbol] && SYM_MAP[d.cardSymbol].name) || 'símbolo da carta';
+        const qtd = (d.cardDrop && d.cardDrop.count) || 0;
+
+        if (d.cardFullBoard) {
+          msgEl.textContent = 'GRADE COMPLETA com ' + qtd + 'x ' + nomeSimbolo + ' — ' + cardFullMultiplier + 'x! Ganho: ' + fmtBRL(winAmt);
+          setMascotState('win', 'GRADE COMPLETA ' + cardFullMultiplier + 'x!');
+          await dispararCelebracaoWin(winAmt, betUsed, false, false, 'GRADE COMPLETA ' + cardFullMultiplier + 'x');
+        } else if (winAmt > 0) {
+          msgEl.textContent = 'A carta soltou ' + qtd + 'x ' + nomeSimbolo + '. Ganho: ' + fmtBRL(winAmt) + '. Não completou a grade — pagou só o que conectou.';
+          setMascotState('win', '+' + fmtBRL(winAmt));
+          playWinSound('big');
+        } else {
+          setMascotState('idle');
+          msgEl.textContent = 'A carta não conectou desta vez.';
+        }
+
+        syncBonusUI();
+        return;
+      }
+
+      // ===== GIRO NORMAL =====
       if (d.mode === 'real' && typeof d.balance === 'number') {
-        updateBalanceUI(Math.max(0, d.balance - Number(d.win || 0)));
+        updateBalanceUI(Math.max(0, d.balance - winAmt));
       }
 
       const winCellSet = new Set();
-      (d.winLines || []).forEach(wl => wl.cells.forEach(c => winCellSet.add(c)));
+      (d.winLines || []).forEach(wl => (wl.cells || []).forEach(c => winCellSet.add(c)));
 
-      // O coelho só aparece quando ameaça ou solta a carta (decisão do servidor).
-      if (d.cardEvent && !d.cardBonus) await animarCarta(d);
+      // O coelho só aparece quando ameaça a carta (decisão do servidor).
+      if (d.cardEvent) await animarCarta(d);
 
       // Para os carretéis em cascata suave
       await stopReelsCascade(d.grid, winCellSet);
       currentGrid = d.grid;
-      const winAmt = Number(d.win || 0);
-      const betUsed = d.bet || currentBet;
       const ratioPremio = winAmt / (betUsed || 0.5);
       const linhaTier = d.jackpot || ratioPremio >= 1000 ? 'jackpot'
         : ratioPremio >= 30 ? 'super' : ratioPremio >= 15 ? 'mega' : 'big';
@@ -3117,15 +3169,6 @@
         updateBalanceUI(currentBalance + winAmt);
       }
 
-      if (d.freeSpins) {
-        activeBonus = d.freeSpins.spinsLeft > 0 ? d.freeSpins : null;
-      } else if (d.isFreeSpin) {
-        activeBonus = null;
-      }
-
-      const msgEl = document.getElementById('slotMsg');
-      const winEl = document.getElementById('winVal');
-
       if (d.jackpot) {
         winEl.textContent = fmtBRL(winAmt);
         msgEl.textContent = 'JACKPOT ZKN 1000x! PRÊMIO MÁXIMO!';
@@ -3135,25 +3178,11 @@
         playTone(660, 0.35, 'sawtooth', 0.18);
         await dispararCelebracaoWin(winAmt, betUsed, false, true);
         if (shell) setTimeout(() => shell.classList.remove('jackpot-flash'), 600);
-      } else if (d.bonusTriggered) {
-        const simboloBônus = d.freeSpins && d.freeSpins.symbol && SYM_MAP[d.freeSpins.symbol]
-          ? SYM_MAP[d.freeSpins.symbol].name : 'surpresa';
-        winEl.textContent = fmtBRL(winAmt);
-        msgEl.textContent = 'Bônus ativado! Símbolo: ' + simboloBônus + ' · 10 giros ' + freeSpinsMult + 'x!';
-        await animarConexaoWilds(d.grid);
-        setMascotState('win', 'BÔNUS 10 GIROS!');
-        await dispararCelebracaoWin(winAmt > 0 ? winAmt : betUsed * freeSpinsMult, betUsed, false);
-      } else if (d.retriggered) {
-        winEl.textContent = fmtBRL(winAmt);
-        msgEl.textContent = '+5 Rodadas Grátis Extras! Wilds Conectados!';
-        await animarConexaoWilds(d.grid);
-        setMascotState('win', '+5 GIROS!');
-        playTone(980, 0.2, 'sine', 0.2);
       } else if (winAmt > 0) {
         winEl.textContent = fmtBRL(winAmt);
-        msgEl.textContent = d.cardFullBoard
-          ? '3x3 PERFEITO DO MESMO SÍMBOLO — 10x! Ganho: ' + fmtBRL(winAmt)
-          : d.isFullBoard ? 'TELA CHEIA 5x! Ganho: ' + fmtBRL(winAmt) : 'Você ganhou ' + fmtBRL(winAmt) + '!';
+        msgEl.textContent = d.isFullBoard
+          ? 'TELA CHEIA 5x! Ganho: ' + fmtBRL(winAmt)
+          : 'Você ganhou ' + fmtBRL(winAmt) + '!';
 
         // Verifica se qualifica para Big Win / Mega Win / Super Mega Win
         if (d.isFullBoard || winAmt >= betUsed * 5) {
@@ -3168,20 +3197,9 @@
           piscarNearJackpot();
           msgEl.textContent = 'QUASE! O jackpot 1000x passou pertinho...';
         } else if (d.cardEvent === 'threat') {
-          msgEl.textContent = 'O coelho quase soltou a carta...';
+          msgEl.textContent = 'O coelho quase soltou a carta... mas era só ameaça.';
         } else {
-          msgEl.textContent = (activeBonus && activeBonus.spinsLeft > 0)
-          ? 'Modo Bônus ' + activeBonus.multiplier + 'x: ' + activeBonus.spinsLeft + ' giros restantes'
-          : 'Tente novamente!';
-        }
-      }
-
-      if (!d.jackpot && d.isFreeSpin && (!activeBonus || activeBonus.spinsLeft === 0)) {
-        const totalBonusWin = d.freeSpins ? Number(d.freeSpins.totalWin || 0) : winAmt;
-        msgEl.textContent = 'Fim do Bônus! Total acumulado: ' + fmtBRL(totalBonusWin);
-        if (totalBonusWin > 0) {
-          setMascotState('win', 'TOTAL DO BÔNUS!');
-          await dispararCelebracaoWin(totalBonusWin, betUsed, false);
+          msgEl.textContent = 'Tente novamente!';
         }
       }
 
