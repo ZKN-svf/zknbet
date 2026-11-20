@@ -1325,6 +1325,14 @@
     .card-cine-card img { width: 66px; height: 66px; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.4)); }
     .card-cine.run .card-cine-card { animation: cardFlight 1.25s cubic-bezier(0.22,0.9,0.25,1) forwards; }
 
+    .card-fall-overlay { position: fixed; inset: 0; z-index: 870; pointer-events: none; }
+    .falling-symbol {
+      position: absolute;
+      width: 58px; height: 58px;
+      object-fit: contain;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 0 12px rgba(245,197,66,.85)) drop-shadow(0 8px 12px rgba(0,0,0,.6));
+    }
     /* Ameaça: gesto curto, carta fica na mão e NUNCA chega ao centro */
     .card-cine.threat .card-cine-rabbit { animation: cardRabbitTease 0.95s ease-in-out forwards !important; }
     .card-cine.threat .card-cine-card { animation: cardTeaseHope 0.95s cubic-bezier(0.3,0.9,0.3,1) forwards !important; }
@@ -2028,7 +2036,7 @@
       </div>
 
       <button type="button" class="buy-bonus-btn" id="buyBonusBtn" onclick="abrirModalCompraBonus()">
-        <span>COMPRAR BÔNUS (10 GIROS)</span>
+        <span>COMPRAR CARTA</span>
         <span class="buy-bonus-price" id="buyBonusPrice">R$ 15,00</span>
       </button>
 
@@ -2117,13 +2125,13 @@
        MODAL COMPRA DE BÔNUS
        ============================================================ -->
   <div class="slot-backdrop" id="buyBackdrop" onclick="if(event.target===this)fecharModalCompraBonus()">
-    <div class="slot-modal" role="dialog" aria-modal="true" aria-label="Comprar Bônus">
+    <div class="slot-modal" role="dialog" aria-modal="true" aria-label="Comprar Carta">
       <div class="modal-head">
-        <h2>Comprar Bônus</h2>
+        <h2>Comprar Carta</h2>
         <button type="button" class="modal-close" onclick="fecharModalCompraBonus()">&times;</button>
       </div>
       <p class="pay-note" style="font-size:13px;color:#e2e8f0;">
-        Ative imediatamente <strong id="buyModalSpins">10 rodadas grátis</strong> com multiplicador <strong id="buyModalMult">4x</strong> baseadas na aposta de <strong id="buyModalBet">R$ 0,50</strong>.
+        Uma carta será revelada e os símbolos dela cairão na grade, um a um. Se os 9 espaços forem preenchidos, você ganha <strong>10x</strong> o que conectou. Aposta: <strong id="buyModalBet">R$ 0,50</strong>.
       </p>
       <div style="margin-top:12px;padding:12px;background:#0b1117;border:1px solid rgba(244,232,58,0.28);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
         <span style="font-size:12px;color:var(--muted);font-weight:700;">Valor da compra</span>
@@ -2199,7 +2207,7 @@
       return pool[0];
     }
 
-    function avaliarGridLocal(grid, betAmount, bonusMult) {
+    function avaliarGridLocal(grid, betAmount, bonusMult, fullBoardMult = 5) {
       const winLines = [];
       let totalMult = 0;
       let wildCount = 0;
@@ -2235,7 +2243,7 @@
       const isFullBoard = winLines.length > 0 && (
         allNonWild.length === 0 || allNonWild.every(id => id === allNonWild[0])
       );
-      if (isFullBoard) totalMult *= 5;
+      if (isFullBoard) totalMult *= fullBoardMult;
       const extraMult = Number(bonusMult) > 1 ? Number(bonusMult) : 1;
       totalMult *= extraMult;
       const winAmount = Math.round(betAmount * totalMult * 100) / 100;
@@ -2245,7 +2253,7 @@
         wildCount,
         isBonusTrigger,
         isFullBoard,
-        boardMultiplier: isFullBoard ? 5 : 1,
+        boardMultiplier: isFullBoard ? fullBoardMult : 1,
         bonusMultiplier: extraMult,
         totalMultiplier: Math.round(totalMult * 100) / 100,
         winAmount
@@ -2275,13 +2283,22 @@
     }
 
     function simularCompraBonusLocal(bet) {
-      const grid = Array.from({ length: 9 }, () => localRandomSymbol(true));
-      const rows = [0, 1, 2].sort(() => Math.random() - 0.5);
-      grid[0 + rows[0] * 3] = 'wild';
-      grid[1 + rows[1] * 3] = 'wild';
-      grid[2 + rows[2] * 3] = 'wild';
-      const outcome = aplicarJackpotLocal(avaliarGridLocal(grid, bet, 1), bet);
-      return { ok: true, mode: 'demo', grid, outcome };
+      const ids = SYM_ORDER.slice();
+      const simbolo = ids[Math.floor(Math.random() * ids.length)];
+      const base = Array.from({ length: 9 }, () => localRandomSymbol(true));
+      const r = Math.random();
+      const qtd = r < 0.35 ? 3 : r < 0.60 ? 4 : r < 0.78 ? 5 : r < 0.90 ? 6 : r < 0.96 ? 7 : r < 0.99 ? 8 : 9;
+      const posicoes = Array.from({ length: 9 }, (_, i) => i)
+        .sort(() => Math.random() - 0.5).slice(0, qtd).sort((a, b) => a - b);
+      const grid = base.slice();
+      for (const p of posicoes) grid[p] = simbolo;
+      const full = qtd === 9;
+      const outcome = avaliarGridLocal(grid, bet, 1, full ? 10 : 5);
+      return {
+        ok: true, mode: 'demo', grid, outcome,
+        cardBonus: true, cardEvent: 'drop', cardSymbol: simbolo, cardFullBoard: full,
+        cardDrop: { symbol: simbolo, positions: posicoes, count: qtd, full },
+      };
     }
 
     // Estrutura do Pool dos Carretéis: 7 células por coluna
@@ -2871,36 +2888,24 @@
        UI SYNC & CONTROLES
        ============================================================ */
     function syncBonusUI() {
+      // Não existe mais bônus de 10 giros: só a compra da carta.
       const hud = document.getElementById('bonusHud');
+      if (hud) hud.classList.remove('show');
       const buyBtn = document.getElementById('buyBonusBtn');
       const spinBtn = document.getElementById('spinBtn');
       const chips = [document.getElementById('betMinus'), document.getElementById('betPlus'), document.getElementById('betListBtn')].filter(Boolean);
       const buyCost = Math.round(currentBet * bonusBuyMult * 100) / 100;
       document.getElementById('buyBonusPrice').textContent = fmtBRL(buyCost);
 
-      if (activeBonus && activeBonus.spinsLeft > 0) {
-        hud.classList.add('show');
-        document.getElementById('bonusMultPill').textContent = activeBonus.multiplier + 'x';
-        const nomeSimbolo = activeBonus.symbol && SYM_MAP[activeBonus.symbol] ? SYM_MAP[activeBonus.symbol].name : '';
-        document.getElementById('bonusSpinsLeft').textContent =
-          activeBonus.spinsLeft + (activeBonus.spinsLeft === 1 ? ' rodada grátis' : ' rodadas grátis') +
-          (nomeSimbolo ? ' · ' + nomeSimbolo : '');
-        document.getElementById('bonusTotalWin').textContent = fmtBRL(activeBonus.totalWin || 0);
-        buyBtn.disabled = true;
-        spinBtn.textContent = 'GRÁTIS (' + activeBonus.spinsLeft + ')';
-        chips.forEach(c => { c.disabled = true; });
-      } else {
-        hud.classList.remove('show');
-        buyBtn.disabled = isSpinning;
-        spinBtn.textContent = 'GIRAR';
-        chips.forEach(c => { c.disabled = isSpinning; });
-        if (!isSpinning) {
-          const idx = allowedBets.indexOf(currentBet);
-          const minus = document.getElementById('betMinus');
-          const plus = document.getElementById('betPlus');
-          if (minus) minus.disabled = idx <= 0;
-          if (plus) plus.disabled = idx >= allowedBets.length - 1;
-        }
+      buyBtn.disabled = isSpinning;
+      spinBtn.textContent = 'GIRAR';
+      chips.forEach(c => { c.disabled = isSpinning; });
+      if (!isSpinning) {
+        const idx = allowedBets.indexOf(currentBet);
+        const minus = document.getElementById('betMinus');
+        const plus = document.getElementById('betPlus');
+        if (minus) minus.disabled = idx <= 0;
+        if (plus) plus.disabled = idx >= allowedBets.length - 1;
       }
     }
 
@@ -3006,6 +3011,44 @@
     /* ============================================================
        PROCESSAMENTO DE RESULTADO E RODADA
        ============================================================ */
+    async function animarQuedaCarta(d) {
+      const queda = d && d.cardDrop;
+      if (!queda || REDUCE_MOTION) return;
+      const overlay = document.createElement('div');
+      overlay.className = 'card-fall-overlay';
+      document.body.appendChild(overlay);
+
+      for (const pos of queda.positions) {
+        const col = pos % 3;
+        const row = Math.floor(pos / 3);
+        const cell = stripCells[col] && stripCells[col][row];
+        if (!cell) continue;
+        const r = cell.getBoundingClientRect();
+        const img = document.createElement('img');
+        img.className = 'falling-symbol';
+        img.src = ICON_BASE + queda.symbol + '.webp';
+        img.style.left = (r.left + r.width / 2) + 'px';
+        img.style.top = '0px';
+        overlay.appendChild(img);
+        const destinoY = r.top + r.height / 2;
+        try {
+          await img.animate([
+            { transform: 'translate(-50%, -40px) scale(0.65) rotate(-22deg)', opacity: 0 },
+            { transform: 'translate(-50%, ' + (destinoY - 70) + 'px) scale(1.12) rotate(8deg)', opacity: 1, offset: 0.75 },
+            { transform: 'translate(-50%, ' + destinoY + 'px) scale(1) rotate(0deg)', opacity: 1 },
+          ], {
+            duration: isTurbo ? 280 : 440,
+            easing: 'cubic-bezier(0.2, 0.9, 0.25, 1)',
+            fill: 'forwards',
+          }).finished;
+        } catch (e) {}
+        img.style.top = destinoY + 'px';
+        img.style.transform = 'translate(-50%, -50%)';
+      }
+      await new Promise(r => setTimeout(r, isTurbo ? 160 : 260));
+      overlay.remove();
+    }
+
     async function animarCarta(d) {
       const cine = document.getElementById('cardCine');
       const tipo = d && d.cardEvent;
@@ -3056,7 +3099,7 @@
       (d.winLines || []).forEach(wl => wl.cells.forEach(c => winCellSet.add(c)));
 
       // O coelho só aparece quando ameaça ou solta a carta (decisão do servidor).
-      if (d.cardEvent) await animarCarta(d);
+      if (d.cardEvent && !d.cardBonus) await animarCarta(d);
 
       // Para os carretéis em cascata suave
       await stopReelsCascade(d.grid, winCellSet);
@@ -3283,8 +3326,6 @@
     function abrirModalCompraBonus() {
       if (!gameReady || isSpinning || (activeBonus && activeBonus.spinsLeft > 0)) return;
       const buyCost = Math.round(currentBet * bonusBuyMult * 100) / 100;
-      document.getElementById('buyModalSpins').textContent = freeSpinsCount + ' rodadas grátis';
-      document.getElementById('buyModalMult').textContent = freeSpinsMult + 'x';
       document.getElementById('buyModalBet').textContent = fmtBRL(currentBet);
       document.getElementById('buyModalCost').textContent = fmtBRL(buyCost);
       document.getElementById('buyBackdrop').classList.add('open');
@@ -3356,22 +3397,20 @@
           resData = {
             ok: true,
             mode: 'demo',
-            bonusTriggered: true,
+            cardBonus: true,
+            cardEvent: sim.cardEvent,
+            cardSymbol: sim.cardSymbol,
+            cardFullBoard: sim.cardFullBoard,
+            cardDrop: sim.cardDrop,
             grid: sim.grid,
             bet: currentBet,
             win: sim.outcome.winAmount,
             winLines: sim.outcome.winLines,
             isFullBoard: sim.outcome.isFullBoard,
-            jackpot: !!sim.outcome.jackpot,
-            jackpotMultiplier: sim.outcome.jackpot ? sim.outcome.jackpotMultiplier : 0,
-            nearJackpot: !!sim.outcome.nearJackpot,
-            freeSpins: {
-              spinsLeft: freeSpinsCount,
-              totalSpins: freeSpinsCount,
-              multiplier: freeSpinsMult,
-              totalWin: 0,
-              bet: currentBet
-            }
+            boardMultiplier: sim.outcome.boardMultiplier,
+            totalMultiplier: sim.outcome.totalMultiplier,
+            jackpot: false,
+            nearJackpot: false,
           };
         } else {
           const res = await ZKNAuth.api('/originals/slot777/buy-bonus', {
@@ -3387,6 +3426,8 @@
           }
           resData = res.data;
         }
+        await animarCarta(resData);
+        await animarQuedaCarta(resData);
         await concluirResultado(resData);
       } catch (e) {
         stopReelsEmergency();
@@ -3396,10 +3437,6 @@
         isSpinning = false;
         document.getElementById('spinBtn').disabled = false;
         syncBonusUI();
-        // O bônus recém-comprado já inicia o primeiro giro automaticamente.
-        if (activeBonus && activeBonus.spinsLeft > 0 && autoRemaining === 0) {
-          setTimeout(() => { if (!isSpinning && activeBonus && activeBonus.spinsLeft > 0) girar(); }, isTurbo ? 320 : 620);
-        }
       }
     }
 
@@ -3530,7 +3567,7 @@
         document.getElementById('rtpBadge').textContent = 'RTP ' + Number(d.targetRtp || 95).toFixed(1).replace('.0', '') + '%';
         document.getElementById('payFsCount').textContent = freeSpinsCount;
         document.getElementById('payFsMult').textContent = freeSpinsMult + 'x';
-        document.getElementById('buyBonusBtn').querySelector('span').textContent = 'COMPRAR BÔNUS (' + freeSpinsCount + ' GIROS)';
+        document.getElementById('buyBonusBtn').querySelector('span').textContent = 'COMPRAR CARTA';
 
         updateBalanceUI(currentMode === 'real' ? d.balance : 1000);
         renderBetChips();
