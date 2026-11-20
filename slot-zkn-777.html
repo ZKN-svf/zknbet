@@ -7,7 +7,7 @@
   <title>ZKN Fortune 777 — ZKN Originals</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Sora:wght@800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@500;600;700;800&family=Sora:wght@800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --gold: #f4e83a;
@@ -78,11 +78,14 @@
       position: absolute;
       inset: 0;
       background:
+        repeating-conic-gradient(from 0deg at 50% 42%, rgba(245,197,66,0.05) 0deg 3deg, transparent 3deg 9deg),
         radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.28) 0%, transparent 55%),
         radial-gradient(circle at 50% 80%, rgba(244, 232, 58, 0.18) 0%, transparent 50%),
         linear-gradient(180deg, rgba(6, 11, 16, 0.5) 0%, rgba(3, 6, 8, 0.7) 100%);
+      animation: loaderRays 18s linear infinite;
       z-index: -1;
     }
+    @keyframes loaderRays { to { filter: hue-rotate(8deg) brightness(1.05); } }
     .loader-screen.done {
       opacity: 0;
       transform: scale(1.04);
@@ -885,10 +888,20 @@
     .win-line-path {
       fill: none;
       stroke: #f4e83a;
-      stroke-width: 3.8;
+      stroke-width: 3.4;
       stroke-linecap: round;
-      filter: drop-shadow(0 0 6px rgba(244, 232, 58, 0.8));
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 5px rgba(244, 232, 58, 0.85)) drop-shadow(0 0 12px rgba(244, 232, 58, 0.45));
+      stroke-dasharray: 420;
+      stroke-dashoffset: 420;
+      animation: winLineDraw 0.55s ease-out forwards, winLinePulse 1.1s ease-in-out 0.55s infinite alternate;
     }
+    .win-lines-svg.tier-mega .win-line-path { stroke: #34d399; filter: drop-shadow(0 0 6px rgba(16,185,129,0.9)); }
+    .win-lines-svg.tier-super .win-line-path { stroke: #fb7185; filter: drop-shadow(0 0 7px rgba(244,63,94,0.95)); }
+    .win-lines-svg.tier-jackpot .win-line-path { stroke: #e9d5ff; filter: drop-shadow(0 0 8px rgba(168,85,247,1)); }
+    .win-line-spark { fill: #fff8cf; filter: drop-shadow(0 0 4px #f4e83a); }
+    @keyframes winLineDraw { to { stroke-dashoffset: 0; } }
+    @keyframes winLinePulse { from { stroke-width: 3.2; opacity: 0.85; } to { stroke-width: 4.4; opacity: 1; } }
 
     /* ANIMAÇÃO DE CONEXÃO DOS WILDS */
     .reel-cell.wild-connect {
@@ -1031,6 +1044,103 @@
     }
     .bet-chip:disabled { opacity: 0.4; cursor: not-allowed; }
 
+    /* Seletor de aposta premium [-] valor [+] */
+    .bet-control {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 6px;
+      border-radius: 6px;
+      background: linear-gradient(180deg, #1a1410 0%, #100c0a 100%);
+      border: 1px solid rgba(245, 197, 66, 0.34);
+      box-shadow: inset 0 1px 0 rgba(255, 226, 150, 0.14), inset 0 -2px 6px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .bet-step {
+      width: 38px; height: 34px;
+      flex: 0 0 38px;
+      border-radius: 4px;
+      border: 1px solid rgba(245, 197, 66, 0.28);
+      background: linear-gradient(180deg, #3a2d16 0%, #201809 100%);
+      color: #f5d77a;
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,230,160,0.18), 0 2px 4px rgba(0,0,0,0.5);
+      transition: transform 0.1s, filter 0.1s;
+    }
+    .bet-step:active:not(:disabled) { transform: translateY(1px) scale(0.96); filter: brightness(1.2); }
+    .bet-step:disabled { opacity: 0.35; cursor: not-allowed; }
+    .bet-value-wrap {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.05;
+    }
+    .bet-value {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: #f7e7a8;
+      text-shadow: 0 0 12px rgba(245,197,66,0.35);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .bet-caption {
+      margin-top: 2px;
+      font-family: 'Inter', sans-serif;
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: rgba(244, 224, 170, 0.5);
+    }
+    .bet-list-btn {
+      width: 32px; height: 34px;
+      flex: 0 0 32px;
+      border-radius: 4px;
+      border: 1px solid rgba(245, 197, 66, 0.24);
+      background: rgba(245, 197, 66, 0.08);
+      color: #e9cf82;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .bet-list {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 6px);
+      z-index: 40;
+      width: 188px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 6px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      background: #15100a;
+      border: 1px solid rgba(245, 197, 66, 0.35);
+      border-radius: 6px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+    }
+    .bet-list.open { display: grid; }
+    .bet-list button {
+      padding: 7px 2px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: #241a0e;
+      color: #d8c69a;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .bet-list button.active {
+      border-color: #f5c542;
+      color: #ffe9a8;
+      background: rgba(245,197,66,0.18);
+    }
+
     .buy-bonus-btn {
       width: 100%;
       padding: 8px 12px;
@@ -1091,6 +1201,52 @@
       box-shadow: 0 0 10px rgba(40, 229, 184, 0.25);
     }
     .side-ctrl-btn svg { width: 14px; height: 14px; }
+    .auto-wrap { position: relative; display: flex; flex: 1; min-width: 0; }
+    .auto-menu {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      right: 0;
+      z-index: 45;
+      width: 128px;
+      padding: 6px;
+      grid-template-columns: 1fr;
+      gap: 3px;
+      background: #15100a;
+      border: 1px solid rgba(245, 197, 66, 0.35);
+      border-radius: 6px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+    }
+    .auto-menu.open { display: grid; }
+    .auto-menu button {
+      padding: 7px 6px;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 4px;
+      background: #241a0e;
+      color: #d8c69a;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .auto-menu button:hover { border-color: #f5c542; color: #ffe9a8; }
+    .auto-stop {
+      display: none;
+      position: absolute;
+      top: -8px;
+      right: -4px;
+      z-index: 46;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #f59e0b;
+      background: #2a1608;
+      color: #ffd08a;
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(245,158,11,0.4);
+    }
+    .auto-stop.show { display: block; }
 
     .spin-main-btn {
       width: 98px;
@@ -1123,6 +1279,169 @@
     /* ============================================================
        CELEBRAÇÕES: TELAS DE BIG WIN / MEGA WIN / SUPER MEGA WIN
        ============================================================ */
+    /* CINEMÁTICA DA CARTA — coelho prepara, lança e carta gira até o centro */
+    .card-cine {
+      position: fixed;
+      inset: 0;
+      z-index: 880;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+    }
+    .card-cine.run { opacity: 1; visibility: visible; }
+    .card-cine-glow {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 60vmin; height: 60vmin;
+      transform: translate(-50%, -50%) scale(0.3);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,197,66,0.35), transparent 68%);
+      opacity: 0;
+    }
+    .card-cine.run .card-cine-glow { animation: cardGlowIn 1.15s ease-out forwards; }
+    .card-cine-rabbit {
+      position: absolute;
+      left: 18%; bottom: 8%;
+      width: min(38vw, 168px);
+      transform: translate(-30%, 20%) scale(0.8);
+      filter: drop-shadow(0 10px 24px rgba(0,0,0,0.65));
+      opacity: 0;
+    }
+    .card-cine.run .card-cine-rabbit { animation: cardRabbitThrow 1.25s cubic-bezier(0.34,1.3,0.5,1) forwards; }
+    .card-cine-card {
+      position: absolute;
+      left: 18%; bottom: 16%;
+      width: 86px; height: 118px;
+      border-radius: 10px;
+      background: linear-gradient(145deg, #f7e7a8, #d9a72f 60%, #8a5a08);
+      border: 2px solid #fff2c4;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6), inset 0 0 0 3px rgba(90,55,4,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: rotate(-18deg) scale(0.7);
+    }
+    .card-cine-card img { width: 66px; height: 66px; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.4)); }
+    .card-cine.run .card-cine-card { animation: cardFlight 1.25s cubic-bezier(0.22,0.9,0.25,1) forwards; }
+    .card-cine-impact {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #fff;
+      opacity: 0;
+      box-shadow: 0 0 40px 18px rgba(245,197,66,0.9);
+    }
+    .card-cine.run .card-cine-impact { animation: cardImpact 0.5s ease-out 1.05s forwards; }
+    @keyframes cardGlowIn {
+      0% { opacity: 0; transform: translate(-50%,-50%) scale(0.3); }
+      60% { opacity: 0.7; transform: translate(-50%,-50%) scale(1); }
+      100% { opacity: 0.15; transform: translate(-50%,-50%) scale(1.2); }
+    }
+    @keyframes cardRabbitThrow {
+      0% { opacity: 0; transform: translate(-30%, 20%) scale(0.75) rotate(-6deg); }
+      22% { opacity: 1; transform: translate(-30%, 0%) scale(1.05) rotate(3deg); }
+      46% { transform: translate(-30%, -6%) scale(1.12) rotate(-4deg); }
+      70% { transform: translate(-20%, -2%) scale(1.05) rotate(8deg); }
+      100% { opacity: 1; transform: translate(-30%, 0%) scale(1) rotate(0); }
+    }
+    @keyframes cardFlight {
+      0% { opacity: 0; left: 18%; bottom: 16%; transform: rotate(-18deg) scale(0.7); }
+      18% { opacity: 1; left: 26%; bottom: 26%; transform: rotate(-8deg) scale(0.92); }
+      46% { opacity: 1; left: 44%; bottom: 54%; transform: rotate(130deg) scale(1.12); }
+      72% { opacity: 1; left: 55%; bottom: 62%; transform: rotate(310deg) scale(1.16); }
+      100% { opacity: 0; left: 50%; bottom: 50%; transform: translate(50%, 50%) rotate(360deg) scale(1.4); }
+    }
+    @keyframes cardImpact {
+      0% { opacity: 0.95; transform: translate(-50%,-50%) scale(0.4); }
+      100% { opacity: 0; transform: translate(-50%,-50%) scale(7); }
+    }
+
+    /* CINEMÁTICA DE BÔNUS — mudança de cena antes do giro */
+    .bonus-cine {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      background: radial-gradient(circle at 50% 42%, rgba(16,185,129,0.36), rgba(5,12,18,0.96) 72%);
+      overflow: hidden;
+    }
+    .bonus-cine.run { animation: bonusCineFade 1.15s ease-in-out forwards; }
+    .bonus-rays {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 180vmax; height: 180vmax;
+      transform: translate(-50%, -50%);
+      background: repeating-conic-gradient(from 0deg, rgba(245,197,66,0.10) 0deg 5deg, transparent 5deg 13deg);
+      animation: bonusRaysSpin 2.6s linear infinite;
+      opacity: 0;
+    }
+    .bonus-cine.run .bonus-rays { opacity: 1; }
+    .bonus-rabbit {
+      position: absolute;
+      left: 50%; top: 52%;
+      width: min(46vw, 210px);
+      transform: translate(-50%, -50%) scale(0.7);
+      filter: drop-shadow(0 12px 30px rgba(0,0,0,0.7)) drop-shadow(0 0 26px rgba(16,185,129,0.5));
+      opacity: 0;
+    }
+    .bonus-cine.run .bonus-rabbit { animation: bonusRabbitReveal 1.1s cubic-bezier(0.22,1.4,0.36,1) forwards; }
+    .bonus-word {
+      position: absolute;
+      left: 50%; top: 20%;
+      transform: translate(-50%, -50%) scale(0.5);
+      font-family: 'Cinzel', serif;
+      font-size: clamp(28px, 8vw, 68px);
+      font-weight: 900;
+      letter-spacing: 5px;
+      color: #f7e7a8;
+      text-shadow: 0 0 24px rgba(16,185,129,0.9), 0 6px 24px rgba(0,0,0,0.8);
+      opacity: 0;
+      white-space: nowrap;
+    }
+    .bonus-cine.run .bonus-word { animation: bonusWordStamp 1.1s cubic-bezier(0.2,1.6,0.4,1) forwards; }
+    .bonus-particles { position: absolute; inset: 0; }
+    .bonus-particles i {
+      position: absolute;
+      top: 110%;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #f5d77a;
+      box-shadow: 0 0 10px #f5d77a;
+      opacity: 0;
+    }
+    .bonus-cine.run .bonus-particles i { animation: bonusParticleRise 1.5s ease-out forwards; }
+    @keyframes bonusCineFade {
+      0% { opacity: 0; visibility: visible; }
+      18% { opacity: 1; }
+      78% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+    @keyframes bonusRaysSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+    @keyframes bonusRabbitReveal {
+      0% { opacity: 0; transform: translate(-50%, -30%) scale(0.5) rotate(-12deg); }
+      55% { opacity: 1; transform: translate(-50%, -50%) scale(1.12) rotate(4deg); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); }
+    }
+    @keyframes bonusWordStamp {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-8deg); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(2deg); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); }
+    }
+    @keyframes bonusParticleRise {
+      0% { top: 110%; opacity: 0; transform: scale(0.6); }
+      20% { opacity: 0.9; }
+      100% { top: -10%; opacity: 0; transform: scale(1.2) translateX(var(--drift, 0px)); }
+    }
+    .buy-bonus-btn.cine-pulse { animation: buyBtnCinePulse 1s ease-in-out; }
+    @keyframes buyBtnCinePulse {
+      0%, 100% { box-shadow: 0 0 0 rgba(245,197,66,0); }
+      50% { box-shadow: 0 0 26px rgba(245,197,66,0.9), inset 0 0 14px rgba(245,197,66,0.5); transform: scale(1.02); }
+    }
+
     .win-overlay-modal {
       position: fixed;
       inset: 0;
@@ -1397,6 +1716,23 @@
       70% { transform: scale(1.08); opacity: 1; }
       100% { transform: scale(1); }
     }
+
+    /* Acessibilidade: quem pediu redução de movimento vê o jogo sem coreografias longas. */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .bonus-cine, .card-cine { display: none !important; }
+    }
+    /* Mobile: menos partículas e brilhos para preservar bateria/60fps */
+    @media (max-width: 520px) {
+      .bonus-cine .bonus-particles i:nth-child(n+14) { display: none; }
+      .win-sunburst { opacity: 0.5; }
+      .loader-screen::before { filter: blur(6px) brightness(0.38); }
+    }
   </style>
 </head>
 <body>
@@ -1524,7 +1860,7 @@
 
       <button type="button" class="loader-enter-btn" id="loaderEnterBtn" onclick="entrarNoJogo()">
         <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        <span>JOGAR</span>
+        <span>INICIAR</span>
       </button>
     </div>
   </div>
@@ -1603,7 +1939,16 @@
 
     <!-- CONTROLES -->
     <section class="slot-controls">
-      <div class="bet-quick-row" id="betChips"></div>
+      <div class="bet-control" id="betControl">
+        <button type="button" class="bet-step" id="betMinus" onclick="stepBet(-1)" aria-label="Diminuir aposta">&#8722;</button>
+        <div class="bet-value-wrap">
+          <span class="bet-value" id="betValue">R$ 0,50</span>
+          <span class="bet-caption">APOSTA</span>
+        </div>
+        <button type="button" class="bet-step" id="betPlus" onclick="stepBet(1)" aria-label="Aumentar aposta">+</button>
+        <button type="button" class="bet-list-btn" id="betListBtn" onclick="toggleBetList()" aria-label="Lista de valores">&#9776;</button>
+        <div class="bet-list" id="betList"></div>
+      </div>
 
       <button type="button" class="buy-bonus-btn" id="buyBonusBtn" onclick="abrirModalCompraBonus()">
         <span>COMPRAR BÔNUS (10 GIROS)</span>
@@ -1618,15 +1963,42 @@
 
         <button type="button" class="spin-main-btn" id="spinBtn" onclick="girar()">GIRAR</button>
 
-        <button type="button" class="side-ctrl-btn" id="autoBtn" onclick="toggleAuto()" title="Giro Automático">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          <span id="autoLabel">Auto</span>
-        </button>
+        <div class="auto-wrap">
+          <button type="button" class="side-ctrl-btn" id="autoBtn" onclick="toggleAutoMenu()" title="Giros automáticos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span id="autoLabel">Auto</span>
+          </button>
+          <div class="auto-menu" id="autoMenu">
+            <button type="button" onclick="iniciarAuto(5)">5 giros</button>
+            <button type="button" onclick="iniciarAuto(10)">10 giros</button>
+            <button type="button" onclick="iniciarAuto(20)">20 giros</button>
+            <button type="button" onclick="iniciarAuto(30)">30 giros</button>
+            <button type="button" onclick="iniciarAuto(50)">50 giros</button>
+            <button type="button" onclick="iniciarAuto(100)">100 giros</button>
+          </div>
+          <button type="button" class="auto-stop" id="autoStopBtn" onclick="pararAuto()">PARAR</button>
+        </div>
       </div>
 
       <div class="slot-msg" id="slotMsg">3 WILDs (1 em cada carretel) ativam 10 rodadas grátis!</div>
     </section>
   </main>
+
+  <!-- CINEMÁTICA DA CARTA DO COELHO -->
+  <div class="card-cine" id="cardCine" aria-hidden="true">
+    <div class="card-cine-glow" id="cardGlow"></div>
+    <img class="card-cine-rabbit" src="img/originals/slot777/mascot.webp" alt="">
+    <div class="card-cine-card" id="cardCineCard"><img id="cardCineImg" src="img/originals/slot777/seven.webp" alt=""></div>
+    <div class="card-cine-impact" id="cardImpact"></div>
+  </div>
+
+  <!-- CINEMÁTICA DE BÔNUS -->
+  <div class="bonus-cine" id="bonusCine">
+    <div class="bonus-rays"></div>
+    <div class="bonus-particles" id="bonusParticles"></div>
+    <img class="bonus-rabbit" src="img/originals/slot777/mascot.webp" alt="">
+    <div class="bonus-word" id="bonusWord">BÔNUS!</div>
+  </div>
 
   <!-- ============================================================
        CELEBRAÇÃO MODAL: BIG WIN / MEGA WIN / SUPER MEGA WIN
@@ -1707,10 +2079,11 @@
     const SLOT_LINES = [
       [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 4, 8], [6, 4, 2]
     ];
-    const DEFAULT_BETS = [0.5, 1, 2, 5, 10, 25, 50];
+    const DEFAULT_BETS = [0.5, 1, 2, 5, 10, 20, 25, 50, 100, 200, 500];
     const JACKPOT_MULT = 1000;
     const JACKPOT_CHANCE = 0.00001;
     const NEAR_JACKPOT_CHANCE = 0.02;
+    const REDUCE_MOTION = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     const CELL_H = 74;
     const ICON_BASE = 'img/originals/slot777/';
     const ALL_ASSETS = [
@@ -2156,19 +2529,43 @@
       }
     }
 
-    function renderWinLines(winLines) {
+    function renderWinLines(winLines, tier) {
       const svg = document.getElementById('winLinesSvg');
+      if (!svg) return;
+      svg.setAttribute('class', 'win-lines-svg' + (tier ? ' tier-' + tier : ''));
       if (!winLines || !winLines.length) { svg.innerHTML = ''; return; }
       const centers = [
         [50, 37],  [150, 37],  [250, 37],
         [50, 111], [150, 111], [250, 111],
         [50, 185], [150, 185], [250, 185]
       ];
-      svg.innerHTML = winLines.map(wl => {
-        const [a, b, c] = wl.cells;
-        const p1 = centers[a], p2 = centers[b], p3 = centers[c];
-        return '<path class="win-line-path" d="M ' + p1[0] + ' ' + p1[1] + ' L ' + p2[0] + ' ' + p2[1] + ' L ' + p3[0] + ' ' + p3[1] + '"/>';
-      }).join('');
+
+      let paths = '';
+      let sparks = '';
+      winLines.forEach((wl, i) => {
+        const cells = Array.isArray(wl.cells) ? wl.cells : [];
+        const pts = cells.map(c => centers[c]).filter(Boolean);
+        if (pts.length < 2) return;
+        const p1 = pts[0], p2 = pts[Math.floor(pts.length / 2)], p3 = pts[pts.length - 1];
+        const pid = 'winPath' + i;
+        // Curva suave que passa "por" a célula do meio, com brilho percorrendo o traço.
+        const dpath = 'M ' + p1[0] + ' ' + p1[1] + ' Q ' + p2[0] + ' ' + p2[1] + ' ' + p3[0] + ' ' + p3[1];
+        paths += '<path id="' + pid + '" class="win-line-path" d="' + dpath + '"/>';
+        const dur = (1.1 + i * 0.08).toFixed(2);
+        const delay = (i * 0.18).toFixed(2);
+        for (let s = 0; s < 2; s++) {
+          const begin = (parseFloat(delay) + s * parseFloat(dur) / 2).toFixed(2);
+          sparks += '<circle class="win-line-spark" r="2.6">' +
+            '<animateMotion dur="' + dur + 's" begin="' + begin + 's" repeatCount="indefinite" calcMode="linear">' +
+              '<mpath href="#' + pid + '"/>' +
+            '</animateMotion>' +
+          '</circle>';
+        }
+      });
+
+      svg.innerHTML = '<defs><filter id="wlGlow" x="-50%" y="-50%" width="200%" height="200%">' +
+        '<feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>' +
+        '</filter></defs>' + paths + sparks;
     }
 
     /* ============================================================
@@ -2203,8 +2600,21 @@
         }
 
         const modal = document.getElementById('winModal');
-        modal.className = 'win-overlay-modal show tier-' + tier;
-        document.getElementById('winBadgeTitle').textContent = badgeText;
+        const badgeEl = document.getElementById('winBadgeTitle');
+        const textoPorTier = {
+          big: 'BIG WIN',
+          mega: 'MEGA WIN',
+          super: isFullBoard ? 'TELA CHEIA 5X — SUPER MEGA WIN' : 'SUPER MEGA WIN',
+          jackpot: 'JACKPOT ZKN 1000x!'
+        };
+        // A classificação evolui junto com o valor contado — nunca é sorteada.
+        let tierExibido = jackpot ? 'jackpot' : 'big';
+        function aplicarTierExibido(t) {
+          tierExibido = t;
+          modal.className = 'win-overlay-modal show tier-' + t;
+          if (badgeEl) badgeEl.textContent = textoPorTier[t];
+        }
+        aplicarTierExibido(tierExibido);
 
         const shell = document.querySelector('.slot-shell');
         if (shell) shell.classList.add(jackpot ? 'jackpot-shake' : 'win-shake');
@@ -2217,7 +2627,7 @@
 
         // Animação rolante do contador de moedas de 0 até o valor final
         const numEl = document.getElementById('winCounterNum');
-        const duration = jackpot ? (isTurbo ? 2200 : 3600) : (isTurbo ? 1200 : 2200);
+        const duration = REDUCE_MOTION ? 400 : (jackpot ? (isTurbo ? 2200 : 3600) : (isTurbo ? 1200 : 2200));
         const startTime = performance.now();
 
         if (_winCounterAnim) cancelAnimationFrame(_winCounterAnim);
@@ -2225,8 +2635,22 @@
         function tick(now) {
           const elapsed = now - startTime;
           const progress = Math.min(1, elapsed / duration);
-          const currentVal = winAmount * progress;
+          // easeOutCubic: sobe rápido e desacelera no final, como um contador comercial.
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const currentVal = winAmount * eased;
           numEl.textContent = fmtBRL(currentVal);
+
+          if (!jackpot) {
+            const multAtual = currentVal / (betAmount || 0.5);
+            let proximoTier = 'big';
+            if (multAtual >= 30 || (isFullBoard && progress > 0.55)) proximoTier = 'super';
+            else if (multAtual >= 15) proximoTier = 'mega';
+            if (proximoTier !== tierExibido) {
+              aplicarTierExibido(proximoTier);
+              playTone(proximoTier === 'super' ? 1046 : 880, 0.16, 'triangle', 0.14);
+              if (navigator.vibrate) navigator.vibrate(proximoTier === 'super' ? 40 : 22);
+            }
+          }
 
           if (Math.random() > 0.4) playCoinTickSound();
 
@@ -2234,6 +2658,7 @@
             _winCounterAnim = requestAnimationFrame(tick);
           } else {
             numEl.textContent = fmtBRL(winAmount);
+            aplicarTierExibido(tier); // garante a classificação final real
             _winCounterAnim = null;
             // Fecha automaticamente após celebração
             _winAutoCloseTimer = setTimeout(coletarWinInstantaneo, jackpot ? (isTurbo ? 2000 : 3200) : (isTurbo ? 1000 : 2000));
@@ -2340,7 +2765,7 @@
       const hud = document.getElementById('bonusHud');
       const buyBtn = document.getElementById('buyBonusBtn');
       const spinBtn = document.getElementById('spinBtn');
-      const chips = document.querySelectorAll('.bet-chip');
+      const chips = [document.getElementById('betMinus'), document.getElementById('betPlus'), document.getElementById('betListBtn')].filter(Boolean);
       const buyCost = Math.round(currentBet * bonusBuyMult * 100) / 100;
       document.getElementById('buyBonusPrice').textContent = fmtBRL(buyCost);
 
@@ -2356,23 +2781,52 @@
         hud.classList.remove('show');
         buyBtn.disabled = isSpinning;
         spinBtn.textContent = 'GIRAR';
-        chips.forEach(c => { c.disabled = false; });
+        chips.forEach(c => { c.disabled = isSpinning; });
+        if (!isSpinning) {
+          const idx = allowedBets.indexOf(currentBet);
+          const minus = document.getElementById('betMinus');
+          const plus = document.getElementById('betPlus');
+          if (minus) minus.disabled = idx <= 0;
+          if (plus) plus.disabled = idx >= allowedBets.length - 1;
+        }
       }
     }
 
     function renderBetChips() {
-      const wrap = document.getElementById('betChips');
-      wrap.innerHTML = allowedBets.map(v =>
-        '<button type="button" class="bet-chip ' + (v === currentBet ? 'active' : '') + '" onclick="setBet(' + v + ')">' +
-          fmtBRL(v).replace(',00', '') +
-        '</button>'
-      ).join('');
+      const valEl = document.getElementById('betValue');
+      if (valEl) valEl.textContent = fmtBRL(currentBet);
+      const minus = document.getElementById('betMinus');
+      const plus = document.getElementById('betPlus');
+      if (minus) minus.disabled = allowedBets.indexOf(currentBet) <= 0;
+      if (plus) plus.disabled = allowedBets.indexOf(currentBet) >= allowedBets.length - 1;
+
+      const list = document.getElementById('betList');
+      if (list) {
+        list.innerHTML = allowedBets.map(v =>
+          '<button type="button" class="' + (v === currentBet ? 'active' : '') + '" onclick="setBet(' + v + '); document.getElementById(\'betList\').classList.remove(\'open\')">' +
+            fmtBRL(v).replace(',00', '') +
+          '</button>'
+        ).join('');
+      }
       syncBonusUI();
+    }
+
+    function stepBet(dir) {
+      if (isSpinning || (activeBonus && activeBonus.spinsLeft > 0)) return;
+      const i = allowedBets.indexOf(currentBet);
+      const next = Math.max(0, Math.min(allowedBets.length - 1, (i < 0 ? 0 : i) + dir));
+      setBet(allowedBets[next]);
+    }
+
+    function toggleBetList() {
+      if (isSpinning || (activeBonus && activeBonus.spinsLeft > 0)) return;
+      const list = document.getElementById('betList');
+      if (list) list.classList.toggle('open');
     }
 
     function setBet(val) {
       if (isSpinning || (activeBonus && activeBonus.spinsLeft > 0)) return;
-      currentBet = val;
+      currentBet = Number(val);
       renderBetChips();
       playTone(520, 0.05, 'sine', 0.06);
     }
@@ -2391,17 +2845,40 @@
       playTone(isTurbo ? 880 : 440, 0.06, 'triangle', 0.08);
     }
 
-    function toggleAuto() {
-      if (autoRemaining > 0) {
-        autoRemaining = 0;
-        document.getElementById('autoBtn').classList.remove('active');
-        document.getElementById('autoLabel').textContent = 'Auto';
-        return;
-      }
-      autoRemaining = 10;
+    function toggleAutoMenu() {
+      if (autoRemaining > 0) { pararAuto(); return; }
+      const menu = document.getElementById('autoMenu');
+      if (menu) menu.classList.toggle('open');
+    }
+
+    function iniciarAuto(qtd) {
+      if (!gameReady || isSpinning) return;
+      const menu = document.getElementById('autoMenu');
+      if (menu) menu.classList.remove('open');
+      autoRemaining = Number(qtd) || 10;
       document.getElementById('autoBtn').classList.add('active');
+      document.getElementById('autoStopBtn').classList.add('show');
       document.getElementById('autoLabel').textContent = 'Auto (' + autoRemaining + ')';
+      playTone(720, 0.07, 'triangle', 0.1);
       if (!isSpinning) girar();
+    }
+
+    function pararAuto() {
+      autoRemaining = 0;
+      const btn = document.getElementById('autoBtn');
+      const stop = document.getElementById('autoStopBtn');
+      const menu = document.getElementById('autoMenu');
+      if (btn) btn.classList.remove('active');
+      if (stop) stop.classList.remove('show');
+      if (menu) menu.classList.remove('open');
+      document.getElementById('autoLabel').textContent = 'Auto';
+    }
+
+    function syncAutoUI() {
+      const label = document.getElementById('autoLabel');
+      if (label) label.textContent = autoRemaining > 0 ? ('Auto (' + autoRemaining + ')') : 'Auto';
+      const stop = document.getElementById('autoStopBtn');
+      if (stop) stop.classList.toggle('show', autoRemaining > 0);
     }
 
     function updateBalanceUI(newBal) {
@@ -2417,6 +2894,25 @@
     /* ============================================================
        PROCESSAMENTO DE RESULTADO E RODADA
        ============================================================ */
+    async function animarCarta(d) {
+      const cine = document.getElementById('cardCine');
+      if (!cine || REDUCE_MOTION) return;
+      const grid = Array.isArray(d.grid) ? d.grid : [];
+      const simbolo = grid.find(s => s && s !== 'wild') || grid[4] || 'seven';
+      const img = document.getElementById('cardCineImg');
+      if (img) img.src = ICON_BASE + simbolo + '.webp';
+      cine.classList.remove('run');
+      void cine.offsetWidth;
+      cine.classList.add('run');
+      unlockAudio();
+      playTone(300, 0.09, 'triangle', 0.08);
+      setTimeout(() => playTone(520, 0.08, 'triangle', 0.08), 240);
+      setTimeout(() => playTone(880, 0.16, 'sine', 0.12), 640);
+      if (navigator.vibrate) navigator.vibrate(isTurbo ? 12 : 24);
+      await new Promise(r => setTimeout(r, isTurbo ? 620 : 1220));
+      cine.classList.remove('run');
+    }
+
     function piscarNearJackpot() {
       const tag = document.getElementById('jackpotTag');
       if (!tag) return;
@@ -2432,12 +2928,19 @@
       const winCellSet = new Set();
       (d.winLines || []).forEach(wl => wl.cells.forEach(c => winCellSet.add(c)));
 
+      // O coelho lança a carta: antecipação → voo com giro → impacto → revelação
+      await animarCarta(d);
+
       // Para os carretéis em cascata suave
       await stopReelsCascade(d.grid, winCellSet);
       currentGrid = d.grid;
-      renderWinLines(d.winLines);
-
       const winAmt = Number(d.win || 0);
+      const betUsed = d.bet || currentBet;
+      const ratioPremio = winAmt / (betUsed || 0.5);
+      const linhaTier = d.jackpot || ratioPremio >= 1000 ? 'jackpot'
+        : ratioPremio >= 30 ? 'super' : ratioPremio >= 15 ? 'mega' : 'big';
+      renderWinLines(d.winLines, linhaTier);
+
       if (d.mode === 'real' && typeof d.balance === 'number') {
         updateBalanceUI(d.balance);
       } else {
@@ -2452,7 +2955,6 @@
 
       const msgEl = document.getElementById('slotMsg');
       const winEl = document.getElementById('winVal');
-      const betUsed = d.bet || currentBet;
 
       if (d.jackpot) {
         winEl.textContent = fmtBRL(winAmt);
@@ -2522,9 +3024,7 @@
           updateBalanceUI(1000);
         } else {
           document.getElementById('slotMsg').textContent = 'Saldo insuficiente para aposta de ' + fmtBRL(currentBet) + '.';
-          autoRemaining = 0;
-          document.getElementById('autoBtn').classList.remove('active');
-          document.getElementById('autoLabel').textContent = 'Auto';
+          pararAuto();
           return;
         }
       }
@@ -2618,9 +3118,7 @@
             stopReelsEmergency();
             setMascotState('idle');
             document.getElementById('slotMsg').textContent = (res.data && res.data.message) || 'Erro ao girar.';
-            autoRemaining = 0;
-            document.getElementById('autoBtn').classList.remove('active');
-            document.getElementById('autoLabel').textContent = 'Auto';
+            pararAuto();
             if (currentMode === 'demo' && debitBet > 0) updateBalanceUI(currentBalance + debitBet);
             return;
           }
@@ -2637,9 +3135,14 @@
         syncBonusUI();
         if (autoRemaining > 0) {
           autoRemaining--;
-          document.getElementById('autoLabel').textContent = autoRemaining > 0 ? ('Auto (' + autoRemaining + ')') : 'Auto';
-          if (autoRemaining === 0) document.getElementById('autoBtn').classList.remove('active');
-          setTimeout(() => { if (!isSpinning) girar(); }, isTurbo ? 100 : 250);
+          syncAutoUI();
+          if (autoRemaining === 0) pararAuto();
+          else if (currentMode !== 'demo' && currentBalance + 0.0001 < currentBet) {
+            pararAuto();
+            document.getElementById('slotMsg').textContent = 'Auto encerrado: saldo insuficiente.';
+          } else {
+            setTimeout(() => { if (!isSpinning && autoRemaining > 0) girar(); }, isTurbo ? 100 : 250);
+          }
         }
       }
     }
@@ -2658,9 +3161,35 @@
       document.getElementById('buyBackdrop').classList.remove('open');
     }
 
+    async function sequenciaBonus() {
+      if (REDUCE_MOTION) return;
+      const cine = document.getElementById('bonusCine');
+      const particles = document.getElementById('bonusParticles');
+      const buy = document.getElementById('buyBonusBtn');
+      if (buy) { buy.classList.add('cine-pulse'); }
+      if (particles) {
+        let html = '';
+        for (let i = 0; i < 26; i++) {
+          const left = (i * 37 + Math.random() * 9) % 100;
+          const delay = (Math.random() * 0.5).toFixed(2);
+          const drift = Math.round(Math.random() * 60 - 30);
+          html += '<i style="left:' + left + '%;animation-delay:' + delay + 's;--drift:' + drift + 'px"></i>';
+        }
+        particles.innerHTML = html;
+      }
+      if (cine) { cine.classList.remove('run'); void cine.offsetWidth; cine.classList.add('run'); }
+      unlockAudio();
+      playTone(392, 0.18, 'triangle', 0.12);
+      setTimeout(() => playTone(523, 0.18, 'triangle', 0.12), 110);
+      setTimeout(() => playTone(784, 0.28, 'sine', 0.14), 240);
+      await new Promise(r => setTimeout(r, isTurbo ? 480 : 900));
+      if (buy) buy.classList.remove('cine-pulse');
+    }
+
     async function confirmarCompraBonus() {
       if (isSpinning) return;
       unlockAudio();
+      await sequenciaBonus();
       const buyCost = Math.round(currentBet * bonusBuyMult * 100) / 100;
       if (currentBalance + 0.0001 < buyCost) {
         if (currentMode === 'demo') {
@@ -2734,6 +3263,10 @@
         isSpinning = false;
         document.getElementById('spinBtn').disabled = false;
         syncBonusUI();
+        // O bônus recém-comprado já inicia o primeiro giro automaticamente.
+        if (activeBonus && activeBonus.spinsLeft > 0 && autoRemaining === 0) {
+          setTimeout(() => { if (!isSpinning && activeBonus && activeBonus.spinsLeft > 0) girar(); }, isTurbo ? 320 : 620);
+        }
       }
     }
 
@@ -2796,6 +3329,7 @@
        PRELOADER ESTÚDIO: DECODIFICAÇÃO DE IMAGENS + API FETCH
        ============================================================ */
     (async function init() {
+      const iniciadoEm = Date.now();
       startLoaderCarousel();
 
       const fill = document.getElementById('loaderFill');
@@ -2880,8 +3414,14 @@
         renderBetChips();
       }
 
+      // Duração mínima da introdução (não é progresso falso: os recursos já carregaram).
+      const introMinima = isTurbo ? 1200 : 2400;
+      const restante = introMinima - (Date.now() - iniciadoEm);
+      if (restante > 0) await new Promise(r => setTimeout(r, restante));
+
       const petBubble = document.getElementById('loaderPetBubble');
-      if (petBubble) petBubble.textContent = '100% Carregado!';
+      if (petBubble) petBubble.textContent = 'Tudo pronto!';
+      if (statusEl) statusEl.textContent = 'Pronto para iniciar';
       if (animWrap) animWrap.classList.add('hide');
       enterBtn.classList.add('show');
     })();
