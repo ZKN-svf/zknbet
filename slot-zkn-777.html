@@ -2028,11 +2028,12 @@
   <script src="assets/config.js"></script>
   <script src="assets/auth.js"></script>
   <script>
-    const isUserLoggedIn = !!(window.ZKNAuth && ZKNAuth.isLoggedIn && ZKNAuth.isLoggedIn());
-    if (!isUserLoggedIn) {
+    let isUserLoggedIn = !!(window.ZKNAuth && ZKNAuth.isLoggedIn && ZKNAuth.isLoggedIn());
+    function syncGuestButton() {
       const glBtn = document.getElementById('guestLoginBtn');
-      if (glBtn) glBtn.style.display = 'inline-flex';
+      if (glBtn) glBtn.style.display = isUserLoggedIn ? 'none' : 'inline-flex';
     }
+    syncGuestButton();
 
     const SYM_ORDER = ['clover', 'coin', 'ruby', 'bell', 'seven', 'crown', 'wild'];
     const SYM_MAP = {
@@ -2391,6 +2392,11 @@
       } else if (soundOn) {
         audioCtx.resume().catch(() => {});
       }
+      if (!document.hidden) sincronizarSessaoJogo();
+    });
+    window.addEventListener('focus', () => { sincronizarSessaoJogo(); });
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'zkn_jwt' || e.key === 'zkn_user') sincronizarSessaoJogo();
     });
 
     function startBgmScheduler() {
@@ -2956,6 +2962,65 @@
       if (stop) stop.classList.toggle('show', autoRemaining > 0);
     }
 
+    // Aplica o /info do servidor (modo real/demo, saldo, config). Reutilizado
+    // pelo preloader e pela sincronização quando o login aparece depois.
+    function aplicarInfoJogo(d) {
+      currentMode = d.mode === 'real' ? 'real' : 'demo';
+      allowedBets = Array.isArray(d.allowedBets) && d.allowedBets.length ? d.allowedBets : DEFAULT_BETS;
+      if (!allowedBets.includes(currentBet)) currentBet = allowedBets[0];
+      bonusBuyMult = Number(d.bonusBuyMult || 30);
+      if (d.cardBonusValues && typeof d.cardBonusValues === 'object') {
+        cardBonusValues = { ...CARD_VALUES_DEFAULT, ...d.cardBonusValues };
+      }
+      cardFullMultiplier = Number(d.cardFullMultiplier || CARD_FULL_MULT_DEFAULT);
+      if (Number(d.cardDropContinueChance) > 0) CARD_DROP_CONTINUE = Number(d.cardDropContinueChance);
+      if (Number(d.naturalBonusChance) > 0) NATURAL_BONUS_CHANCE = Number(d.naturalBonusChance);
+
+      const modeEl = document.getElementById('modeTag');
+      if (modeEl) {
+        modeEl.textContent = currentMode.toUpperCase();
+        modeEl.className = 'slot-mode-tag ' + currentMode;
+      }
+      const jackpotEl = document.getElementById('jackpotTag');
+      if (jackpotEl) jackpotEl.textContent = 'JACKPOT ' + Number(d.jackpotMultiplier || 1000) + 'x';
+      const rtpEl = document.getElementById('rtpBadge');
+      if (rtpEl) rtpEl.textContent = 'RTP ' + Number(d.targetRtp || 95).toFixed(1).replace('.0', '') + '%';
+      const btnSpan = document.getElementById('buyBonusBtn') && document.getElementById('buyBonusBtn').querySelector('span');
+      if (btnSpan) btnSpan.textContent = 'COMPRAR CARTA';
+
+      updateBalanceUI(currentMode === 'real' ? d.balance : 1000);
+      renderBetChips();
+
+      const payGrid = document.getElementById('payGrid');
+      if (payGrid) {
+        payGrid.innerHTML = (d.symbols || []).slice().reverse().map(s =>
+          '<div class="pay-item">' +
+            '<img src="' + ICON_BASE + s.id + '.webp" alt="' + s.name + '">' +
+            '<div><div class="pay-item-name">' + s.name + '</div><div class="pay-item-mult">' + s.mult + 'x</div></div>' +
+          '</div>'
+        ).join('');
+      }
+
+      if (currentMode === 'real') setMascotState('idle', 'Modo real ativo — saldo sincronizado!');
+    }
+
+    // Detecta login que aconteceu depois do carregamento (outra aba / aba em
+    // segundo plano / troca www <-> raiz) e atualiza o jogo sem recarregar.
+    async function sincronizarSessaoJogo() {
+      const logado = !!(window.ZKNAuth && ZKNAuth.isLoggedIn && ZKNAuth.isLoggedIn());
+      if (logado !== isUserLoggedIn) {
+        isUserLoggedIn = logado;
+        syncGuestButton();
+      }
+      if (!isUserLoggedIn || !gameReady) return;
+      // Só repete o /info se ainda estiver em demo (sinal de que entrou depois).
+      if (currentMode === 'real') return;
+      try {
+        const res = await ZKNAuth.api('/originals/slot777/info');
+        if (res && res.ok && res.data && res.data.ok) aplicarInfoJogo(res.data);
+      } catch (_) {}
+    }
+
     function updateBalanceUI(newBal) {
       currentBalance = Number(newBal || 0);
       document.getElementById('balanceVal').textContent = fmtBRL(currentBalance);
@@ -3209,6 +3274,7 @@
 
     async function girar() {
       if (!gameReady || isSpinning) return;
+      if (!isUserLoggedIn) await sincronizarSessaoJogo();
       unlockAudio();
 
       const debitBet = currentBet;
@@ -3323,6 +3389,7 @@
 
     async function confirmarCompraBonus() {
       if (isSpinning) return;
+      if (!isUserLoggedIn) await sincronizarSessaoJogo();
 
       // Trava IMEDIATAMENTE: a sequência de abertura tem ~1s e, sem essa trava,
       // toques repetidos no confirmar iniciavam duas cartas ao mesmo tempo.
@@ -3520,36 +3587,7 @@
       buildReelPool();
 
       if (info && info.ok && info.data && info.data.ok) {
-        const d = info.data;
-        currentMode = d.mode === 'real' ? 'real' : 'demo';
-        allowedBets = Array.isArray(d.allowedBets) && d.allowedBets.length ? d.allowedBets : DEFAULT_BETS;
-        if (!allowedBets.includes(currentBet)) currentBet = allowedBets[0];
-        bonusBuyMult = Number(d.bonusBuyMult || 30);
-        if (d.cardBonusValues && typeof d.cardBonusValues === 'object') {
-          cardBonusValues = { ...CARD_VALUES_DEFAULT, ...d.cardBonusValues };
-        }
-        cardFullMultiplier = Number(d.cardFullMultiplier || CARD_FULL_MULT_DEFAULT);
-        if (Number(d.cardDropContinueChance) > 0) CARD_DROP_CONTINUE = Number(d.cardDropContinueChance);
-        if (Number(d.naturalBonusChance) > 0) NATURAL_BONUS_CHANCE = Number(d.naturalBonusChance);
-
-        const modeEl = document.getElementById('modeTag');
-        modeEl.textContent = currentMode.toUpperCase();
-        modeEl.className = 'slot-mode-tag ' + currentMode;
-
-        document.getElementById('jackpotTag').textContent = 'JACKPOT ' + Number(d.jackpotMultiplier || 1000) + 'x';
-        document.getElementById('rtpBadge').textContent = 'RTP ' + Number(d.targetRtp || 95).toFixed(1).replace('.0', '') + '%';
-        document.getElementById('buyBonusBtn').querySelector('span').textContent = 'COMPRAR CARTA';
-
-        updateBalanceUI(currentMode === 'real' ? d.balance : 1000);
-        renderBetChips();
-
-        const payGrid = document.getElementById('payGrid');
-        payGrid.innerHTML = (d.symbols || []).slice().reverse().map(s =>
-          '<div class="pay-item">' +
-            '<img src="' + ICON_BASE + s.id + '.webp" alt="' + s.name + '">' +
-            '<div><div class="pay-item-name">' + s.name + '</div><div class="pay-item-mult">' + s.mult + 'x</div></div>' +
-          '</div>'
-        ).join('');
+        aplicarInfoJogo(info.data);
       } else {
         updateBalanceUI(1000);
         renderBetChips();
