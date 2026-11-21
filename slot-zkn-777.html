@@ -59,7 +59,6 @@
       padding: 24px 16px 28px;
       text-align: center;
       transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s ease, visibility 0.4s ease;
-      will-change: opacity, transform;
       overflow-y: auto;
     }
     .loader-screen::before {
@@ -142,7 +141,6 @@
       object-fit: contain;
       filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.65));
       animation: floatMascot 2.5s ease-in-out infinite;
-      will-change: transform;
     }
     .loader-pet-bubble {
       position: absolute;
@@ -481,7 +479,6 @@
       cursor: pointer;
       box-shadow: 0 8px 32px rgba(244, 232, 58, 0.55), 0 0 16px rgba(255, 255, 255, 0.4);
       animation: pulseButton 1.4s ease-in-out infinite;
-      will-change: transform, box-shadow;
     }
     .loader-enter-btn.show {
       display: inline-flex;
@@ -563,8 +560,8 @@
       animation: jackpotHit 1.4s ease-in-out infinite;
     }
     @keyframes jackpotIdle {
-      0%, 100% { transform: scale(1); filter: brightness(1); }
-      50% { transform: scale(1.06); filter: brightness(1.25); }
+      0%, 100% { transform: scale(1); opacity: 0.92; }
+      50% { transform: scale(1.05); opacity: 1; }
     }
     @keyframes jackpotNearFlash {
       0% { transform: scale(1); }
@@ -633,7 +630,6 @@
       border-radius: 50%;
       background: radial-gradient(circle, rgba(244, 232, 58, 0.42) 0%, rgba(16, 185, 129, 0.16) 55%, transparent 75%);
       transform: translate3d(0, 0, 0);
-      will-change: transform, opacity;
       animation: pulseAura 3s ease-in-out infinite;
     }
     .mascot-sprite-wrap {
@@ -787,31 +783,23 @@
       object-fit: contain;
       display: block;
       pointer-events: none;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
       transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .reel-cell.win-cell {
       background: radial-gradient(circle, rgba(244, 232, 58, 0.32) 0%, transparent 74%);
+      box-shadow: inset 0 0 18px rgba(244, 232, 58, 0.26);
     }
     .reel-cell.win-cell img {
-      transform: scale(1.12);
-      filter: drop-shadow(0 0 14px rgba(244, 232, 58, 0.85));
-      animation: winSymbolPop 0.85s cubic-bezier(0.34, 1.7, 0.64, 1) both;
-    }
-    .reel-cell.win-cell {
-      animation: winCellGlow 1.2s ease-in-out infinite alternate;
+      transform: scale(1.1);
+      animation: winSymbolPop 0.7s cubic-bezier(0.34, 1.7, 0.64, 1) both;
     }
     .reel-cell.dim-cell {
       opacity: 0.32;
     }
     @keyframes winSymbolPop {
-      0% { transform: scale(0.88) translateY(-6px); filter: brightness(1.8); }
-      55% { transform: scale(1.22); }
-      100% { transform: scale(1.12); }
-    }
-    @keyframes winCellGlow {
-      from { box-shadow: inset 0 0 0 rgba(244, 232, 58, 0); }
-      to { box-shadow: inset 0 0 22px rgba(244, 232, 58, 0.32); }
+      0% { transform: scale(0.9) translateY(-4px); }
+      55% { transform: scale(1.18); }
+      100% { transform: scale(1.1); }
     }
     .slot-shell.win-shake { animation: winShake 0.5s ease-in-out; }
     .slot-shell.jackpot-shake { animation: jackpotShake 0.75s ease-in-out; }
@@ -873,7 +861,7 @@
       box-shadow: inset 0 0 18px rgba(244, 232, 58, 0.8), 0 0 20px rgba(244, 232, 58, 0.4);
     }
     .reel-cell.card-line img {
-      filter: drop-shadow(0 0 12px rgba(244, 232, 58, 0.9));
+      transform: scale(1.06);
     }
 
     /* METERS */
@@ -1170,7 +1158,6 @@
       cursor: pointer;
       box-shadow: 0 6px 20px rgba(244, 232, 58, 0.45);
       transition: transform 0.06s ease, filter 0.1s ease;
-      will-change: transform;
     }
     .spin-main-btn:active:not(:disabled) { transform: scale(0.94); }
     .spin-main-btn:disabled { opacity: 0.55; cursor: not-allowed; }
@@ -1337,6 +1324,7 @@
       overflow: hidden;
     }
     .bonus-cine.run { animation: bonusCineFade 1.15s ease-in-out forwards; }
+    .bonus-cine:not(.run) * { animation-play-state: paused !important; }
     .bonus-rays {
       position: absolute;
       left: 50%; top: 50%;
@@ -1579,8 +1567,7 @@
     .slot-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(4, 6, 10, 0.85);
-      backdrop-filter: blur(6px);
+      background: rgba(4, 6, 10, 0.94);
       z-index: 300;
       display: none;
       align-items: center;
@@ -1712,9 +1699,12 @@
     /* Mobile: menos partículas e brilhos para preservar bateria/60fps */
     @media (max-width: 520px) {
       .bonus-cine .bonus-particles i:nth-child(n+14) { display: none; }
-      .win-sunburst { opacity: 0.5; animation-duration: 24s; }
+      .win-sunburst { opacity: 0.4; width: 320px; height: 320px; animation-duration: 24s; }
       .win-line-spark { display: none; }
       .mascot-speech { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); }
+      .mascot-sprite, .card-cine-rabbit, .bonus-rabbit { filter: none; }
+      .slot-shell { box-shadow: none; }
+      .slot-jackpot-tag, .buy-bonus-btn { animation: none; }
     }
     @media (hover: none) and (pointer: coarse) {
       .win-overlay-modal { background: rgba(3, 6, 10, 0.97); }
@@ -1774,7 +1764,7 @@
               <img src="img/originals/slot777/wild.webp" alt="Wild" class="slide-mini-wild">
             </div>
             <div class="slide-feature-title">SORTE DO SÍMBOLO DO BÔNUS</div>
-            <div class="slide-feature-highlight">CARTA DA SORTE · 10x NA GRADE COMPLETA</div>
+            <div class="slide-feature-highlight">CARTA DA SORTE · CASCATA ATÉ 10x NA GRADE COMPLETA</div>
           </div>
           <div class="slide-desc">Ative naturalmente nos giros ou compre a funcionalidade</div>
         </div>
@@ -1955,7 +1945,7 @@
         </div>
       </div>
 
-      <div class="slot-msg" id="slotMsg">O bônus é comprado — torça para o coelho soltar a carta do seu símbolo!</div>
+      <div class="slot-msg" id="slotMsg">Torça para o coelho soltar a carta — o bônus também pode cair no giro!</div>
     </section>
   </main>
 
@@ -2003,8 +1993,9 @@
       </div>
       <div class="pay-grid" id="payGrid"></div>
       <p class="pay-note">
-        <strong>Bônus da carta:</strong> ao comprar, a carta revela um símbolo — o wild também pode sair. A grade começa vazia e <strong>apenas esse símbolo</strong> pode cair, em ondas de 3. Se os 3 formarem uma linha, descem mais 3; se a segunda onda também conectar, a terceira fecha a grade. Grade completa paga <strong>10x</strong>. Se não completar, você recebe só o que conectou.<br><br>
-        <strong>Ameaça do coelho:</strong> às vezes ele quase solta a carta no giro normal, mas isso é só efeito visual e não muda o resultado.<br><br>
+        <strong>Bônus da carta:</strong> a carta revela um símbolo — o wild também pode sair. A grade começa vazia e <strong>apenas esse símbolo</strong> cai, um de cada vez. Cada símbolo que cai numa casa vazia dá chance de cair o próximo; se parar de cair, o bônus acaba. Se você tiver sorte de completar as 9 casas, a grade fecha e paga <strong>10x</strong>.<br><br>
+        <strong>Bônus no giro:</strong> além de comprado, o bônus pode cair de graça no giro normal (cerca de 1 em 250 giros).<br><br>
+        <strong>Ameaça do coelho:</strong> às vezes ele só finge soltar a carta no giro normal — isso é efeito visual e não muda o resultado.<br><br>
         <strong>Tela Cheia 5x:</strong> preencher os 9 espaços com o mesmo símbolo no giro normal multiplica o prêmio por <strong>5x</strong>!<br><br>
         <strong>Jackpot ZKN 1000x:</strong> prêmio surpresa raríssimo — pode cair em qualquer giro normal e paga até <strong>1000x</strong> o valor da aposta!
       </p>
@@ -2021,7 +2012,7 @@
         <button type="button" class="modal-close" onclick="fecharModalCompraBonus()">&times;</button>
       </div>
       <p class="pay-note" style="font-size:13px;color:#e2e8f0;">
-        A carta revela um símbolo e a grade começa vazia. Só caem símbolos iguais ao da carta, em ondas de 3: se os 3 conectarem numa linha, descem mais 3. Completou os 9 espaços? <strong>10x</strong> o que conectou. Aposta: <strong id="buyModalBet">R$ 0,50</strong>.
+        A carta revela um símbolo e a grade começa vazia. Só caem símbolos iguais ao da carta, um de cada vez: cada queda numa casa vazia dá chance de cair a próxima. Se parar de cair, o bônus acaba. Completou os 9 espaços? <strong>10x</strong>. Aposta: <strong id="buyModalBet">R$ 0,50</strong>.
       </p>
       <div style="margin-top:12px;padding:12px;background:#0b1117;border:1px solid rgba(244,232,58,0.28);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
         <span style="font-size:12px;color:var(--muted);font-weight:700;">Valor da compra</span>
@@ -2063,8 +2054,9 @@
       [0, 4, 8], [2, 4, 6]
     ];
     const CARD_VALUES_DEFAULT = { clover: 2.6, coin: 2.7, ruby: 2.8, bell: 2.9, seven: 3.0, crown: 3.1, wild: 3.2 };
-    const CARD_CONNECT_WAVE1 = 0.70;
-    const CARD_CONNECT_WAVE2 = 0.09;
+    // Cascata: cada queda que acerta uma casa vazia dá chance à próxima.
+    let CARD_DROP_CONTINUE = 0.735;
+    let NATURAL_BONUS_CHANCE = 0.004; // ~1 em 250 giros
     const CARD_FULL_MULT_DEFAULT = 10;
     const DEFAULT_BETS = [0.5, 1, 2, 5, 10, 20, 25, 50, 100, 200, 500];
     const JACKPOT_MULT = 1000;
@@ -2092,6 +2084,7 @@
     let soundOn = true;
     let autoRemaining = 0;
     let currentGrid = ['seven', 'coin', 'clover', 'wild', 'seven', 'ruby', 'crown', 'bell', 'seven'];
+    let lastFullGrid = currentGrid.slice();
 
     // Motor de Simulação Local para Visitante / Modo Demo Offline
     function localRandomSymbol(excludeWild) {
@@ -2172,6 +2165,19 @@
     function simularGiroLocal(bet) {
       const grid = Array.from({ length: 9 }, () => localRandomSymbol(false));
       const outcome = aplicarJackpotLocal(avaliarGridLocal(grid, bet, 1), bet);
+
+      // O bônus também pode cair de graça no giro normal (espelho do servidor).
+      if (!outcome.jackpot && Math.random() < NATURAL_BONUS_CHANCE) {
+        const carta = montarCartaLocal(bet);
+        return Object.assign({
+          ok: true, mode: 'demo', bet, bonusFromSpin: true,
+          winLines: [], isFullBoard: carta.cardFullBoard,
+          boardMultiplier: carta.cardFullBoard ? cardFullMultiplier : 1,
+          totalMultiplier: carta.totalMultiplier, jackpot: false,
+          nearJackpot: false,
+        }, carta);
+      }
+
       let cardEvent = null;
       let cardSymbol = null;
       // Ameaça visual: mesmo comportamento do servidor, sem alterar o resultado.
@@ -2183,11 +2189,24 @@
         cardSymbol = Object.entries(contagem).sort((a, b) => b[1] - a[1])[0]?.[0] || 'seven';
         cardEvent = 'threat';
       }
-      return { ok: true, mode: 'demo', grid, outcome, cardEvent, cardSymbol, cardFullBoard: false };
+      return {
+        ok: true, mode: 'demo', grid, bet,
+        win: outcome.winAmount,
+        winLines: outcome.winLines,
+        isFullBoard: outcome.isFullBoard,
+        boardMultiplier: outcome.boardMultiplier,
+        totalMultiplier: outcome.totalMultiplier,
+        jackpot: !!outcome.jackpot,
+        jackpotMultiplier: outcome.jackpot ? outcome.jackpotMultiplier : 0,
+        nearJackpot: !!outcome.nearJackpot,
+        cardBonus: false, bonusFromSpin: false, cardEvent, cardSymbol,
+        cardFullBoard: false, cardDrop: null,
+      };
     }
 
     /* BÔNUS DA CARTA — espelho local da lógica do servidor.
-       Grade vazia, ondas de 3 do MESMO símbolo, conexão por linha e 10x na grade cheia. */
+       Grade vazia, quedas de 1 símbolo de cada vez. Enquanto a queda acertar
+       uma casa vazia, vem a próxima; se parar, o bônus acaba. 10x na grade cheia. */
     function cartaSortearSimbolo() {
       const total = SYM_ORDER.reduce((s, id) => s + SYM_MAP[id].weight, 0);
       let r = Math.random() * total;
@@ -2199,98 +2218,49 @@
       return SYM_ORDER[0];
     }
 
-    function cartaCombinarTriplas(cells) {
-      const out = [];
-      for (let a = 0; a < cells.length; a++) {
-        for (let b = a + 1; b < cells.length; b++) {
-          for (let c = b + 1; c < cells.length; c++) {
-            out.push([cells[a], cells[b], cells[c]]);
-          }
-        }
-      }
-      return out;
-    }
-
     function cartaLinhasNovas(antes, depois) {
       return CARD_LINES.filter(line =>
         !line.every(i => antes.has(i)) && line.every(i => depois.has(i))
       );
     }
 
-    function cartaGerarOndas() {
+    function cartaGerarQuedas() {
       const preenchidas = new Set();
-      const ondas = [];
+      const quedas = [];
 
-      // 1ª onda: 70% já conecta numa linha; senão cai em 3 casas que não formam linha.
-      let posicoes;
-      let linha = null;
-      if (Math.random() < CARD_CONNECT_WAVE1) {
-        linha = CARD_LINES[Math.floor(Math.random() * CARD_LINES.length)].slice();
-        posicoes = linha.slice();
-      } else {
-        const naoLinhas = [];
-        for (let a = 0; a < 9; a++) {
-          for (let b = a + 1; b < 9; b++) {
-            for (let c = b + 1; c < 9; c++) {
-              if (!CARD_LINES.some(l => l[0] === a && l[1] === b && l[2] === c)) naoLinhas.push([a, b, c]);
-            }
-          }
-        }
-        posicoes = naoLinhas[Math.floor(Math.random() * naoLinhas.length)].slice();
+      for (let passo = 0; passo < 9; passo++) {
+        const vazias = [0, 1, 2, 3, 4, 5, 6, 7, 8].filter(i => !preenchidas.has(i));
+        if (!vazias.length) break;
+
+        const pos = vazias[Math.floor(Math.random() * vazias.length)];
+        const antes = new Set(preenchidas);
+        preenchidas.add(pos);
+        const novas = cartaLinhasNovas(antes, preenchidas);
+        const full = preenchidas.size === 9;
+
+        quedas.push({
+          positions: [pos],
+          connected: full || novas.length > 0,
+          line: novas.length ? novas[Math.floor(Math.random() * novas.length)].slice() : null,
+          full,
+        });
+
+        if (full) break;
+        if (Math.random() >= CARD_DROP_CONTINUE) break; // deixou de cair: fim do bônus
       }
-      posicoes.forEach(p => preenchidas.add(p));
-      ondas.push({ positions: posicoes.slice().sort((a, b) => a - b), connected: !!linha, line: linha });
-
-      if (!linha) return ondas;
-
-      // 2ª onda: só desce +3 se completar alguma linha.
-      const vazias = [0, 1, 2, 3, 4, 5, 6, 7, 8].filter(i => !preenchidas.has(i));
-      const triplas = cartaCombinarTriplas(vazias);
-      const antes = new Set(preenchidas);
-      const conectam = [];
-      const naoConectam = [];
-      for (const t of triplas) {
-        const depois = new Set(antes);
-        t.forEach(p => depois.add(p));
-        const novas = cartaLinhasNovas(antes, depois);
-        if (novas.length) conectam.push({ positions: t, line: novas[Math.floor(Math.random() * novas.length)].slice() });
-        else naoConectam.push(t);
-      }
-
-      let escolhida = null;
-      let conectou = false;
-      let linha2 = null;
-      if (Math.random() < CARD_CONNECT_WAVE2 && conectam.length) {
-        const c = conectam[Math.floor(Math.random() * conectam.length)];
-        escolhida = c.positions; conectou = true; linha2 = c.line;
-      } else if (naoConectam.length) {
-        escolhida = naoConectam[Math.floor(Math.random() * naoConectam.length)];
-      } else if (conectam.length) {
-        const c = conectam[Math.floor(Math.random() * conectam.length)];
-        escolhida = c.positions; conectou = true; linha2 = c.line;
-      } else {
-        escolhida = triplas[Math.floor(Math.random() * triplas.length)];
-      }
-
-      escolhida.forEach(p => preenchidas.add(p));
-      ondas.push({ positions: escolhida.slice().sort((a, b) => a - b), connected: conectou, line: linha2 });
-
-      if (conectou) {
-        const restantes = [0, 1, 2, 3, 4, 5, 6, 7, 8].filter(i => !preenchidas.has(i));
-        restantes.forEach(p => preenchidas.add(p));
-        ondas.push({ positions: restantes, connected: true, line: null, full: true });
-      }
-      return ondas;
+      return quedas;
     }
 
-    function simularCompraBonusLocal(bet) {
+    // Espelho local da montagem do servidor, usado pela compra e pelo bônus natural.
+    function montarCartaLocal(bet) {
       const simbolo = cartaSortearSimbolo();
-      const ondas = cartaGerarOndas();
-      const posicoes = ondas.flatMap(o => o.positions);
+      const quedas = cartaGerarQuedas();
       const grid = Array(9).fill(null);
-      for (const p of posicoes) grid[p] = simbolo;
+      for (const q of quedas) {
+        for (const p of q.positions) grid[p] = simbolo;
+      }
 
-      const count = posicoes.length;
+      const count = quedas.reduce((s, q) => s + q.positions.length, 0);
       const full = count === 9;
       const perSymbol = cardBonusValues[simbolo] || CARD_VALUES_DEFAULT[simbolo] || 2.6;
       const mult = Math.round(count * perSymbol * (full ? cardFullMultiplier : 1) * 100) / 100;
@@ -2303,7 +2273,10 @@
         cardEvent: 'drop',
         cardSymbol: simbolo,
         cardFullBoard: full,
-        cardDrop: { symbol: simbolo, waves: ondas, count, full, perSymbol, fullMultiplier: cardFullMultiplier },
+        cardDrop: {
+          symbol: simbolo, waves: quedas, drops: quedas,
+          count, full, perSymbol, fullMultiplier: cardFullMultiplier,
+        },
         grid,
         bet,
         win,
@@ -2316,11 +2289,18 @@
       };
     }
 
+    function simularCompraBonusLocal(bet) {
+      return montarCartaLocal(bet);
+    }
+
     // Estrutura do Pool dos Carretéis: 7 células por coluna
     // [0..2] = As 3 células visíveis paradas
     // [3..6] = Células de animação para loop contínuo sem mexer no DOM
     const stripCells = [[], [], []];
     const stripImgs = [[], [], []];
+    // Cada compra da carta recebe um token. Ondas de rodadas antigas ficam
+    // proibidas de escrever na grade, mesmo se algum timer atrasar.
+    let cardRunToken = 0;
 
     function buildReelPool() {
       for (let col = 0; col < 3; col++) {
@@ -2402,6 +2382,16 @@
         audioCtx.resume();
       }
     }
+
+    // Economiza bateria/CPU quando o jogador troca de aba ou minimiza o app.
+    document.addEventListener('visibilitychange', () => {
+      if (!audioCtx) return;
+      if (document.hidden) {
+        audioCtx.suspend().catch(() => {});
+      } else if (soundOn) {
+        audioCtx.resume().catch(() => {});
+      }
+    });
 
     function startBgmScheduler() {
       if (bgmTimer) return;
@@ -2534,7 +2524,6 @@
         }
       }
       document.getElementById('winLinesSvg').innerHTML = '';
-      currentGrid = Array(9).fill(null);
     }
 
     function startInstantReelLoops() {
@@ -2587,7 +2576,7 @@
         const strip = document.getElementById('strip' + col);
         strip.className = 'reel-strip';
         for (let row = 0; row < 3; row++) {
-          stripImgs[col][row].src = ICON_BASE + currentGrid[col + row * 3] + '.webp';
+          stripImgs[col][row].src = ICON_BASE + lastFullGrid[col + row * 3] + '.webp';
           stripCells[col][row].classList.remove('win-cell', 'dim-cell', 'card-empty', 'card-landed', 'card-line');
         }
       }
@@ -2640,7 +2629,7 @@
     let _activeWinAmount = 0;
     let _winResolver = null;
 
-    function dispararCelebracaoWin(winAmount, betAmount, isFullBoard, jackpot) {
+    function dispararCelebracaoWin(winAmount, betAmount, isFullBoard, jackpot, badgeOverride, rainSymbols) {
       return new Promise(resolve => {
         _winResolver = resolve;
         _activeWinAmount = winAmount;
@@ -2654,7 +2643,7 @@
           badgeText = 'JACKPOT ZKN 1000x!';
         } else if (isFullBoard || mult >= 30) {
           tier = 'super';
-          badgeText = isFullBoard ? 'TELA CHEIA 5X — SUPER MEGA WIN' : 'SUPER MEGA WIN';
+          badgeText = badgeOverride || (isFullBoard ? 'TELA CHEIA 5X — SUPER MEGA WIN' : 'SUPER MEGA WIN');
         } else if (mult >= 15) {
           tier = 'mega';
           badgeText = 'MEGA WIN';
@@ -2668,7 +2657,7 @@
         const textoPorTier = {
           big: 'BIG WIN',
           mega: 'MEGA WIN',
-          super: isFullBoard ? 'TELA CHEIA 5X — SUPER MEGA WIN' : 'SUPER MEGA WIN',
+          super: badgeOverride || (isFullBoard ? 'TELA CHEIA 5X — SUPER MEGA WIN' : 'SUPER MEGA WIN'),
           jackpot: 'JACKPOT ZKN 1000x!'
         };
         // A classificação evolui junto com o valor contado — nunca é sorteada.
@@ -2687,7 +2676,9 @@
 
         setMascotState('win', badgeText + '!');
         playWinSound(tier);
-        const simbolosPremio = (Array.isArray(currentGrid) ? currentGrid.filter(s => s && s !== 'wild') : []);
+        const simbolosPremio = Array.isArray(rainSymbols) && rainSymbols.length
+          ? rainSymbols.slice()
+          : (Array.isArray(currentGrid) ? currentGrid.filter(s => s && s !== 'wild') : []);
         startCoinsShower(jackpot, simbolosPremio);
 
         // Animação rolante do contador de moedas de 0 até o valor final
@@ -2794,15 +2785,17 @@
       }
       if (!pool.length) pool = SYM_ORDER.slice();
 
-      const total = intenso ? 90 : 38;
+      const total = intenso
+        ? (window.innerWidth < 540 ? 40 : 70)
+        : (window.innerWidth < 540 ? 20 : 34);
       for (let i = 0; i < total; i++) {
         const id = pool[Math.floor(Math.random() * pool.length)];
         simObj(id); // pré-carrega
         _coins.push({
           x: Math.random() * cvs.width,
           y: Math.random() * -cvs.height,
-          size: (intenso ? 34 : 26) + Math.random() * (intenso ? 26 : 18),
-          speedY: (intenso ? 5 : 3.5) + Math.random() * (intenso ? 8 : 5),
+          size: (intenso ? 34 : 26) + Math.random() * (intenso ? 22 : 14),
+          speedY: (intenso ? 5 : 3.5) + Math.random() * (intenso ? 7 : 4.5),
           speedX: -1.5 + Math.random() * 3,
           rot: Math.random() * Math.PI,
           rotSpeed: -0.04 + Math.random() * 0.08,
@@ -2810,8 +2803,15 @@
         });
       }
 
-      function renderCoins() {
+      let _lastFrame = 0;
+      function renderCoins(now) {
+        _coinsCanvasAnim = requestAnimationFrame(renderCoins);
+        // Chuva decorativa roda a ~30fps e pausa com a aba oculta.
+        if (document.hidden || now - _lastFrame < 32) return;
+        _lastFrame = now;
+
         ctx.clearRect(0, 0, cvs.width, cvs.height);
+        ctx.globalAlpha = 0.92;
         _coins.forEach(c => {
           c.y += c.speedY;
           c.x += c.speedX;
@@ -2822,21 +2822,14 @@
           }
 
           const img = simObj(c.id);
-          ctx.save();
-          ctx.translate(c.x, c.y);
-          ctx.rotate(c.rot);
           if (img.complete && img.naturalWidth > 0) {
-            ctx.globalAlpha = 0.92;
+            ctx.save();
+            ctx.translate(c.x, c.y);
+            ctx.rotate(c.rot);
             ctx.drawImage(img, -c.size / 2, -c.size / 2, c.size, c.size);
-          } else {
-            ctx.fillStyle = '#f4e83a';
-            ctx.beginPath();
-            ctx.arc(0, 0, c.size / 3, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.restore();
           }
-          ctx.restore();
         });
-        _coinsCanvasAnim = requestAnimationFrame(renderCoins);
       }
       if (_coinsCanvasAnim) cancelAnimationFrame(_coinsCanvasAnim);
       _coinsCanvasAnim = requestAnimationFrame(renderCoins);
@@ -2856,9 +2849,6 @@
        UI SYNC & CONTROLES
        ============================================================ */
     function syncBonusUI() {
-      // Não existe mais bônus de 10 giros: só a compra da carta.
-      const hud = document.getElementById('bonusHud');
-      if (hud) hud.classList.remove('show');
       const buyBtn = document.getElementById('buyBonusBtn');
       const spinBtn = document.getElementById('spinBtn');
       const chips = [document.getElementById('betMinus'), document.getElementById('betPlus'), document.getElementById('betListBtn')].filter(Boolean);
@@ -2897,20 +2887,20 @@
     }
 
     function stepBet(dir) {
-      if (isSpinning || (activeBonus && activeBonus.spinsLeft > 0)) return;
+      if (isSpinning) return;
       const i = allowedBets.indexOf(currentBet);
       const next = Math.max(0, Math.min(allowedBets.length - 1, (i < 0 ? 0 : i) + dir));
       setBet(allowedBets[next]);
     }
 
     function toggleBetList() {
-      if (isSpinning || (activeBonus && activeBonus.spinsLeft > 0)) return;
+      if (isSpinning) return;
       const list = document.getElementById('betList');
       if (list) list.classList.toggle('open');
     }
 
     function setBet(val) {
-      if (isSpinning || (activeBonus && activeBonus.spinsLeft > 0)) return;
+      if (isSpinning) return;
       currentBet = Number(val);
       renderBetChips();
       playTone(520, 0.05, 'sine', 0.06);
@@ -2983,16 +2973,18 @@
       return { col: pos % 3, row: Math.floor(pos / 3) };
     }
 
-    async function animarOndasCarta(d) {
+    async function animarOndasCarta(d, runToken) {
       const queda = d && d.cardDrop;
       const ondas = queda && Array.isArray(queda.waves) ? queda.waves : [];
       if (!queda || !ondas.length) return;
+      if (runToken !== undefined && runToken !== cardRunToken) return;
 
       // Garante que a grade esteja realmente vazia antes da primeira onda.
       prepararGradeCarta();
       const simbolo = queda.symbol;
 
       for (let wi = 0; wi < ondas.length; wi++) {
+        if (runToken !== undefined && runToken !== cardRunToken) return;
         const onda = ondas[wi];
         const posicoes = Array.isArray(onda.positions) ? onda.positions : [];
         const jobs = posicoes.map((pos, i) => {
@@ -3001,9 +2993,9 @@
           const img = stripImgs[col] && stripImgs[col][row];
           if (!cell || !img) return Promise.resolve();
 
-          cell.classList.remove('card-empty', 'card-line');
           cell.classList.add('card-landed');
           img.src = ICON_BASE + simbolo + '.webp';
+          cell.classList.remove('card-empty', 'card-line');
 
           if (REDUCE_MOTION) return Promise.resolve();
           const fromY = -CELL_H * (row + 1) - 14;
@@ -3042,7 +3034,8 @@
       await new Promise(r => setTimeout(r, isTurbo ? 80 : 140));
     }
 
-    function finalizarGradeCarta(d) {
+    function finalizarGradeCarta(d, runToken) {
+      if (runToken !== undefined && runToken !== cardRunToken) return;
       const grid = Array.isArray(d.grid) ? d.grid : [];
       for (let i = 0; i < 9; i++) {
         const { col, row } = celulaDaPosicao(i);
@@ -3105,17 +3098,23 @@
       setTimeout(() => tag.classList.remove('near-flash'), 900);
     }
 
-    async function concluirResultado(d) {
+    async function concluirResultado(d, runToken, jaAnimado) {
       const winAmt = Number(d.win || 0);
       const betUsed = Number(d.bet || currentBet);
       const msgEl = document.getElementById('slotMsg');
       const winEl = document.getElementById('winVal');
 
-      // ===== BÔNUS DA CARTA =====
+      // ===== BÔNUS DA CARTA (comprado ou caído no giro) =====
       // Caminho próprio: NÃO passa por stopReelsCascade, para as casas vazias
       // continuarem vazias e só o símbolo sorteado aparecer.
       if (d.cardBonus) {
-        finalizarGradeCarta(d);
+        // Na compra a cinemática já rodou antes; no giro normal ela roda aqui.
+        if (!jaAnimado) {
+          document.getElementById('winLinesSvg').innerHTML = '';
+          await animarCarta(d);
+          await animarOndasCarta(d);
+        }
+        finalizarGradeCarta(d, runToken);
         winEl.textContent = fmtBRL(winAmt);
 
         if (d.mode === 'real' && typeof d.balance === 'number') {
@@ -3126,18 +3125,19 @@
 
         const nomeSimbolo = (SYM_MAP[d.cardSymbol] && SYM_MAP[d.cardSymbol].name) || 'símbolo da carta';
         const qtd = (d.cardDrop && d.cardDrop.count) || 0;
+        const origem = d.bonusFromSpin ? 'O bônus caiu no giro! ' : '';
 
         if (d.cardFullBoard) {
-          msgEl.textContent = 'GRADE COMPLETA com ' + qtd + 'x ' + nomeSimbolo + ' — ' + cardFullMultiplier + 'x! Ganho: ' + fmtBRL(winAmt);
+          msgEl.textContent = origem + 'GRADE COMPLETA com ' + qtd + 'x ' + nomeSimbolo + ' — ' + cardFullMultiplier + 'x! Ganho: ' + fmtBRL(winAmt);
           setMascotState('win', 'GRADE COMPLETA ' + cardFullMultiplier + 'x!');
-          await dispararCelebracaoWin(winAmt, betUsed, false, false, 'GRADE COMPLETA ' + cardFullMultiplier + 'x');
+          await dispararCelebracaoWin(winAmt, betUsed, false, false, 'GRADE COMPLETA ' + cardFullMultiplier + 'x', [d.cardSymbol]);
         } else if (winAmt > 0) {
-          msgEl.textContent = 'A carta soltou ' + qtd + 'x ' + nomeSimbolo + '. Ganho: ' + fmtBRL(winAmt) + '. Não completou a grade — pagou só o que conectou.';
+          msgEl.textContent = origem + 'A cascata soltou ' + qtd + 'x ' + nomeSimbolo + ' e parou antes de completar a grade. Ganho: ' + fmtBRL(winAmt) + '.';
           setMascotState('win', '+' + fmtBRL(winAmt));
           playWinSound('big');
         } else {
           setMascotState('idle');
-          msgEl.textContent = 'A carta não conectou desta vez.';
+          msgEl.textContent = origem + 'A carta não soltou nenhum símbolo desta vez.';
         }
 
         syncBonusUI();
@@ -3158,6 +3158,7 @@
       // Para os carretéis em cascata suave
       await stopReelsCascade(d.grid, winCellSet);
       currentGrid = d.grid;
+      lastFullGrid = d.grid.slice();
       const ratioPremio = winAmt / (betUsed || 0.5);
       const linhaTier = d.jackpot || ratioPremio >= 1000 ? 'jackpot'
         : ratioPremio >= 30 ? 'super' : ratioPremio >= 15 ? 'mega' : 'big';
@@ -3210,10 +3211,9 @@
       if (!gameReady || isSpinning) return;
       unlockAudio();
 
-      const inBonus = !!(activeBonus && activeBonus.spinsLeft > 0);
-      const debitBet = inBonus ? 0 : currentBet;
+      const debitBet = currentBet;
 
-      if (debitBet > 0 && currentBalance + 0.0001 < debitBet) {
+      if (currentBalance + 0.0001 < debitBet) {
         if (currentMode === 'demo') {
           updateBalanceUI(1000);
         } else {
@@ -3229,10 +3229,10 @@
       document.getElementById('buyBonusBtn').disabled = true;
       document.getElementById('winLinesSvg').innerHTML = '';
       document.getElementById('winVal').textContent = fmtBRL(0);
-      document.getElementById('slotMsg').textContent = inBonus ? 'Rodada grátis...' : 'Girando...';
+      document.getElementById('slotMsg').textContent = 'Girando...';
 
       startInstantReelLoops();
-      setMascotState('spinning', inBonus ? 'Bora pro Bônus!' : 'Boa sorte!');
+      setMascotState('spinning', 'Boa sorte!');
       playTone(330, 0.07, 'sine', 0.08);
 
       if (currentMode === 'demo' && debitBet > 0) {
@@ -3243,65 +3243,7 @@
         let resData;
         if (!isUserLoggedIn) {
           await new Promise(r => setTimeout(r, isTurbo ? 100 : 250));
-          const fsActive = !!(activeBonus && activeBonus.spinsLeft > 0);
-          if (fsActive) {
-            activeBonus.spinsLeft--;
-            const sim = simularGiroLocal(activeBonus.bet || currentBet, true, activeBonus.multiplier);
-            let retriggered = false;
-            let extraSpins = 0;
-            if (sim.outcome.isBonusTrigger) {
-              retriggered = true;
-              extraSpins = 5;
-              activeBonus.spinsLeft += 5;
-              activeBonus.totalSpins += 5;
-            }
-            activeBonus.totalWin = Math.round(((activeBonus.totalWin || 0) + sim.outcome.winAmount) * 100) / 100;
-            resData = {
-              ok: true,
-              mode: 'demo',
-              isFreeSpin: true,
-              retriggered,
-              extraSpins,
-              grid: sim.grid,
-              bet: activeBonus.bet || currentBet,
-              win: sim.outcome.winAmount,
-              winLines: sim.outcome.winLines,
-              isFullBoard: sim.outcome.isFullBoard,
-              jackpot: !!sim.outcome.jackpot,
-              jackpotMultiplier: sim.outcome.jackpot ? sim.outcome.jackpotMultiplier : 0,
-              nearJackpot: !!sim.outcome.nearJackpot,
-              freeSpins: { ...activeBonus }
-            };
-          } else {
-            const sim = simularGiroLocal(currentBet, false, 1);
-            let bonusTriggered = false;
-            let fsInfo = null;
-            if (sim.outcome.isBonusTrigger) {
-              bonusTriggered = true;
-              fsInfo = {
-                spinsLeft: freeSpinsCount,
-                totalSpins: freeSpinsCount,
-                multiplier: freeSpinsMult,
-                totalWin: 0,
-                bet: currentBet
-              };
-            }
-            resData = {
-              ok: true,
-              mode: 'demo',
-              isFreeSpin: false,
-              bonusTriggered,
-              freeSpins: fsInfo,
-              grid: sim.grid,
-              bet: currentBet,
-              win: sim.outcome.winAmount,
-              winLines: sim.outcome.winLines,
-              isFullBoard: sim.outcome.isFullBoard,
-              jackpot: !!sim.outcome.jackpot,
-              jackpotMultiplier: sim.outcome.jackpot ? sim.outcome.jackpotMultiplier : 0,
-              nearJackpot: !!sim.outcome.nearJackpot
-            };
-          }
+          resData = simularGiroLocal(currentBet);
         } else {
           const res = await ZKNAuth.api('/originals/slot777/spin', {
             method: 'POST',
@@ -3342,7 +3284,7 @@
     }
 
     function abrirModalCompraBonus() {
-      if (!gameReady || isSpinning || (activeBonus && activeBonus.spinsLeft > 0)) return;
+      if (!gameReady || isSpinning) return;
       const buyCost = Math.round(currentBet * bonusBuyMult * 100) / 100;
       document.getElementById('buyModalBet').textContent = fmtBRL(currentBet);
       document.getElementById('buyModalCost').textContent = fmtBRL(buyCost);
@@ -3370,6 +3312,7 @@
         particles.innerHTML = html;
       }
       if (cine) { cine.classList.remove('run'); void cine.offsetWidth; cine.classList.add('run'); }
+      if (cine) setTimeout(() => cine.classList.remove('run'), 1250);
       unlockAudio();
       playTone(392, 0.18, 'triangle', 0.12);
       setTimeout(() => playTone(523, 0.18, 'triangle', 0.12), 110);
@@ -3380,56 +3323,53 @@
 
     async function confirmarCompraBonus() {
       if (isSpinning) return;
-      unlockAudio();
-      await sequenciaBonus();
-      const buyCost = Math.round(currentBet * bonusBuyMult * 100) / 100;
-      if (currentBalance + 0.0001 < buyCost) {
-        if (currentMode === 'demo') {
-          updateBalanceUI(1000);
-        } else {
-          fecharModalCompraBonus();
-          document.getElementById('slotMsg').textContent = 'Saldo insuficiente (' + fmtBRL(buyCost) + ').';
-          return;
-        }
-      }
 
-      fecharModalCompraBonus();
+      // Trava IMEDIATAMENTE: a sequência de abertura tem ~1s e, sem essa trava,
+      // toques repetidos no confirmar iniciavam duas cartas ao mesmo tempo.
+      // As ondas de uma rodada antiga escreviam por cima da nova e mostravam
+      // símbolos diferentes do sorteado.
       isSpinning = true;
-      document.getElementById('spinBtn').disabled = true;
-      document.getElementById('buyBonusBtn').disabled = true;
-      document.getElementById('winLinesSvg').innerHTML = '';
-      document.getElementById('slotMsg').textContent = 'Ativando Bônus 10 Rodadas...';
+      const runToken = ++cardRunToken;
+      const spinBtn = document.getElementById('spinBtn');
+      const buyBtn = document.getElementById('buyBonusBtn');
+      if (spinBtn) spinBtn.disabled = true;
+      if (buyBtn) buyBtn.disabled = true;
+      fecharModalCompraBonus();
 
-      startInstantReelLoops();
-      setMascotState('spinning', 'PREPARANDO BÔNUS!');
+      const buyCost = Math.round(currentBet * bonusBuyMult * 100) / 100;
+      unlockAudio();
 
-      if (currentMode === 'demo') {
-        updateBalanceUI(currentBalance - buyCost);
-      }
+      // A grade já começa vazia, antes mesmo da cinemática de abertura.
+      prepararGradeCarta();
+      document.getElementById('slotMsg').textContent = 'Preparando a carta...';
+      setMascotState('spinning', 'PREPARANDO A CARTA!');
 
+      let debited = false;
       try {
+        await sequenciaBonus();
+
+        if (currentBalance + 0.0001 < buyCost) {
+          if (currentMode === 'demo') {
+            updateBalanceUI(1000);
+          } else {
+            stopReelsEmergency();
+            setMascotState('idle');
+            document.getElementById('slotMsg').textContent = 'Saldo insuficiente (' + fmtBRL(buyCost) + ').';
+            return;
+          }
+        }
+
+        document.getElementById('winLinesSvg').innerHTML = '';
+
+        if (currentMode === 'demo') {
+          updateBalanceUI(currentBalance - buyCost);
+          debited = true;
+        }
+
         let resData;
         if (!isUserLoggedIn) {
           await new Promise(r => setTimeout(r, isTurbo ? 100 : 250));
-          const sim = simularCompraBonusLocal(currentBet);
-          resData = {
-            ok: true,
-            mode: 'demo',
-            cardBonus: true,
-            cardEvent: sim.cardEvent,
-            cardSymbol: sim.cardSymbol,
-            cardFullBoard: sim.cardFullBoard,
-            cardDrop: sim.cardDrop,
-            grid: sim.grid,
-            bet: currentBet,
-            win: sim.outcome.winAmount,
-            winLines: sim.outcome.winLines,
-            isFullBoard: sim.outcome.isFullBoard,
-            boardMultiplier: sim.outcome.boardMultiplier,
-            totalMultiplier: sim.outcome.totalMultiplier,
-            jackpot: false,
-            nearJackpot: false,
-          };
+          resData = simularCompraBonusLocal(currentBet);
         } else {
           const res = await ZKNAuth.api('/originals/slot777/buy-bonus', {
             method: 'POST',
@@ -3439,22 +3379,34 @@
             stopReelsEmergency();
             setMascotState('idle');
             document.getElementById('slotMsg').textContent = (res.data && res.data.message) || 'Erro ao comprar bônus.';
-            if (currentMode === 'demo') updateBalanceUI(currentBalance + buyCost);
+            if (currentMode === 'demo' && debited) updateBalanceUI(currentBalance + buyCost);
             return;
           }
           resData = res.data;
         }
+
+        // Uma rodada mais nova já assumiu a grade: esta não pode mais escrever nada.
+        if (runToken !== cardRunToken) return;
+
+        // Mostra a compra descontada enquanto a carta é revelada e os símbolos caem.
+        if (resData.mode === 'real' && typeof resData.balance === 'number') {
+          updateBalanceUI(Math.max(0, resData.balance - Number(resData.win || 0)));
+        }
+
         await animarCarta(resData);
-        await animarQuedaCarta(resData);
-        await concluirResultado(resData);
+        await animarOndasCarta(resData, runToken);
+        await concluirResultado(resData, runToken, true);
       } catch (e) {
         stopReelsEmergency();
         setMascotState('idle');
         document.getElementById('slotMsg').textContent = 'Erro de conexão.';
+        if (currentMode === 'demo' && debited) updateBalanceUI(currentBalance + buyCost);
       } finally {
-        isSpinning = false;
-        document.getElementById('spinBtn').disabled = false;
-        syncBonusUI();
+        if (runToken === cardRunToken) {
+          isSpinning = false;
+          if (spinBtn) spinBtn.disabled = false;
+          syncBonusUI();
+        }
       }
     }
 
@@ -3487,7 +3439,9 @@
       }
       unlockAudio();
       playTone(587, 0.09, 'sine', 0.1);
-      document.getElementById('loaderScreen').classList.add('done');
+      const ls = document.getElementById('loaderScreen');
+      ls.classList.add('done');
+      setTimeout(() => { if (ls.classList.contains('done')) ls.style.display = 'none'; }, 460);
       gameReady = true;
       setMascotState('idle', 'Boa sorte na ZKN!');
     }
@@ -3555,10 +3509,9 @@
               allowedBets: DEFAULT_BETS,
               targetRtp: 95.0,
               bonusBuyMult: 30,
-              freeSpinsCount: 10,
-              freeSpinsMult: 4,
-              symbols: SYM_ORDER.map(id => ({ id: SYM_MAP[id].id, name: SYM_MAP[id].name, mult: SYM_MAP[id].mult })),
-              activeBonus: null
+              cardBonusValues: CARD_VALUES_DEFAULT,
+              cardFullMultiplier: CARD_FULL_MULT_DEFAULT,
+              symbols: SYM_ORDER.map(id => ({ id: SYM_MAP[id].id, name: SYM_MAP[id].name, mult: SYM_MAP[id].mult }))
             }
           }).then(res => { tick(); return res; });
       const results = await Promise.all([...preloadImgs, infoPromise]);
@@ -3572,10 +3525,12 @@
         allowedBets = Array.isArray(d.allowedBets) && d.allowedBets.length ? d.allowedBets : DEFAULT_BETS;
         if (!allowedBets.includes(currentBet)) currentBet = allowedBets[0];
         bonusBuyMult = Number(d.bonusBuyMult || 30);
-        freeSpinsCount = Number(d.freeSpinsCount || 10);
-        freeSpinsMult = Number(d.freeSpinsMult || 4);
-        activeBonus = d.activeBonus || null;
-        if (activeBonus && activeBonus.bet) currentBet = activeBonus.bet;
+        if (d.cardBonusValues && typeof d.cardBonusValues === 'object') {
+          cardBonusValues = { ...CARD_VALUES_DEFAULT, ...d.cardBonusValues };
+        }
+        cardFullMultiplier = Number(d.cardFullMultiplier || CARD_FULL_MULT_DEFAULT);
+        if (Number(d.cardDropContinueChance) > 0) CARD_DROP_CONTINUE = Number(d.cardDropContinueChance);
+        if (Number(d.naturalBonusChance) > 0) NATURAL_BONUS_CHANCE = Number(d.naturalBonusChance);
 
         const modeEl = document.getElementById('modeTag');
         modeEl.textContent = currentMode.toUpperCase();
