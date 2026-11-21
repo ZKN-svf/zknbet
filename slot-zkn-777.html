@@ -1877,7 +1877,6 @@
     <section class="slot-cabinet">
       <div class="slot-info-strip">
         <span>Bônus na compra</span>
-        <span id="rtpBadge">RTP 95%</span>
         <span>Tela Cheia 5x</span>
       </div>
 
@@ -2983,8 +2982,6 @@
       }
       const jackpotEl = document.getElementById('jackpotTag');
       if (jackpotEl) jackpotEl.textContent = 'JACKPOT ' + Number(d.jackpotMultiplier || 1000) + 'x';
-      const rtpEl = document.getElementById('rtpBadge');
-      if (rtpEl) rtpEl.textContent = 'RTP ' + Number(d.targetRtp || 95).toFixed(1).replace('.0', '') + '%';
       const btnSpan = document.getElementById('buyBonusBtn') && document.getElementById('buyBonusBtn').querySelector('span');
       if (btnSpan) btnSpan.textContent = 'COMPRAR CARTA';
 
