@@ -1992,7 +1992,7 @@
       </div>
       <div class="pay-grid" id="payGrid"></div>
       <p class="pay-note">
-        <strong>Bônus da carta:</strong> a carta revela um símbolo — o wild também pode sair. A grade começa vazia e <strong>apenas esse símbolo</strong> cai, um de cada vez. Cada símbolo que cai numa casa vazia dá chance de cair o próximo; se parar de cair, o bônus acaba. Se você tiver sorte de completar as 9 casas, a grade fecha e paga <strong>10x</strong>.<br><br>
+        <strong>Bônus da carta:</strong> a carta revela um símbolo — o wild também pode sair. A grade começa vazia e <strong>apenas esse símbolo</strong> cai, um de cada vez. O bônus só para quando não sobrar espaço ou quando os símbolos pararem de conectar — e é <strong>obrigatório formar pelo menos 1 linha</strong>. Se você tiver sorte de completar as 9 casas, a grade fecha e paga <strong>10x</strong>.<br><br>
         <strong>Bônus no giro:</strong> além de comprado, o bônus pode cair de graça no giro normal (cerca de 1 em 250 giros).<br><br>
         <strong>Ameaça do coelho:</strong> às vezes ele só finge soltar a carta no giro normal — isso é efeito visual e não muda o resultado.<br><br>
         <strong>Tela Cheia 5x:</strong> preencher os 9 espaços com o mesmo símbolo no giro normal multiplica o prêmio por <strong>5x</strong>!<br><br>
@@ -2055,7 +2055,7 @@
     ];
     const CARD_VALUES_DEFAULT = { clover: 2.6, coin: 2.7, ruby: 2.8, bell: 2.9, seven: 3.0, crown: 3.1, wild: 3.2 };
     // Cascata: cada queda que acerta uma casa vazia dá chance à próxima.
-    let CARD_DROP_CONTINUE = 0.735;
+    let CARD_DROP_CONTINUE = 0.49;
     let NATURAL_BONUS_CHANCE = 0.004; // ~1 em 250 giros
     const CARD_FULL_MULT_DEFAULT = 10;
     const DEFAULT_BETS = [0.5, 1, 2, 5, 10, 20, 25, 50, 100, 200, 500];
@@ -2227,6 +2227,7 @@
     function cartaGerarQuedas() {
       const preenchidas = new Set();
       const quedas = [];
+      let conectouAlguma = false;
 
       for (let passo = 0; passo < 9; passo++) {
         const vazias = [0, 1, 2, 3, 4, 5, 6, 7, 8].filter(i => !preenchidas.has(i));
@@ -2236,6 +2237,7 @@
         const antes = new Set(preenchidas);
         preenchidas.add(pos);
         const novas = cartaLinhasNovas(antes, preenchidas);
+        if (novas.length) conectouAlguma = true;
         const full = preenchidas.size === 9;
 
         quedas.push({
@@ -2246,7 +2248,9 @@
         });
 
         if (full) break;
-        if (Math.random() >= CARD_DROP_CONTINUE) break; // deixou de cair: fim do bônus
+        // Só encerra por "não conectar" se já houver ao menos 1 linha ligada.
+        if (!conectouAlguma) continue;
+        if (Math.random() >= CARD_DROP_CONTINUE) break;
       }
       return quedas;
     }
@@ -3060,15 +3064,15 @@
           cell.classList.remove('card-empty', 'card-line');
 
           if (REDUCE_MOTION) return Promise.resolve();
-          const fromY = -CELL_H * (row + 1) - 14;
+          // Queda suave e leve: só translacão + opacidade, sem rotação/scale estressante.
+          const fromY = -CELL_H * (row + 1) - 18;
           const anim = img.animate([
-            { transform: 'translate3d(0,' + fromY + 'px,0) scale(0.6) rotate(-16deg)', opacity: 0, offset: 0 },
-            { transform: 'translate3d(0,6px,0) scale(1.14) rotate(2deg)', opacity: 1, offset: 0.72 },
-            { transform: 'translate3d(0,0,0) scale(1) rotate(0deg)', opacity: 1, offset: 1 },
+            { transform: 'translate3d(0,' + fromY + 'px,0)', opacity: 0, offset: 0 },
+            { transform: 'translate3d(0,0,0)', opacity: 1, offset: 1 },
           ], {
-            duration: (isTurbo ? 210 : 340) + i * (isTurbo ? 20 : 40),
-            delay: i * (isTurbo ? 15 : 35),
-            easing: 'cubic-bezier(0.2, 0.85, 0.25, 1)',
+            duration: (isTurbo ? 480 : 820) + i * (isTurbo ? 30 : 55),
+            delay: i * (isTurbo ? 20 : 45),
+            easing: 'cubic-bezier(0.25, 0.6, 0.3, 1)',
             fill: 'backwards',
           });
           return anim.finished.catch(() => {});
@@ -3086,14 +3090,15 @@
             if (cell) cell.classList.add('card-line');
           });
           playTone(660, 0.1, 'sine', 0.1);
-          setTimeout(() => playTone(880, 0.12, 'sine', 0.1), 90);
-          await new Promise(r => setTimeout(r, isTurbo ? 220 : 420));
+          setTimeout(() => playTone(880, 0.12, 'sine', 0.1), 110);
+          await new Promise(r => setTimeout(r, isTurbo ? 420 : 850));
         } else {
-          await new Promise(r => setTimeout(r, isTurbo ? 90 : 160));
+          await new Promise(r => setTimeout(r, isTurbo ? 240 : 520));
         }
       }
 
-      await new Promise(r => setTimeout(r, isTurbo ? 80 : 140));
+      // Pausa final para o jogador ver a grade montada antes do resultado.
+      await new Promise(r => setTimeout(r, isTurbo ? 260 : 900));
     }
 
     function finalizarGradeCarta(d, runToken) {
@@ -3144,11 +3149,11 @@
         if (navigator.vibrate) navigator.vibrate(10);
         await new Promise(r => setTimeout(r, isTurbo ? 520 : 950));
       } else {
-        // Soltura: voo curto até o centro (mais leve) + impacto se fechou o 3x3.
+        // Soltura: voo até o centro + impacto, com tempo para apreciar o bônus.
         playTone(320, 0.08, 'triangle', 0.08);
         setTimeout(() => playTone(660, 0.1, 'sine', 0.1), 180);
         if (navigator.vibrate) navigator.vibrate(d.cardFullBoard ? 30 : 14);
-        await new Promise(r => setTimeout(r, isTurbo ? 480 : 860));
+        await new Promise(r => setTimeout(r, isTurbo ? 700 : 1400));
       }
       cine.classList.remove('run', 'threat', 'drop', 'full');
     }
@@ -3380,7 +3385,7 @@
       playTone(392, 0.18, 'triangle', 0.12);
       setTimeout(() => playTone(523, 0.18, 'triangle', 0.12), 110);
       setTimeout(() => playTone(784, 0.28, 'sine', 0.14), 240);
-      await new Promise(r => setTimeout(r, isTurbo ? 480 : 900));
+      await new Promise(r => setTimeout(r, isTurbo ? 700 : 1400));
       if (buy) buy.classList.remove('cine-pulse');
     }
 

@@ -20,7 +20,7 @@ function extractFunction(name) {
 
 const code = [
   'const CARD_LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];',
-  'const CARD_DROP_CONTINUE = 0.735;',
+  'const CARD_DROP_CONTINUE = 0.49;',
   'const CARD_VALUES_DEFAULT = { clover: 2.6, coin: 2.7, ruby: 2.8, bell: 2.9, seven: 3.0, crown: 3.1, wild: 3.2 };',
   'const cardFullMultiplier = 10;',
   "const SYM_ORDER = ['clover','coin','ruby','bell','seven','crown','wild'];",
